@@ -1,17 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import Http from "./http.js";
 import http from "./http";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [text, setText] = useState("");
+  const [writer, setWriter] = useState(true);
+  let timeout = null;
 
+  useEffect(() => {
+    http.socket_listener((message) => {
+      setText(message);
+    })
+  })
+
+  
   return (
     <div className="App">
-      <p onClick={() => http.socket()}>Socket request</p>
-      {/* <p onClick={() => setCount(count + 1)}>Count is {count}</p> */}
-      <p onClick={() => http.get()}>Get req</p>
+      <button onClick={() => setWriter(!writer)}>Change account type</button>
+      {
+        writer ? 
+        <textarea onChange={(e) => {
+          clearTimeout(timeout);
+          let a = e.target.value;
+          timeout = setTimeout(() => {
+            http.send_message(a);
+          }, 500);
+        }}></textarea>
+
+        :
+        <div>
+          <p>Text below</p>
+          <p>{text}</p>
+        </div>
+      }
     </div>
   );
 }

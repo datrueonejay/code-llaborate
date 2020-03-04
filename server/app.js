@@ -2,21 +2,18 @@ var express = require("express");
 var app = express();
 var expressWs = require("express-ws")(app);
 
-app.use(function(req, res, next) {
-  console.log("middleware");
-  req.testing = "testing";
-  return next();
-});
-
 app.get("/", function(req, res, next) {
-  console.log("get route", req.testing);
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+
   return res.send("Get route");
 });
 
 app.ws("/", function(ws, req) {
   ws.on("message", function(msg) {
-    console.log("socket", req.testing);
-    ws.send("Socket route");
+    expressWs.getWss().clients.forEach((client) => {
+      client.send(msg);
+    })
+
   });
 });
 
