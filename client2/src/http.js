@@ -5,29 +5,27 @@ let http = (function() {
   const listeners = [];
 
   exampleSocket.onopen = () => {
-    console.log("connection and opened")
-  }
-
-  exampleSocket.onerror = function (error) {
-    console.log('WebSocket Error ' + error);
+    console.log("connection and opened");
   };
 
-  exampleSocket.onmessage = function (e) {
-    console.log('Server: ' + e.data);
+  exampleSocket.onerror = function(error) {
+    console.log("WebSocket Error " + error);
+  };
+
+  exampleSocket.onmessage = function(e) {
+    console.log("Server: " + e.data);
     listeners.forEach(listener => {
       listener(e.data);
-    })
+    });
   };
-
 
   let module = {};
 
-
-  module.socket_listener = (listener) => {
+  module.socket_listener = listener => {
     listeners.push(listener);
-  }
+  };
 
-  module.send_message = (message) => exampleSocket.send(message);
+  module.send_message = message => exampleSocket.send(message);
   return module;
 })();
 
