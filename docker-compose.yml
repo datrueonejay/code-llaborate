@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  redis:
+    container_name: redis_container
+    image: redis
+    expose:
+      - 6379
+    # ports: 
+    #   - 6379:6379
+  server:
+    container_name: ws_container
+    build: ./websocket_server
+    expose:
+      - 3001
+
+    depends_on:
+      - redis
+  client:
+    container_name: client_container
+    build: ./client2
+    ports: 
+      - 3000:3000
+    depends_on:
+      - server
+# TODO: Fix client, for some reason it does not connect to the server???

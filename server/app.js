@@ -1,21 +1,36 @@
-var express = require("express");
-var app = express();
-var expressWs = require("express-ws")(app);
+let express = require("express");
+let app = express();
+let expressWs = require("express-ws")(app);
+let redis = require("redis");
+
+const client = redis.createClient();
 
 messages = [];
 
 app.get("/", function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-
+  console.log("GET ROUTE");
   return res.send("Get route");
 });
 
 app.ws("/", function(ws, req) {
   ws.on("message", function(msg) {
-    expressWs.getWss().clients.forEach((client) => {
+    console.log("SOCKET MESSAGE");
+    client.set("doc", msg);
+    expressWs.getWss().clients.forEach(client => {
       console.log(msg);
       client.send(msg);
-    })
+    });
+  });
+  //TODO: Fix this to connection and repush to dockerhub
+  ws.on("connection", function(ws) {
+    ws.send("AOSIJDOASIDJ");
+    client.get("doc", (err, res) => {
+      if (err) {
+        ws.send(`Error: ${err}`);
+      } else {
+        ws.send(res);
+      }
+    });
   });
 });
 
@@ -24,13 +39,16 @@ app.ws("/addmessage", function(ws, req) {
     console.log("Received message from client", msg);
     let message = {
       content: `${msg}`
-    }
+    };
     messages.push(message);
-    console.log("Updated messages", messages, typeof(messages));
-    expressWs.getWss().clients.forEach((client) => {
+    console.log("Updated messages", messages, typeof messages);
+    expressWs.getWss().clients.forEach(client => {
       client.send(JSON.stringify(messages));
-    })
-  })
-})
+    });
+  });
+});
 
-app.listen(3001);
+app.listen(3001, err => {
+  if (err) console.log(err);
+  else console.log("HTTP server on http://localhost:3001");
+});

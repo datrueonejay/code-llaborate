@@ -1,11 +1,12 @@
 let http = (function() {
-  const axios = require("axios").default;
-  const exampleSocket = new WebSocket("ws://localhost:3001");
+  // const exampleSocket = new WebSocket("ws://localhost:3001");
+  const exampleSocket = new WebSocket("ws://server:3001");
 
   const listeners = [];
 
-  exampleSocket.onopen = () => {
+  exampleSocket.onopen = e => {
     console.log("connection and opened");
+    console.log("Server: " + e.data);
   };
 
   exampleSocket.onerror = function(error) {
