@@ -12,12 +12,19 @@ services:
     build: ./websocket_server
     expose:
       - 3001
-
+    # ports:
+    #   - 3001:3001
+    environment:
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - redis
   client:
     container_name: client_container
+    environment:
+      - REACT_APP_SOCKET_URL=ws://server:3001
     build: ./client2
+    # expose:
+    #   - 3000
     ports: 
       - 3000:3000
     depends_on:
