@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import logo from "./logo.svg";
-import "./App.css";
-import Http from "./http.js";
-import http from "./http";
+import Http from "../http.js";
+import http from "../http";
+import "./Editor.css";
 
-function App(props) {
+
+export default function Editor(props) {
   const [text, setText] = useState("");
   const [writer, setWriter] = useState(false);
   let timeout = null;
@@ -16,7 +16,7 @@ function App(props) {
   });
 
     return (
-        <div className="App">
+        <div className="codeText">
         {props.isStudent ?  (
             <div>
             <p>Text below</p>
@@ -25,7 +25,7 @@ function App(props) {
         )
         : 
         (
-          <textarea
+          <textarea className="codeText"
           onChange={e => {
               clearTimeout(timeout);
               let a = e.target.value;
@@ -39,5 +39,3 @@ function App(props) {
         </div>
     );
 }
-
-export default App;

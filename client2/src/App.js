@@ -6,7 +6,7 @@ import Http from "./http.js";
 import http from "./http";
 import Login from "./containers/Login.js";
 import Signup from "./containers/Signup.js";
-import Editor from "./Editor.js";
+import Editor from "./containers/Editor.js";
 import { setAuth } from "./redux/actions/userActions";
 
 function App() {
