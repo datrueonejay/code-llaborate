@@ -1,5 +1,8 @@
 .App {
   text-align: center;
+  border: 1px solid black;
+  background-image: url("toronto.jpg");
+  background-size: cover
 }
 
 .App-logo {

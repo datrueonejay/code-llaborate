@@ -9,5 +9,16 @@
     .Login form {
       margin: 0 auto;
       max-width: 320px;
+      border-radius: 10px;
+      border: 2px #3C3D3F solid;
+      padding:20px 10px 10px 10px;
+      background-color: rgba(255, 255, 255, 0.7);
+
     }
+
   }
+
+
+
+
+  
