@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import logo from "./logo.svg";
 import "./App.css";
 import Http from "./http.js";
@@ -6,12 +7,16 @@ import http from "./http";
 import Login from "./containers/Login.js";
 import Signup from "./containers/Signup.js";
 import Editor from "./Editor.js";
+import { setAuth } from "./redux/actions/userActions";
 
 function App() {
   const [text, setText] = useState("");
   const [writer, setWriter] = useState(false);
-  const [authenticate, setAuthenticate] = useState(false);
+  // const [authenticate, setAuthenticate] = useState(false);
   let timeout = null;
+
+  const authenticate = useSelector(state => state.userReducer.auth)
+  const dispatch = useDispatch();
 
   useEffect(() => {
     http.socket_listener(message => {
@@ -25,7 +30,7 @@ function App() {
 
   function Logout() {
     return (
-      <button className="logout" onClick={e => setAuthenticate(false)}>
+      <button className="logout" onClick={e => dispatch(setAuth(false))}>
         Logout
       </button>
     );
@@ -40,8 +45,8 @@ function App() {
   } 
     else { // authenticate = false
       return (<div className="App">
-              <div> <Signup auth={authenticate} onChange={loginStatus} /> </div>
-              <div> <Login auth={authenticate} onChange={loginStatus} /> </div>
+              <div> <Signup /> </div>
+              <div> <Login /> </div>
               </div>
             )
   }

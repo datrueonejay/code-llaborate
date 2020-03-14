@@ -18,13 +18,7 @@ function send(method, url, data, callback){
 }
 
 exports.addUser = function(username, password, role, name, callback=null){
-    send("POST", "/db/adduser/", {username: username, password: password, role:role, name:name}, function(err, res){
-            if (err) return console.log(err);
-            else {
-                console.log(res);
-                callback();
-            }
-    });
+    send("POST", "/db/adduser/", {username: username, password: password, role:role, name:name}, callback);
 };
 
 exports.checkUser = function(username, password, callback=null){

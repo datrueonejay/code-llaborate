@@ -11,6 +11,8 @@ import {
   FormLabel, 
 } from "react-bootstrap";
 import "./Signup.css";
+import { useDispatch } from 'react-redux';
+import { setType, setAuth } from './redux/actions/userActions';
 
 export default function Signup(props) {
 
@@ -19,18 +21,23 @@ export default function Signup(props) {
   const [name, setName] = useState("");
   const api = require('../api.js');
 
+  const dispatch = useDispatch()
+
   function validateForm() {
     return username.length > 0 && password.length && name.length> 0;
   }
 
 
   // async
-  async function handleSubmit(event) {
+  function handleSubmit(event) {
     event.preventDefault();
     let e = document.getElementById("roleid");
     let role = e.options[e.selectedIndex].value;
-    api.addUser(username, password, role, name, function(){
-      props.onChange(true);
+    api.addUser(username, password, role, name, function(err, res){
+      if (err) return console.log("Error homie");
+      // props.onChange(true);
+      dispatch(setAuth(true));
+      dispatch(setType(role));
     });
   }
 
