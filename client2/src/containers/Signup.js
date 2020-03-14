@@ -5,101 +5,43 @@
 import React, { useState } from "react";
 import {
   Button,
-  FormText,
   FormGroup,
   FormControl,
-  FormLabel
+  FormLabel, 
+  Dropdown,
+  DropdownButton,
 } from "react-bootstrap";
-// import LoaderButton from "../components/LoaderButton";
-// import { useFormFields } from "../libs/hooksLib";
 import "./Signup.css";
 
 export default function Signup(props) {
-//   const [fields, handleFieldChange] = useFormFields({
-//     email: "",
-//     password: "",
-//     confirmPassword: "",
-//     confirmationCode: ""
-//   });
 
-
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setconfirmPassword] = useState("");
-//   const [newUser, setNewUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  //const [authenticated, setauthenticated] = useState("false");
+  const [name, setName] = useState("");
+  const api = require('../api.js');
 
-//   function validateForm() {
-//     return (
-//       fields.email.length > 0 &&
-//       fields.password.length > 0 &&
-//       fields.password === fields.confirmPassword
-//     );
-//   }
-
-//   function validateConfirmationForm() {
-//     return fields.confirmationCode.length > 0;
-//   }
-
-    // function validateForm() {
-    //     return email.length > 0 && password.length > 0;
-    // }
 
   async function handleSubmit(event) {
     event.preventDefault();
-
-    //setIsLoading(true);
-
-    // setNewUser("test");
-
-    //setIsLoading(false);
+    api.addUser(username, password, 1, name, function(){
+      props.onChange(true);
+    });
   }
-
-//   async function handleConfirmationSubmit(event) {
-//     event.preventDefault();
-
-//     setIsLoading(true);
-//   }
-
-//   function renderConfirmationForm() {
-//     return (
-//       <form onSubmit={handleConfirmationSubmit}>
-//         <FormGroup controlId="confirmationCode" bsSize="large">
-//           <FormLabel>Confirmation Code</FormLabel>
-//           <FormControl
-//             autoFocus
-//             type="tel"
-//             onChange={handleFieldChange}
-//             value={fields.confirmationCode}
-//           />
-//           <FormText>Please check your email for the code.</FormText>
-//         </FormGroup>
-//         <LoaderButton
-//           block
-//           type="submit"
-//           bsSize="large"
-//           isLoading={isLoading}
-//           disabled={!validateConfirmationForm()}
-//         >
-//           Verify
-//         </LoaderButton>
-//       </form>
-//     );
-//   }
 
   function renderForm() {
     return (
       <form onSubmit={handleSubmit}>
-        <FormGroup controlId="email" bsSize="large">
-          <FormLabel>Email</FormLabel>
+        <FormGroup controlId="username">
+          <FormLabel>Username</FormLabel>
           <FormControl
             autoFocus
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            type="text"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
           />
         </FormGroup>
-        <FormGroup controlId="password" bsSize="large">
+        <FormGroup controlId="password">
           <FormLabel>Password</FormLabel>
           <FormControl
             type="password"
@@ -107,33 +49,34 @@ export default function Signup(props) {
             onChange={e => setPassword(e.target.value)}
           />
         </FormGroup>
-        <FormGroup controlId="confirmPassword" bsSize="large">
-          <FormLabel>Confirm Password</FormLabel>
+        <FormGroup controlId="name">
+          <FormLabel>Name</FormLabel>
           <FormControl
-            type="password"
-            onChange={ e => setconfirmPassword(e.target.value) }
-            value={confirmPassword}
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
           />
         </FormGroup>
-        {/* <LoaderButton
-          block
-          type="submit"
-          bsSize="large"
-          isLoading={isLoading}
-          disabled={!validateForm()}
-        >
-          Signup
-        </LoaderButton> */}
-        <Button type="submit">
+        <FormLabel>
+        Choose your role:
+        <select class="custom-select">
+          <option selected>Open this select menu</option>
+          <option value="1">Student</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
+        </FormLabel>
+        <Button type="submit" class="btn">
           Signup
         </Button>
+
       </form>
     );
   }
 
   return (
     <div className="Signup">
-      {renderForm() /* {newUser === null ? renderForm() : renderConfirmationForm()} */}
+      {renderForm()}
     </div>
   );
 }

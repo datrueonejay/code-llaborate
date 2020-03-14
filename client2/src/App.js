@@ -10,7 +10,7 @@ import Editor from "./Editor.js";
 function App() {
   const [text, setText] = useState("");
   const [writer, setWriter] = useState(false);
-  const [authenticate, setauthenticate] = useState(false);
+  const [authenticate, setAuthenticate] = useState(false);
   let timeout = null;
 
   useEffect(() => {
@@ -19,9 +19,13 @@ function App() {
     });
   });
 
+  function loginStatus(newValue) {
+    setAuthenticate(newValue);
+  }
+
   function Logout() {
     return (
-      <button className="logout" onClick={e => setauthenticate(false)}>
+      <button className="logout" onClick={e => setAuthenticate(false)}>
         Logout
       </button>
     );
@@ -34,8 +38,12 @@ function App() {
              </div>
             )
   } 
-    else {
-      return (<div> <Signup /> </div>)
+    else { // authenticate = false
+      return (<div className="App">
+              <div> <Signup auth={authenticate} onChange={loginStatus} /> </div>
+              <div> <Login /> </div>
+              </div>
+            )
   }
 
   // return (
