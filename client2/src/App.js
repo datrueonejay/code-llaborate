@@ -41,7 +41,7 @@ function App() {
     else { // authenticate = false
       return (<div className="App">
               <div> <Signup auth={authenticate} onChange={loginStatus} /> </div>
-              <div> <Login /> </div>
+              <div> <Login auth={authenticate} onChange={loginStatus} /> </div>
               </div>
             )
   }

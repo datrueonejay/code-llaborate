@@ -26,3 +26,13 @@ exports.addUser = function(username, password, role, name, callback=null){
             }
     });
 };
+
+exports.checkUser = function(username, password, callback=null){
+    send("POST", "/db/checkuser/", {username: username, password: password }, function(err, res){
+            if (err) return console.log(err);
+            else {
+                console.log(res);
+                callback();
+            }
+    });
+};

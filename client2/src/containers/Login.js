@@ -3,34 +3,39 @@
  */
 
  import React, { useState } from "react";
-import { Button, FormGroup, FormControl, FormLabel } from "react-bootstrap";
+import { Form, Button, FormGroup, FormControl, FormLabel } from "react-bootstrap";
 import "./Login.css";
 
 export default function Login(props) {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const api = require('../api.js');
+
 
   function validateForm() {
-    return email.length > 0 && password.length > 0;
+    return username.length > 0 && password.length > 0;
   }
 
   function handleSubmit(event) {
     event.preventDefault();
+    api.checkUser(username, password, function(){
+      props.onChange(true);
+    });
   }
 
   return (
     <div className="Login">
-      <form onSubmit={handleSubmit}>
-        <FormGroup controlId="email" bsSize="large">
-          <FormLabel>Email</FormLabel>
+      <Form onSubmit={handleSubmit}>
+        <FormGroup className="username">
+          <FormLabel>Username</FormLabel>
           <FormControl
             autoFocus
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            type="text"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
           />
         </FormGroup>
-        <FormGroup controlId="password" bsSize="large">
+        <FormGroup className="password">
           <FormLabel>Password</FormLabel>
           <FormControl
             value={password}
@@ -38,10 +43,10 @@ export default function Login(props) {
             type="password"
           />
         </FormGroup>
-        <Button block bsSize="large" disabled={!validateForm()} type="submit">
+        <Button block disabled={!validateForm()} type="submit">
           Login
         </Button>
-      </form>
+      </Form>
     </div>
   );
 }

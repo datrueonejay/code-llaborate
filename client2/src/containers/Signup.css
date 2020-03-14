@@ -9,22 +9,41 @@
     border-radius: 10px;
     border: 2px #3C3D3F solid;
     padding:20px 10px 10px 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+
   }
 
 }
+
+.password {
+  margin: 10px;
+}
+
+.username {
+  margin: 10px;
+}
+
+.custom-select {
+  margin: 10px;
+}
+
+.role {
+  margin: 10px;
+}
+
 /* This snippet of code was generated using: http://css3buttongenerator.com/ */
 
-/* .btn{
+.btn{
+  margin: 10px;
   border-radius:10px;
   text-align:center;
   font-size: 20px;
   color: #3C3D3F;
   background: #ffffff;
   border: 2px #3C3D3F solid;
-  padding: 10px 20px 10px 20px;
 }
 
 .btn:hover {
 background: #3C3D3F;
 color: #ffffff;
-} */
+}
