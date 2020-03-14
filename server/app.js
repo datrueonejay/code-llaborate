@@ -3,9 +3,14 @@ let app = express();
 let expressWs = require("express-ws")(app);
 let redis = require("redis");
 
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDIS_PORT || 6379, process.env.REDIS_HOST || "localhost");
 
 messages = [];
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.get("/", function(req, res, next) {
   console.log("GET ROUTE");
@@ -23,6 +28,7 @@ app.ws("/", function(ws, req) {
   });
   //TODO: Fix this to connection and repush to dockerhub
   ws.on("connection", function(ws) {
+    console.log("Trying to connect");
     ws.send("AOSIJDOASIDJ");
     client.get("doc", (err, res) => {
       if (err) {

@@ -1,6 +1,8 @@
 let http = (function() {
-  // const exampleSocket = new WebSocket("ws://localhost:3001");
-  const exampleSocket = new WebSocket("ws://server:3001");
+  const exampleSocket = new WebSocket(
+    process.env.REACT_APP_SOCKET_URL || "ws://localhost:8080"
+  );
+  // const exampleSocket = new WebSocket("ws://server:3001");
 
   const listeners = [];
 
@@ -10,7 +12,8 @@ let http = (function() {
   };
 
   exampleSocket.onerror = function(error) {
-    console.log("WebSocket Error " + error);
+    console.log("WebSocket Error ");
+    console.log(error);
   };
 
   exampleSocket.onmessage = function(e) {
