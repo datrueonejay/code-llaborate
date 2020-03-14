@@ -5,7 +5,7 @@ let connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'password',
-  database: 'USERS',
+  database: 'JayJayRay',
   insecureAuth: true
 });
 
@@ -20,8 +20,12 @@ connection.connect(function(err) {
 
 
 exports.addUser = (role, username, password, name, cb) => {
+  findRole(role, function(err, results) {
+    if (err) return cb("Error finding role", null);
+    role = results[0].ID;
+  })
 
-  findUser(username, function(err, results, fields) {
+  findUser(username, function(err, results) {
     if (results.length > 0) {
       return cb("User already exists", null);
     }
@@ -33,7 +37,7 @@ exports.addUser = (role, username, password, name, cb) => {
     let saltedHash = hash.digest('base64');
     // end of sauce
 
-    let sql = "INSERT INTO USERS(RoleID, Username, Password, Salt, Name) VALUES (?, ? ,? ,? ,?)";
+    let sql = "INSERT INTO Users(RoleID, Username, Password, Salt, Name) VALUES (?, ? ,? ,? ,?)";
     connection.query(sql, [role, username, saltedHash, salt, name], function(err, results, fields) {
       if (err) return cb(err, null);
       cb(null, results);
@@ -43,7 +47,7 @@ exports.addUser = (role, username, password, name, cb) => {
 
 exports.checkUser = (username, password, cb) => {
 
-  findUser(username, function(err, results, fields) {
+  findUser(username, function(err, results) {
     if (results.length > 0) {
       // Sauce from lab7 CSCC09
       let salt = results[0].Salt;
@@ -63,9 +67,12 @@ exports.checkUser = (username, password, cb) => {
 }
 
 function findUser(username, cb) {
-  let sql = "SELECT * from USERS WHERE Username=?";
-  connection.query(sql, [username], function(err, results, fields) {
-    cb(err, results, fields);
-  })
+  let sql = "SELECT * from Users WHERE Username=?";
+  connection.query(sql, [username], cb);
+}
+
+function findRole(role, cb) {
+  let sql = "SELECT * from Roles where Role=?";
+  connection.query(sql, [role], cb);
 }
 
