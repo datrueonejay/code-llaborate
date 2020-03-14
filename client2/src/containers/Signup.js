@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import "./Signup.css";
 import { useDispatch } from 'react-redux';
-import { setType, setAuth } from './redux/actions/userActions';
+import { setType, setAuth } from '../redux/actions/userActions';
 
 export default function Signup(props) {
 
@@ -34,7 +34,7 @@ export default function Signup(props) {
     let e = document.getElementById("roleid");
     let role = e.options[e.selectedIndex].value;
     api.addUser(username, password, role, name, function(err, res){
-      if (err) return console.log("Error homie");
+      if (err) return console.log(err);
       // props.onChange(true);
       dispatch(setAuth(true));
       dispatch(setType(role));

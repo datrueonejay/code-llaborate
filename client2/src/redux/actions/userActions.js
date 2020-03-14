@@ -1,6 +1,6 @@
 export const setType = type => ({
-    action: "SET_TYPE",
-    type
+    type: "SET_TYPE",
+    userType: type
 })
 
 
@@ -8,6 +8,6 @@ export const setType = type => ({
     Auth (boolean): Set if user is auth or not
 */
 export const setAuth = auth => ({
-    action: "SET_AUTH",
+    type: "SET_AUTH",
     auth
 })

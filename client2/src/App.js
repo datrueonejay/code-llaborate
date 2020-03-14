@@ -24,9 +24,9 @@ function App() {
     });
   });
 
-  function loginStatus(newValue) {
-    setAuthenticate(newValue);
-  }
+  // function loginStatus(newValue) {
+  //   seAuth(newValue);
+  // }
 
   function Logout() {
     return (
