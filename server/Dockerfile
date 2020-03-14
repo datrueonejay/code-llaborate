@@ -1,5 +1,7 @@
 FROM node:alpine
 
+RUN apt-get update && apt-get install -y python
+
 WORKDIR /usr/src/app
 
 COPY . ./
