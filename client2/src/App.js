@@ -16,6 +16,7 @@ function App() {
   let timeout = null;
 
   const authenticate = useSelector(state => state.userReducer.auth)
+  const type = useSelector(state => state.userReducer.userType)
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -37,11 +38,13 @@ function App() {
   }
 
   if (authenticate) {
+    console.log(type);
+    let isStudent = (type === "STUDENT");
     return  (<div className="App">
-              <div> <Editor /> </div>
-              <div> <Logout/> </div>
-             </div>
-            )
+    <div> <Editor isStudent={isStudent}/> </div>
+    <div> <Logout/> </div>
+    </div>
+    )
   } 
     else { // authenticate = false
       return (<div className="App">

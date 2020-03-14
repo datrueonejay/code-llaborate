@@ -21,7 +21,7 @@ app.post('/db/adduser/', (req, res) => {
 
   return query.addUser(role, username, password, name, function(err, results) {
     if (err) return res.status(406).end(err);
-    res.send("Oh hey there boi, we added the user!");
+    res.send(results);
   });
 })
 
@@ -31,7 +31,7 @@ app.post('/db/checkuser/', (req, res) => {
 
   return query.checkUser(username, password, function(err, results) {
     if (err) return res.status(418).end(err);
-    res.send("Ye Jayden is here");
+    res.send(results);
   })
 })
 

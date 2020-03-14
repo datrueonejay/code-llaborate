@@ -59,7 +59,12 @@ exports.checkUser = (username, password, cb) => {
       let userPass = results[0].Password;
 
       if (userPass == saltedHash) {
-        return cb(null, results);
+        let ret = {
+          name: results[0].name,
+          username: results[0].Username,
+          role: results[0].Role,
+        }
+        return cb(null, ret);
       }
     } 
     return cb("Jayden said you're unauthorized", null);
@@ -67,7 +72,8 @@ exports.checkUser = (username, password, cb) => {
 }
 
 function findUser(username, cb) {
-  let sql = "SELECT * from Users WHERE Username=?";
+  console.log(username);
+  let sql = "SELECT Username, name, Role, Salt, Password from Users as user INNER JOIN Roles as role where role.ID = user.RoleID and user.username=?";
   connection.query(sql, [username], cb);
 }
 

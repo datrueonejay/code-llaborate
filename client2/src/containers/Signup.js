@@ -72,9 +72,8 @@ export default function Signup(props) {
         <FormLabel className="role">
         Choose your role:
         <select id="roleid" className="custom-select">
-          <option value="1">Open this select menu</option>
           <option value="STUDENT">Student</option>
-          <option value="TA">TA</option>
+          <option value="TEACHING ASSISTANT">TA</option>
           <option value="INSTRUCTOR">Instructor</option>
         </select>
         </FormLabel>

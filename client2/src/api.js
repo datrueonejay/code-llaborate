@@ -6,7 +6,7 @@ function send(method, url, data, callback){
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
         if (xhr.status !== 200) callback("[" + xhr.status + "]" + xhr.responseText, null);
-        else callback(null, (xhr.responseText));
+        else callback(null, (JSON.parse(xhr.responseText)));
     };
     url = dburl + url;
     xhr.open(method, url, true);
@@ -22,11 +22,5 @@ exports.addUser = function(username, password, role, name, callback=null){
 };
 
 exports.checkUser = function(username, password, callback=null){
-    send("POST", "/db/checkuser/", {username: username, password: password }, function(err, res){
-            if (err) return console.log(err);
-            else {
-                console.log(res);
-                callback();
-            }
-    });
+    send("POST", "/db/checkuser/", {username: username, password: password }, callback);
 };
