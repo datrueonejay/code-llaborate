@@ -3,12 +3,18 @@ let app = express();
 let expressWs = require("express-ws")(app);
 let redis = require("redis");
 
-const client = redis.createClient(process.env.REDIS_PORT || 6379, process.env.REDIS_HOST || "localhost");
+const client = redis.createClient(
+  process.env.REDIS_PORT || 6379,
+  process.env.REDIS_HOST || "localhost"
+);
 
 messages = [];
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
 });
 

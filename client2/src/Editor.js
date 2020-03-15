@@ -10,34 +10,33 @@ function App(props) {
   let timeout = null;
 
   useEffect(() => {
+    console.log("ASODIJSOAIJJAS using efect");
+    http.connect();
     http.socket_listener(message => {
       setText(message);
     });
-  });
+  }, []);
 
-    return (
-        <div className="App">
-        {props.isStudent ?  (
-            <div>
-            <p>Text below</p>
-            <p>{text}</p>
-            </div>
-        )
-        : 
-        (
-          <textarea
-          onChange={e => {
-              clearTimeout(timeout);
-              let a = e.target.value;
-              timeout = setTimeout(() => {
-              http.send_message(a);
-              }, 500);
-          }}
-          ></textarea>
-      )
-        }
+  return (
+    <div className="App">
+      {props.isStudent ? (
+        <div>
+          <p>Text below</p>
+          <p>{text}</p>
         </div>
-    );
+      ) : (
+        <textarea
+          onChange={e => {
+            clearTimeout(timeout);
+            let a = e.target.value;
+            timeout = setTimeout(() => {
+              http.send_message(a);
+            }, 500);
+          }}
+        ></textarea>
+      )}
+    </div>
+  );
 }
 
 export default App;

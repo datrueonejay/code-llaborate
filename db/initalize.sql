@@ -34,7 +34,8 @@ CREATE TABLE UserCourses(
     CourseId INT,
 	PRIMARY KEY(UserId, CourseId),
     FOREIGN KEY(UserId) REFERENCES Users(ID),
-    FOREIGN KEY(UserId) REFERENCES Courses(ID)
+    FOREIGN KEY(CourseId) REFERENCES Courses(ID)
 );
 
-
+Insert into Courses(CourseCode, Instructor) VALUES("C09", "Thierry");
+Insert into Courses(CourseCode, Instructor) VALUES("D27", "Thierry")
