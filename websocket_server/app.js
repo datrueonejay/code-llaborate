@@ -84,9 +84,13 @@ app.post(
     let username = req.body.username;
     let password = req.body.password;
     db.checkUser(username, password, (err, user) => {
-      if (err) {return res.status(500).end(err.message);}
+      if (err) {
+        return res.status(500).end(err.message);
+      }
       db.findClasses(user.username, (err, classes) => {
-        if (err) {return res.status(500).end(err.message);}
+        if (err) {
+          return res.status(500).end(err.message);
+        }
         req.session.user = user;
         req.session.classes = classes;
         req.session.currSession = null;
@@ -138,6 +142,9 @@ app.get("/api/classes", authenticated, (req, res, next) => {
 
 app.get("/api/sessions", authenticated, (req, res, next) => {
   console.log(req.session.classes);
+  if (req.session.classes.length === 0) {
+    return res.json([]);
+  }
   redisClient.mget(req.session.classes, (err, results) => {
     console.log(err);
     if (err) return res.status(500).end("Internal Server error");
