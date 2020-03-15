@@ -16,6 +16,7 @@ app.use(bodyParser.json());
 
 const path = require('path');
 const multer  = require('multer');
+const uniquefilename = require('unique-filename');
 const upload = multer({ dest: path.join(__dirname, 'uploads')});
 
 /////////////////////////////////////////////////////////////////
@@ -104,9 +105,9 @@ app.post('/compile/plaintext/', upload.single('picture'), function (req, res, ne
   // console.log("hello");
   // console.log(string);
   // console.log("bye");
-
+  let tempfile = uniquefilename("/tmp");
   // full path to tmp file
-  let filePath = path.join(__dirname, '/tmp/code.txt');
+  let filePath = path.join(__dirname, tempfile);
   //function to get the parent dir of tmp file
   let getDirName = path.dirname;
   // mks the parent dir if it doesn't exist
