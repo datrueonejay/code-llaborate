@@ -1,6 +1,38 @@
+
+@media all and (min-width: 480px) {
+    .Editor {
+      padding: 60px 0;
+    }
+  
+    .Editor form {
+      margin: 0 auto;
+      border-radius: 10px;
+      border: 2px #3C3D3F solid;
+      padding:20px 10px 10px 10px;
+      background-color: rgba(255, 255, 255, 0.7);
+  
+    }
+  
+  }
+
+
 .codeText{
     margin:10px;
     font-size: 20px;
     border-radius:10px;
     padding:5px 10px 5px 10px;
+}
+
+#box{
+    white-space: pre-line;
+}
+
+#output{
+    visibility: hidden;
+    margin: 10px;
+    border-radius: 10px;
+    border: 2px #3C3D3F solid;
+    padding:20px 10px 10px 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    font-size: 15px;
 }
