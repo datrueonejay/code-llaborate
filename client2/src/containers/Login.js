@@ -10,6 +10,7 @@ import {
   FormControl,
   FormLabel
 } from "react-bootstrap";
+import { Redirect } from 'react-router-dom'
 import "./Login.css";
 import { useDispatch } from "react-redux";
 import { setType, setAuth } from "../redux/actions/userActions";
@@ -32,6 +33,24 @@ export default function Login(props) {
       if (err) return console.log(err);
       dispatch(setType(res.role));
       dispatch(setAuth(true));
+      let url = "";
+      switch(res.role) {
+        case "STUDENT":
+            url = "/student";
+            break;
+        case "TEACHING ASSISTANT":
+          url = "/ta"
+          break;
+        case "INSTRUCTOR":
+          url = "/instructor";
+          break;
+        default:
+          url = "/login";
+          break;
+      }
+
+      props.history.push(url);
+      
     });
   }
 

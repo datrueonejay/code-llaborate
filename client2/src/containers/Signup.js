@@ -35,9 +35,26 @@ export default function Signup(props) {
     let role = e.options[e.selectedIndex].value;
     api.addUser(username, password, role, name, function(err, res){
       if (err) return console.log(err);
-      // props.onChange(true);
       dispatch(setAuth(true));
       dispatch(setType(role));
+      let url = "";
+      console.log(res.role);
+      switch(res.role) {
+        case "STUDENT":
+            url = "/student";
+            break;
+        case "TEACHING ASSISTANT":
+          url = "/ta"
+          break;
+        case "INSTRUCTOR":
+          url = "/instructor";
+          break;
+        default:
+          url = "/login";
+          break;
+      }
+
+      props.history.push(url);
     });
   }
 

@@ -23,7 +23,7 @@ exports.addUser = (role, username, password, name, cb) => {
   findRole(role, function(err, results) {
     if (err || results.length === 0) return cb("Error finding role", null);
     roleId = results[0].ID;
-    role = results[0].RoleID;
+    role = results[0].Role;
   });
 
   findUser(username, function(err, results) {

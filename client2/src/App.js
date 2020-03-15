@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
 // import Http from "./http.js";
@@ -7,8 +8,13 @@ import "./App.css";
 import Login from "./containers/Login.js";
 import Signup from "./containers/Signup.js";
 import Editor from "./containers/Editor.js";
+import Home from './components/Home.js';
 import { setAuth } from "./redux/actions/userActions";
 import SelectCourse from "./containers/SelectCourse";
+
+import StudentView from './components/StudentView';
+import TeachingAssistantView from './components/TeachingAssistantView';
+import InstructorView from "./components/InstructorView";
 
 function App() {
   const [text, setText] = useState("");
@@ -20,85 +26,20 @@ function App() {
   const type = useSelector(state => state.userReducer.userType);
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   http.socket_listener(message => {
-  //     setText(message);
-  //   });
-  // });
+  let isStudent = type === "STUDENT";
 
-  // function loginStatus(newValue) {
-  //   seAuth(newValue);
-  // }
-
-  function Logout() {
-    return (
-      <button className="logout" onClick={e => dispatch(setAuth(false))}>
-        Logout
-      </button>
-    );
-  }
-
-  if (authenticate) {
-    console.log(type);
-    let isStudent = type === "STUDENT";
-    return (
-      <div className="App">
-        <div>
-          <SelectCourse isStudent={isStudent} />
-        </div>
-      </div>
-    );
-    // return (
-    //   <div className="App">
-    //     <div>
-    //       {" "}
-    //       <Editor isStudent={isStudent} />{" "}
-    //     </div>
-    //     <div>
-    //       {" "}
-    //       <Logout />{" "}
-    //     </div>
-    //   </div>
-    // );
-  } else {
-    // authenticate = false
-    return (
-      <div className="App">
-        <div>
-          {" "}
-          <Signup />{" "}
-        </div>
-        <div>
-          {" "}
-          <Login />{" "}
-        </div>
-      </div>
-    );
-  }
-
-  // return (
-  //   <div className="App">
-  //    <Signup />
-  //    <Login />
-  //     <button onClick={() => setWriter(!writer)}>Change account type</button>
-  //     {writer ? (
-  //       <textarea
-  //         onChange={e => {
-  //           clearTimeout(timeout);
-  //           let a = e.target.value;
-  //           timeout = setTimeout(() => {
-  //             http.send_message(a);
-  //           }, 500);
-  //         }}
-  //       ></textarea>
-  //     ) : (
-  //       <div>
-  //         <p>Text below</p>
-  //         <p>{text}</p>
-  //       </div>
-  //     )}
-  //   </div>
-  // );
+  return (
+    <Router>
+      <Switch>
+        <Route exact path='/' component={Home} />
+        <Route path='/signup' component={Signup} />
+        <Route path='/login' component={Login} />
+        <Route path='/student' render={(props)=> <StudentView {...props} isStudent={isStudent}/>} />
+        <Route path='/ta' render={(props)=> <TeachingAssistantView {...props} isStudent={isStudent}/>} />
+        <Route path='/instructor' render={(props)=> <InstructorView {...props} />}/>
+      </Switch>
+    </Router>
+  )
 }
 
 export default App;
