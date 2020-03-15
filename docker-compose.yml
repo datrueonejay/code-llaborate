@@ -5,6 +5,13 @@ services:
     image: redis
     expose:
       - 6379
+  db:
+    container_name: mysql_container
+    build: ./db
+    expose: 
+      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
     # ports: 
     #   - 6379:6379
   server:
@@ -16,6 +23,12 @@ services:
       - 8080:8080
     depends_on:
       - redis
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PASSWORD=password
+      - REDIS_HOST=redis
+      - PYTHON_PATH=/usr/bin/python
   # client:
   #   container_name: client_container
   #   environment:

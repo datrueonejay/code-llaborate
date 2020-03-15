@@ -9,14 +9,16 @@ let connection = mysql.createConnection({
   insecureAuth: true
 });
 
-connection.connect(function(err) {
-  if (err) {
-    console.log(err);
-    return;
-  }
+let connect = () =>
+  connection.connect(function(err) {
+    if (err) {
+      console.log(err);
+      connect();
+      return;
+    }
 
-  console.log("connected as id ", connection.threadId);
-});
+    console.log("connected as id ", connection.threadId);
+  });
 
 exports.addUser = (role, username, password, name, cb) => {
   let roleId;
@@ -59,6 +61,7 @@ exports.addUser = (role, username, password, name, cb) => {
 
 exports.checkUser = (username, password, cb) => {
   findUser(username, function(err, results) {
+    if (err) return cb(err, null);
     if (results.length > 0) {
       // Sauce from lab7 CSCC09
       let salt = results[0].Salt;
