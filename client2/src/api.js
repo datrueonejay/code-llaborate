@@ -56,3 +56,31 @@ exports.checkUser = function(username, password, callback = null) {
   //     callback(err, null);
   //   });
 };
+
+exports.getStudents = function(callback=null) {
+  send(
+    "GET",
+    "/api/students",
+    {},
+    callback
+  );
+}
+
+exports.getCourses = function(callback=null) {
+  send(
+    "GET",
+    "/api/getallcourses",
+    {},
+    callback
+  );
+}
+
+
+exports.addStudentToCourse = function(studentID, courseCode, callback=null) {
+  send(
+    "POST",
+    "/api/addstudenttocourse",
+    {studentID, courseCode},
+    callback
+  );
+}

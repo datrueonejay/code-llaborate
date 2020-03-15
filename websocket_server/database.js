@@ -111,6 +111,25 @@ exports.findClasses = (username, cb) => {
   });
 };
 
+exports.getStudents = (cb) => {
+  let sql = "SELECT Name,ID FROM Users where RoleID=1";
+  connection.query(sql, cb);
+}
+
+//TODO: perhaps change it so only the isntructors who are a part of the course can see the course???????
+exports.getCourses = (cb) => {
+  let sql = "SELECT * from Courses";
+  connection.query(sql, cb);
+}
+
+exports.addStudentToCourse = (studentId, courseCode, cb) => {
+  CourseCodeToId(courseCode, (err, res) => {
+    if (err) return cb(err, null);
+    let sql = "INSERT INTO UserCourses VALUES (?, ?)";
+    connection.query(sql, [studentId, res[0].ID], cb)
+  })
+}
+
 // exports.
 
 function findClasses(username, cb) {
@@ -135,4 +154,9 @@ function findUser(username, cb) {
 function findRole(role, cb) {
   let sql = "SELECT * from Roles where Role=?";
   connection.query(sql, [role], cb);
+}
+
+function CourseCodeToId(courseCode, cb) {
+  let sql = "SELECT * from Courses where CourseCode=?";
+  connection.query(sql, [courseCode], cb);
 }

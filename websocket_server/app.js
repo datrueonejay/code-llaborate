@@ -135,10 +135,33 @@ app.post(
   }
 );
 
+app.post("/api/addstudenttocourse/", authenticated, (req, res, next) => {
+  let studentID = req.body.studentID;
+  let courseCode = req.body.courseCode;
+  db.addStudentToCourse(studentID, courseCode, (err, results) => {
+    if (err) return res.status(500).end(err.message);
+    return res.json("Successfully added student to course");
+  });
+})
+
 app.get("/api/classes", authenticated, (req, res, next) => {
   console.log(req.session.classes);
   res.json(req.session.classes);
 });
+
+app.get("/api/students", authenticated, (req, res, next) => {
+  db.getStudents((err, results, fields) => {
+    if (err) return res.status(500).end(err.message);
+    return res.json(results);
+  });
+});
+
+app.get("/api/getallcourses", authenticated, (req, res, next) => {
+  db.getCourses((err, results, fields) => {
+    if(err) return res.status(500).end(err.message);
+    return res.json(results);
+  })
+})
 
 app.get("/api/sessions", authenticated, (req, res, next) => {
   console.log(req.session.classes);
