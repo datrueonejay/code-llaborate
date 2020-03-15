@@ -67,7 +67,7 @@ app.post(
     let role = req.body.role;
     let name = req.body.name;
     db.addUser(role, username, password, name, (err, user) => {
-      if (err) return res.status(500).end(err);
+      if (err) return res.status(500).end(err.message);
       req.session.user = user;
       req.session.classes = [];
       req.session.currSession = null;
@@ -84,9 +84,9 @@ app.post(
     let username = req.body.username;
     let password = req.body.password;
     db.checkUser(username, password, (err, user) => {
-      if (err) return res.status(500).end(err);
+      if (err) {return res.status(500).end(err.message);}
       db.findClasses(user.username, (err, classes) => {
-        if (err) return res.status(500).end(err);
+        if (err) {return res.status(500).end(err.message);}
         req.session.user = user;
         req.session.classes = classes;
         req.session.currSession = null;
@@ -103,7 +103,7 @@ app.post(
   [body("course").escape()],
   (req, res, next) => {
     db.isStudent(req.session.user.username, (err, isStudent) => {
-      if (err) return res.status(500).end(err);
+      if (err) return res.status(500).end(err.message);
       // Not a student
       if (!isStudent) {
         // Valid instructor
@@ -137,7 +137,7 @@ app.get("/api/classes", authenticated, (req, res, next) => {
 });
 
 app.get("/api/sessions", authenticated, (req, res, next) => {
-  // console.log(req.session.classes);
+  console.log(req.session.classes);
   redisClient.mget(req.session.classes, (err, results) => {
     console.log(err);
     if (err) return res.status(500).end("Internal Server error");

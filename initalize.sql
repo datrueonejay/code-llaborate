@@ -22,6 +22,9 @@ CREATE TABLE Users(
     FOREIGN KEY(RoleID) REFERENCES Roles(ID)
 );
 
+INSERT INTO Users VALUES(0, 1, 's1', 'jUUORG667DEEVqN9yz/i68+apttG4XSy121RHpnYEVJt6chYZnnf6YY1Zu9wGZ+FlW3t/6an8CHMcSNb+73auQ==', 'cw6ABGA4i53fb+ijN0D8QQ==', 's1');
+INSERT INTO Users VALUES(0, 2, 't1', '3rpxnwwa4ZIb+sRqW8C3zW/sE2U5SFcc/Z3SUQ8XbS4V37OUEQHKgtpjQktFW3NJeiLk1JLT/k0ygtFuglGAxw==', 'FK38LFxiODd+pkmLELONOw==', 't1');
+
 CREATE TABLE Courses(
 	ID INT NOT NULL AUTO_INCREMENT,
     CourseCode VARCHAR(255) NOT NULL,
@@ -38,4 +41,9 @@ CREATE TABLE UserCourses(
 );
 
 Insert into Courses(CourseCode, Instructor) VALUES("C09", "Thierry");
-Insert into Courses(CourseCode, Instructor) VALUES("D27", "Thierry")
+Insert into Courses(CourseCode, Instructor) VALUES("D27", "Thierry");
+Insert into UserCourses VALUES(1,1);
+Insert into UserCourses VALUES(1,2);
+Insert into UserCourses VALUES(2,1);
+Insert into UserCourses VALUES(2,2);
+

@@ -112,13 +112,13 @@ exports.findClasses = (username, cb) => {
 
 function findClasses(username, cb) {
   let sql =
-    "SELECT CourseId FROM usercourses as c inner join users where c.UserID = users.ID and username=?";
+    "SELECT CourseId FROM UserCourses as c inner join Users where c.UserID = Users.ID and Username=?";
   connection.query(sql, [username], cb);
 }
 
 function findPersonClass(username, course, role, cb) {
   let sql =
-    "SELECT * FROM usercourses as c inner join users where c.UserID = users.ID and username=? and CourseID=? and RoleID=?";
+    "SELECT * FROM UserCourses as c inner join users where c.UserID = Users.ID and Username=? and CourseID=? and RoleID=?";
   connection.query(sql, [username, course, role], cb);
 }
 
