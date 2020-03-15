@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Editor from "../Editor.js";
+import Editor from "./Editor.js";
 import http from "../http";
 
 function SelectCourse(props) {
