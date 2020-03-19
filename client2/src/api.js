@@ -3,10 +3,7 @@
 // "use strict";
 const axios = require("axios");
 
-// const dburl = "http://localhost:3006";
-// const dburl = "http://localhost:8080";
-const dburl = "";
-// const dburl = "";
+const dburl = process.env.REACT_APP_DATABASE_BASE_URL || "";
 
 function send(method, url, data, callback) {
   var xhr = new XMLHttpRequest();

@@ -12,8 +12,6 @@ services:
       - 3306
     environment:
       - MYSQL_ROOT_PASSWORD=password
-    # ports: 
-    #   - 6379:6379
   server:
     container_name: ws_container
     build: ./websocket_server

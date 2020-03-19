@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import "./Test.css";
+import "../css/InstructorView.css";
+import "../App.css";
 
 function InstructorView(props) {
   const api = require("../api.js");
@@ -19,9 +20,6 @@ function InstructorView(props) {
     updateStudents();
     updateCourses();
   }, []);
-
-  console.log(students);
-  console.log(courses);
 
   function handleSubmit(e) {
     e.preventDefault();
