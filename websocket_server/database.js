@@ -44,11 +44,13 @@ exports.addUser = (role, username, password, name, cb) => {
       "INSERT INTO Users(RoleID, Username, Password, Salt, Name) VALUES (?, ? ,? ,? ,?)";
     connection.query(sql, [roleId, username, saltedHash, salt, name], function(
       err,
-      results,
+      result,
       fields
     ) {
       if (err) return cb(err, null);
+      console.log(result);
       cb(null, {
+        id: result.insertId,
         roleId: roleId,
         username: username,
         name: name,
@@ -72,7 +74,10 @@ exports.checkUser = (username, password, cb) => {
 
       let userPass = results[0].Password;
       if (userPass == saltedHash) {
+        console.log(results);
+
         let ret = {
+          id: results[0].ID,
           name: results[0].name,
           username: results[0].Username,
           role: results[0].Role,
@@ -111,24 +116,24 @@ exports.findClasses = (username, cb) => {
   });
 };
 
-exports.getStudents = (cb) => {
+exports.getStudents = cb => {
   let sql = "SELECT Name,ID FROM Users where RoleID=1";
   connection.query(sql, cb);
-}
+};
 
 //TODO: perhaps change it so only the isntructors who are a part of the course can see the course???????
-exports.getCourses = (cb) => {
+exports.getCourses = cb => {
   let sql = "SELECT * from Courses";
   connection.query(sql, cb);
-}
+};
 
 exports.addStudentToCourse = (studentId, courseCode, cb) => {
   CourseCodeToId(courseCode, (err, res) => {
     if (err) return cb(err, null);
     let sql = "INSERT INTO UserCourses VALUES (?, ?)";
-    connection.query(sql, [studentId, res[0].ID], cb)
-  })
-}
+    connection.query(sql, [studentId, res[0].ID], cb);
+  });
+};
 
 // exports.
 
@@ -147,7 +152,7 @@ function findPersonClass(username, course, role, cb) {
 function findUser(username, cb) {
   console.log(username);
   let sql =
-    "SELECT RoleID, Username, name, Role, Salt, Password from Users as user INNER JOIN Roles as role where role.ID = user.RoleID and user.username=?";
+    "SELECT user.ID, RoleID, Username, name, Role, Salt, Password from Users as user INNER JOIN Roles as role where role.ID = user.RoleID and user.username=?";
   connection.query(sql, [username], cb);
 }
 
