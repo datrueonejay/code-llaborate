@@ -36,7 +36,6 @@ const sessionParser = session({
 app.use(sessionParser);
 
 let authenticated = (req, res, next) => {
-  // console.log(req.session);
   if (!req.session.user) return res.status(401).end("Access denied");
   next();
 };

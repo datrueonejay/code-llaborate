@@ -1,7 +1,7 @@
 "use strict";
 
 // const serverurl = "http://localhost:3001";
-const serverurl = "";
+const serverurl = process.env.REACT_APP_PYTHON_BASE_URL || "";
 
 function sendFiles(method, url, data, callback) {
   url = serverurl + url;
