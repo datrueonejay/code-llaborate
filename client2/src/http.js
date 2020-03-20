@@ -10,7 +10,7 @@ let http = (function() {
 
   module.connect = () => {
     exampleSocket = new WebSocket(
-      process.env.REACT_APP_SOCKET_URL || "ws://localhost:8080"
+      process.env.REACT_APP_SOCKET_URL || "ws://localhost:8080/api/session"
     );
 
     exampleSocket.onopen = e => {
@@ -26,7 +26,7 @@ let http = (function() {
     exampleSocket.onmessage = function(e) {
       console.log("Server: " + e.data);
       listeners.forEach(listener => {
-        listener(e.data);
+        listener(JSON.parse(e.data).message);
       });
     };
   };

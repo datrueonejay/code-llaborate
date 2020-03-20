@@ -376,14 +376,20 @@ const server = http.createServer(app);
 
 const wss = new WebSocket.Server({ noServer: true });
 
-wss.on("connection", (ws, req) => {
+wss.on("session", (ws, req) => {
   ws.course = req.session.currSession;
+  // Instructor logic
+
   ws.on("message", message => {
+    let ret = {
+      from: req.session.user.roleId,
+      message: message
+    };
     console.log(`Got the message ${message}`);
     redisClient.hset(ws.course, "code", message);
     wss.clients.forEach(client => {
       if (client.course === ws.course) {
-        client.send(message);
+        client.send(JSON.stringify(ret));
       }
     });
   });
@@ -394,26 +400,31 @@ wss.on("connection", (ws, req) => {
       return ws.send("Error retrieving initial message");
     }
     console.log(res);
-    return ws.send(res);
+    let ret = {
+      from: "INITIAL",
+      message: res
+    };
+    return ws.send(JSON.stringify(ret));
   });
 });
 
 server.on("upgrade", (req, socket, head) => {
   const pathname = url.parse(req.url).pathname;
+  const protocol = req.headers["sec-websocket-protocol"];
   // Necessary because we only set express app to use parser, not the http server
   sessionParser(req, {}, () => {
     console.log(req.session);
     if (!req.session.user) {
       return socket.destroy();
     }
-    if (pathname === "/") {
+    if (pathname === "/api/session") {
       console.log("YEEE");
       console.log(req.session.currSession);
       redisClient.exists(req.session.currSession, (err, exists) => {
         if (exists) {
           return wss.handleUpgrade(req, socket, head, ws => {
             console.log("Emitting request");
-            wss.emit("connection", ws, req);
+            wss.emit("session", ws, req);
           });
         }
         console.log("YasdsEEE");
