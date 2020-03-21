@@ -8,7 +8,7 @@ services:
   db:
     container_name: mysql_container
     build: ./db
-    image: c90db:latest
+    image: c09db:latest
     expose: 
       - 3306
     environment:

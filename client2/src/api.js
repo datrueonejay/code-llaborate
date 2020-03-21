@@ -9,8 +9,8 @@ function send(method, url, data, callback) {
   var xhr = new XMLHttpRequest();
   xhr.onload = function() {
     console.log(document.cookie);
-    if (xhr.status !== 200)
-      callback("[" + xhr.status + "]" + xhr.responseText, null);
+    if (xhr.status !== 200) 
+    callback("[" + xhr.status + "]" + xhr.responseText, null);
     else {
       callback(null, JSON.parse(xhr.responseText));
     }
@@ -73,11 +73,11 @@ exports.getCourses = function(callback=null) {
 }
 
 
-exports.addStudentToCourse = function(studentID, courseCode, callback=null) {
+exports.addStudentToCourse = function(studentID, courseID, callback=null) {
   send(
     "POST",
     "/api/addstudenttocourse",
-    {studentID, courseCode},
+    {studentID, courseID},
     callback
   );
 }

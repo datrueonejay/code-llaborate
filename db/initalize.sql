@@ -35,7 +35,7 @@ CREATE TABLE Courses(
 
 CREATE TABLE UserCourses(
 	UserID INT,
-    CourseId INT,
+    CourseID INT,
 	PRIMARY KEY(UserId, CourseId),
     FOREIGN KEY(UserId) REFERENCES Users(ID),
     FOREIGN KEY(CourseId) REFERENCES Courses(ID)

@@ -127,19 +127,33 @@ exports.getCourses = cb => {
   connection.query(sql, cb);
 };
 
-exports.addStudentToCourse = (studentId, courseCode, cb) => {
-  CourseCodeToId(courseCode, (err, res) => {
-    if (err) return cb(err, null);
+exports.addStudentToCourse = (studentID, courseID, cb) => {
+
+  // // Make sure it is a real user
+  // findUserById(studentID, (err, res) => {
+  //   if (err) return cb(err, null);
+
+  //   // Make sure it is a real course
+  //   findCourseById(courseID, (err, res) => {
+  //     if (err) return cb(err, null);
+  //     let sql = "INSERT INTO UserCourses VALUES (?, ?)";
+  //     connection.query(sql, [studentID, courseID], cb);
+  //   });
+  // });
+  checkUserCourse(studentID, courseID, (err, res) => {
+    if (err) {
+      return cb(err, null);
+    }
     let sql = "INSERT INTO UserCourses VALUES (?, ?)";
-    connection.query(sql, [studentId, res[0].ID], cb);
-  });
+    connection.query(sql, [studentID, courseID], cb);
+  })
 };
 
 // exports.
 
 function findClasses(username, cb) {
   let sql =
-    "SELECT CourseId FROM UserCourses as c inner join Users where c.UserID = Users.ID and Username=?";
+    "SELECT CourseID FROM UserCourses as c inner join Users where c.UserID = Users.ID and Username=?";
   connection.query(sql, [username], cb);
 }
 
@@ -161,7 +175,17 @@ function findRole(role, cb) {
   connection.query(sql, [role], cb);
 }
 
-function CourseCodeToId(courseCode, cb) {
-  let sql = "SELECT * from Courses where CourseCode=?";
-  connection.query(sql, [courseCode], cb);
+function findUserById(studentID, cb) {
+  let sql = "SELECT user.ID, RoleID, Username, name, Role, Salt, Password from Users as user INNER JOIN Roles as role where role.ID = user.RoleID and user.ID=?";
+  connection.query(sql, [studentID], cb);
+}
+
+function findCourseById(courseID, cb) {
+  let sql = "SELECT * from Courses where ID=?";
+  connection.query(sql, [courseID], cb);
+}
+
+function checkUserCourse(studentID, courseID, cb) {
+  let sql = "SELECT * FROM UserCourses WHERE UserID=? and CourseID=?";
+  connection.query(sql,[studentID, courseID], cb);
 }

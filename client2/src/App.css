@@ -31,8 +31,8 @@
   color: #61dafb;
 }
 
-form {
-  margin: auto;
+.text-center {
+  text-align: center;
 }
 
 @keyframes App-logo-spin {

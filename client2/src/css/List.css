@@ -1,0 +1,19 @@
+ul {
+  list-style: none;
+  max-height: 40%;
+  overflow-y: scroll;
+}
+
+li {
+  border: 1px black solid;
+  padding: 10px;
+  user-select: none;
+}
+
+li:hover {
+  background-color: #1ff;
+}
+
+li:active {
+  box-shadow: 1px 3px;
+}

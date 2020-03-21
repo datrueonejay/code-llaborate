@@ -200,9 +200,11 @@ app.delete(
 
 app.post("/api/addstudenttocourse/", authenticated, (req, res, next) => {
   let studentID = req.body.studentID;
-  let courseCode = req.body.courseCode;
-  db.addStudentToCourse(studentID, courseCode, (err, results) => {
-    if (err) return res.status(500).end(err.message);
+  let courseID = req.body.courseID;
+  db.addStudentToCourse(studentID, courseID, (err, results) => {
+    if (err) {
+      return res.status(500).end(err.message);
+    }
     return res.json("Successfully added student to course");
   });
 });
