@@ -107,10 +107,12 @@ exports.verifyPersonClass = (username, course, role, cb) => {
 exports.findClasses = (username, cb) => {
   findClasses(username, (err, res) => {
     if (err) return cb(err, null);
+    console.log("DATABASE");
+    console.log(res);
     return cb(
       null,
       res.map((course, index) => {
-        return course.CourseId;
+        return course.CourseID;
       })
     );
   });
@@ -128,7 +130,6 @@ exports.getCourses = cb => {
 };
 
 exports.addStudentToCourse = (studentID, courseID, cb) => {
-
   // // Make sure it is a real user
   // findUserById(studentID, (err, res) => {
   //   if (err) return cb(err, null);
@@ -146,7 +147,7 @@ exports.addStudentToCourse = (studentID, courseID, cb) => {
     }
     let sql = "INSERT INTO UserCourses VALUES (?, ?)";
     connection.query(sql, [studentID, courseID], cb);
-  })
+  });
 };
 
 // exports.
@@ -176,7 +177,8 @@ function findRole(role, cb) {
 }
 
 function findUserById(studentID, cb) {
-  let sql = "SELECT user.ID, RoleID, Username, name, Role, Salt, Password from Users as user INNER JOIN Roles as role where role.ID = user.RoleID and user.ID=?";
+  let sql =
+    "SELECT user.ID, RoleID, Username, name, Role, Salt, Password from Users as user INNER JOIN Roles as role where role.ID = user.RoleID and user.ID=?";
   connection.query(sql, [studentID], cb);
 }
 
@@ -187,5 +189,5 @@ function findCourseById(courseID, cb) {
 
 function checkUserCourse(studentID, courseID, cb) {
   let sql = "SELECT * FROM UserCourses WHERE UserID=? and CourseID=?";
-  connection.query(sql,[studentID, courseID], cb);
+  connection.query(sql, [studentID, courseID], cb);
 }

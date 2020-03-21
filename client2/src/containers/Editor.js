@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Http from "../http.js";
 import http from "../http";
 import "./Editor.css";
 
 import { Button, Form } from "react-bootstrap";
+import Suggestions from "./Suggestions";
 
 const apiPython = require("../apiPython.js");
 
@@ -41,15 +41,25 @@ function handleSubmitFile(event) {
   });
 }
 
+let handleSubmitSuggestion = event => {
+  event.preventDefault();
+  let suggestion = document.querySelector("#suggestionText").value;
+  http.send_message(suggestion);
+};
+
 export default function Editor(props) {
   const [text, setText] = useState("");
   const [writer, setWriter] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
   let timeout = null;
 
   useEffect(() => {
     http.connect();
-    http.socket_listener(message => {
+    http.code_listener(message => {
       setText(message);
+    });
+    http.suggestion_listener(suggests => {
+      setSuggestions(suggests);
     });
   }, []);
 
@@ -57,8 +67,22 @@ export default function Editor(props) {
     <div className="codeText">
       {props.isStudent ? (
         <div>
-          <p>Text below</p>
-          <p>{text}</p>
+          <div>
+            <p>Text below</p>
+            <p>{text}</p>
+          </div>
+          <Form onSubmit={handleSubmitSuggestion}>
+            <textarea
+              name="suggestion"
+              className="suggestionText"
+              id="suggestionText"
+            />
+            <Button type="submit" className="btn">
+              {" "}
+              Suggest{" "}
+            </Button>
+          </Form>
+          <Suggestions suggestions={suggestions} />
         </div>
       ) : (
         <div className="Editor">
@@ -88,6 +112,7 @@ export default function Editor(props) {
           <div id="output">
             <span id="box"> </span>
           </div>
+          <Suggestions suggestions={suggestions} />
         </div>
       )}
     </div>

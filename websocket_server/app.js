@@ -93,6 +93,7 @@ app.post(
         if (err) {
           return res.status(500).end(err.message);
         }
+        console.log(classes);
         req.session.user = user;
         req.session.classes = classes;
         req.session.currSession = null;
@@ -121,12 +122,14 @@ app.post(
         // Valid instructor
         if (req.session.classes.includes(parseInt(req.body.course))) {
           req.session.currSession = req.body.course;
+          console.log(`creating session ${req.body.course}SESSION`);
           redisClient.set(`${req.body.course}SESSION`, "");
           redisClient.expire(`${req.body.course}SESSION`, SESSION_EXPIRE_TIME);
           redisClient.hset(req.body.course, "startedBy", req.session.user.id);
           redisClient.hset(req.body.course, "code", "");
           redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
-
+          // Remove any old suggestions
+          redisClient.del(`${req.body.course}SUGGESTIONS`);
           return res.json("CREATED");
         }
         // db.verifyPersonClass(
@@ -157,6 +160,8 @@ app.delete(
       if (id == req.session.user.id) {
         redisClient.del(`${req.body.course}SESSION`, number => {
           redisClient.del(req.body.course, number => {
+            redisClient.del(`${req.body.course}SESSION`);
+
             return res.json(`${number} session(s) deleted`);
           });
         });
@@ -233,7 +238,12 @@ app.get("/api/sessions", authenticated, (req, res, next) => {
   if (req.session.classes.length === 0) {
     return res.json([]);
   }
-
+  console.log("Looking for");
+  console.log(
+    req.session.classes.map(val => {
+      return `${val}SESSION`;
+    })
+  );
   redisClient.mget(
     req.session.classes.map(val => {
       return `${val}SESSION`;
@@ -379,16 +389,43 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 
 wss.on("session", (ws, req) => {
+  console.log("ASOIDJASOIDJAOSIJ");
   ws.course = req.session.currSession;
   // Instructor logic
 
   ws.on("message", message => {
-    let ret = {
-      from: req.session.user.roleId,
-      message: message
-    };
+    let ret;
     console.log(`Got the message ${message}`);
-    redisClient.hset(ws.course, "code", message);
+    // TA CODE
+    if (req.session.user.role === "TEACHING ASSISTANT") {
+      console.log("TA MESSAGE");
+
+      redisClient.hset(ws.course, "code", message);
+      ret = {
+        from: req.session.user.role,
+        message: message
+      };
+    } else {
+      console.log("STUDENT SUGGESTIONS");
+      console.log(message);
+      // Student suggestions
+      redisClient.sadd(`${req.session.currSession}SUGGESTIONS`, message);
+      return redisClient.smembers(
+        `${req.session.currSession}SUGGESTIONS`,
+        (err, suggestions) => {
+          if (err) return res.status(500).end("Internal server error");
+          ret = {
+            from: req.session.user.role,
+            message: suggestions
+          };
+          wss.clients.forEach(client => {
+            if (client.course === ws.course) {
+              client.send(JSON.stringify(ret));
+            }
+          });
+        }
+      );
+    }
     wss.clients.forEach(client => {
       if (client.course === ws.course) {
         client.send(JSON.stringify(ret));
@@ -403,7 +440,7 @@ wss.on("session", (ws, req) => {
     }
     console.log(res);
     let ret = {
-      from: "INITIAL",
+      from: "TEACHING ASSISTANT",
       message: res
     };
     return ws.send(JSON.stringify(ret));
@@ -411,8 +448,11 @@ wss.on("session", (ws, req) => {
 });
 
 server.on("upgrade", (req, socket, head) => {
+  console.log("ASOIDHJAOSIJ");
+
   const pathname = url.parse(req.url).pathname;
   const protocol = req.headers["sec-websocket-protocol"];
+  console.log("ASOIDHJAOSIJ");
   // Necessary because we only set express app to use parser, not the http server
   sessionParser(req, {}, () => {
     console.log(req.session);

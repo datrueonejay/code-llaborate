@@ -1,7 +1,8 @@
 import axios from "axios";
 
 let http = (function() {
-  const listeners = [];
+  const codeListeners = [];
+  const suggestionListeners = [];
   let module = {};
 
   const base_url = process.env.REACT_APP_API_BASE_URL || "";
@@ -26,14 +27,26 @@ let http = (function() {
 
     exampleSocket.onmessage = function(e) {
       console.log("Server: " + e.data);
-      listeners.forEach(listener => {
-        listener(JSON.parse(e.data).message);
-      });
+      let res = JSON.parse(e.data);
+      let type = res.from;
+      if (type === "TEACHING ASSISTANT") {
+        codeListeners.forEach(listener => {
+          listener(res.message);
+        });
+      } else {
+        suggestionListeners.forEach(listener => {
+          listener(res.message);
+        });
+      }
     };
   };
 
-  module.socket_listener = listener => {
-    listeners.push(listener);
+  module.code_listener = listener => {
+    codeListeners.push(listener);
+  };
+
+  module.suggestion_listener = listener => {
+    suggestionListeners.push(listener);
   };
 
   module.send_message = message => exampleSocket.send(message);
