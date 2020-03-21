@@ -8,6 +8,7 @@ services:
   db:
     container_name: mysql_container
     build: ./db
+    image: c90db:latest
     expose: 
       - 3306
     environment:
@@ -15,6 +16,7 @@ services:
   server:
     container_name: ws_container
     build: ./websocket_server
+    image: c09app:latest
     # expose:
     #   - 3001
     ports:
