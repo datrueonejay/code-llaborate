@@ -303,11 +303,15 @@ app.post("/compile/file/", upload.single("file"), function(req, res, next) {
 
   let filePath = file.path;
 
-  compilePython(filePath, function(output) {
-    // console.log("this comes back");
-    // console.log("this is output "+ output);
-    res.json({ path: filePath, string: output });
-  });
+  compilePython(
+    filePath,
+    function(output) {
+      // console.log("this comes back");
+      // console.log("this is output "+ output);
+      res.json({ path: filePath, string: output });
+    },
+    req.session.currSession
+  );
 });
 
 app.post("/compile/plaintext/", upload.single("picture"), function(
@@ -333,11 +337,15 @@ app.post("/compile/plaintext/", upload.single("picture"), function(
     fs.writeFile(filePath, string, { flag: "w" }, function(err) {
       if (err) throw err;
       console.log("Saved!");
-      compilePython(filePath, function(output) {
-        // console.log("this comes back");
-        // console.log("this is output "+ output);
-        res.json({ path: filePath, string: output });
-      });
+      compilePython(
+        filePath,
+        function(output) {
+          // console.log("this comes back");
+          // console.log("this is output "+ output);
+          res.json({ path: filePath, string: output });
+        },
+        req.session.currSession
+      );
     });
   });
 });
@@ -347,7 +355,7 @@ var decoduint8array = function(data) {
   return new TextDecoder("utf-8").decode(data);
 };
 
-function compilePython(path, callback) {
+function compilePython(path, callback, course) {
   let output = "";
   let pythonPath = process.env.PYTHON_PATH || "/usr/local/bin/python";
 
@@ -357,12 +365,31 @@ function compilePython(path, callback) {
 
   //output
   compilescript.stdout.on("data", data => {
+    // TODO: STREAM OUTPUT
+    let ret = {
+      from: "PYTHON",
+      message: decoduint8array(data)
+    };
+    wss.clients.forEach(client => {
+      if (client.course === course) {
+        client.send(JSON.stringify(ret));
+      }
+    });
     output = output + decoduint8array(data);
     // console.log(decoduint8array(data));
   });
 
   // error
   compilescript.stderr.on("data", data => {
+    let ret = {
+      from: "PYTHON",
+      message: decoduint8array(data)
+    };
+    wss.clients.forEach(client => {
+      if (client.course === course) {
+        client.send(JSON.stringify(ret));
+      }
+    });
     output = output + decoduint8array(data);
     // console.log(decoduint8array(data));
   });

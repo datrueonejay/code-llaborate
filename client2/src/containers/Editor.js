@@ -51,6 +51,7 @@ export default function Editor(props) {
   const [text, setText] = useState("");
   const [writer, setWriter] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [pythonOut, setPythonOut] = useState("");
   let timeout = null;
 
   useEffect(() => {
@@ -60,6 +61,9 @@ export default function Editor(props) {
     });
     http.suggestion_listener(suggests => {
       setSuggestions(suggests);
+    });
+    http.python_listener(output => {
+      setPythonOut(pythonOut + output);
     });
   }, []);
 
@@ -83,6 +87,10 @@ export default function Editor(props) {
             </Button>
           </Form>
           <Suggestions suggestions={suggestions} />
+          <div>
+            PYTHON FROM WEBSOCKET
+            {pythonOut}
+          </div>
         </div>
       ) : (
         <div className="Editor">
@@ -113,6 +121,10 @@ export default function Editor(props) {
             <span id="box"> </span>
           </div>
           <Suggestions suggestions={suggestions} />
+          <div>
+            PYTHON FROM WEBSOCKET
+            {pythonOut}
+          </div>
         </div>
       )}
     </div>

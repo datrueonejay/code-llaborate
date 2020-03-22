@@ -3,6 +3,7 @@ import axios from "axios";
 let http = (function() {
   const codeListeners = [];
   const suggestionListeners = [];
+  const pythonListeners = [];
   let module = {};
 
   const base_url = process.env.REACT_APP_API_BASE_URL || "";
@@ -33,6 +34,10 @@ let http = (function() {
         codeListeners.forEach(listener => {
           listener(res.message);
         });
+      } else if (type === "PYTHON") {
+        pythonListeners.forEach(listener => {
+          listener(res.message);
+        });
       } else {
         suggestionListeners.forEach(listener => {
           listener(res.message);
@@ -47,6 +52,10 @@ let http = (function() {
 
   module.suggestion_listener = listener => {
     suggestionListeners.push(listener);
+  };
+
+  module.python_listener = listener => {
+    pythonListeners.push(listener);
   };
 
   module.send_message = message => exampleSocket.send(message);
