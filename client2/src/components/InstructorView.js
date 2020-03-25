@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import "../App.css";
 import "../css/Form.css";
 import "../css/List.css";
+import "../css/InstructorView.css";
 
 function InstructorView(props) {
   const api = require("../api.js");
@@ -11,6 +12,10 @@ function InstructorView(props) {
   const formRef = useRef(null);
   const studentIdRef = useRef(null);
   const courseIdRef = useRef(null);
+  const filterStudentRef = useRef(null);
+  const filterCourseRef = useRef(null);
+  const studentListRef = useRef(null);
+  const courseListRef = useRef(null);
 
   useEffect(() => {
     function updateStudents() {
@@ -28,7 +33,6 @@ function InstructorView(props) {
   function handleSubmit(e) {
     e.preventDefault();
     let formData = new FormData(e.target);
-    console.log(formData);
     let studentID = formData.get("studentID");
     let courseID = formData.get("courseID");
 
@@ -45,11 +49,31 @@ function InstructorView(props) {
 
   function setValue(ref, id) {
     return function(e) {
-      console.log(ref, ref);
       ref.current.value = id;
     }
   }
 
+  function filterList(inputRef, listRef) {
+    return function(e) {
+      // this should be called when user types into the input
+      let input = inputRef.current.value.toUpperCase(); // what the user typed in
+      let list = listRef.current.querySelectorAll("li");
+
+      for(let i = 0; i < list.length ; i++) {
+        let li, text;
+        li = list[i];
+        text = li.textContent || li.innerText; // text of the list
+        if (text.toUpperCase().indexOf(input) > -1) {
+          li.style.display = "";
+        } else {
+          li.style.display = "none";
+        }
+      }
+      
+    }
+  }
+
+  // TODO: Clean up this pile of mess
   return (
     <div>
       <form ref={formRef} onSubmit={handleSubmit}>
@@ -60,19 +84,28 @@ function InstructorView(props) {
         <div className="notification">{notification}</div>
       </form>
 
-      <h1>Students:</h1>
-      <ul>
-        {students.map((student) => {
-          return <li onClick={setValue(studentIdRef, student.ID)} key={student.ID} id={student.ID}>{student.Name} id: {student.ID}</li>
-        })}
-      </ul>
+      <div id="id-selector">
+        <div id="filter-student">
+          <input ref={filterStudentRef} type="text" onKeyUp={filterList(filterStudentRef, studentListRef)} placeholder="Filter"></input>
+        </div>
+        <h1>Students:</h1>
+        <ul ref={studentListRef}>
+          {students.map((student) => {
+            return <li onClick={setValue(studentIdRef, student.ID)} key={student.ID} id={student.ID}>{student.Name} id: {student.ID}</li>
+          })}
+        </ul>
 
-      <h1>Courses:</h1>
-      <ul>
-      {courses.map((course, index) => {
-          return <li onClick={setValue(courseIdRef, course.ID)} key={index} id={course.ID}>{course.CourseCode}</li>
-        })}
-      </ul>
+        <div id="filter-course">
+          <input ref={filterCourseRef} type="text" onKeyUp={filterList(filterCourseRef, courseListRef)} placeholder="Filter"></input>
+        </div>
+        <h1>Courses:</h1>
+        <ul ref={courseListRef}>
+        {courses.map((course, index) => {
+            return <li onClick={setValue(courseIdRef, course.ID)} key={index} id={course.ID}>{course.CourseCode}</li>
+          })}
+        </ul>
+      </div>
+
     </div>
   )
 }
