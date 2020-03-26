@@ -36,6 +36,15 @@ exports.addUser = function(username, password, role, name, callback = null) {
   );
 };
 
+exports.signoutUser = function(callback = null){
+  send(
+    "GET",
+    "/api/signout",
+    {},
+    callback
+  );
+};
+
 exports.checkUser = function(username, password, callback = null) {
   // send("POST", "/db/checkuser/", {username: username, password: password }, callback);
   send(
