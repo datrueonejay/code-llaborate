@@ -1,12 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import "../App.css";
 import styles from "../scss/InstructorView.module.scss";
+import { TextField, Button, FormControl, InputLabel, Input, FormHelperText } from '@material-ui/core';
 
 function InstructorView(props) {
   const api = require("../api.js");
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [notification, setNotification] = useState("");
+  const [values, setValues] = useState({
+    studentId: "",
+    courseId: ""
+  });
+
   const formRef = useRef(null);
   const studentIdRef = useRef(null);
   const courseIdRef = useRef(null);
@@ -45,11 +51,20 @@ function InstructorView(props) {
     })
   }
 
-  function setValue(ref, id) {
-    return function(e) {
-      ref.current.value = id;
-    }
-  }
+  // function setValue(ref, id) {
+  //   return function(e) {
+  //     console.log(ref.current);
+  //     ref.current.focus();
+  //   }
+  // }
+
+  const setStudentValue = (id) => event => {
+    setValues({...values, studentId: [id]});
+  };
+
+  const setCourseValue = (id) => event => {
+    setValues({...values, courseId: [id]});
+  };
 
   function filterList(inputRef, listRef) {
     return function(e) {
@@ -60,11 +75,12 @@ function InstructorView(props) {
       for(let i = 0; i < list.length ; i++) {
         let li, text;
         li = list[i];
-        text = li.textContent || li.innerText; // text of the list
-        if (text.toUpperCase().indexOf(input) > -1) {
-          li.style.display = "";
+        text = li.textContent|| li.innerText; // text of the list
+        text = text.toUpperCase();
+        if (text.indexOf(input) > -1) {
+          li.classList.remove("hide");
         } else {
-          li.style.display = "none";
+          li.classList.add("hide");
         }
       }
       
@@ -75,31 +91,52 @@ function InstructorView(props) {
   return (
     <div>
       <form className={styles.form} ref={formRef} onSubmit={handleSubmit}>
+
         <h1 className="text-center">Add student to course</h1>
-        <input className={styles.input} ref={studentIdRef} type="text" id="studentID" name="studentID" placeholder="Student ID"></input>
-        <input className={styles.input} ref={courseIdRef} type="text" id="courseID" name="courseID" placeholder="Course ID"></input>
-        <input className={styles.input} type="submit" value="Add student to course"></input>
+
+        <div className={styles['form-input']}>
+          {/* <TextField></TextField> */}
+          <FormControl fullWidth={true}>
+            <InputLabel htmlFor="studentID">Student Id</InputLabel>
+            <Input inputRef={studentIdRef} id="studentID" type="number" aria-describedby="helper-text" name="studentID" value={values.studentId} required/>
+            <FormHelperText id="helper-text">The student id (e.g 3)</FormHelperText>
+          </FormControl>
+        </div>
+
+        <div className={styles['form-input']}>
+          <FormControl fullWidth={true}>
+            <InputLabel htmlFor="courseID">Course Id</InputLabel>
+            <Input ref={courseIdRef} id="courseID" type="number" aria-describedby="helper-text" name="courseID" value={values.courseId} required/>
+            <FormHelperText id="helper-text">The course id (e.g 2)</FormHelperText>
+          </FormControl>
+        </div>
+        
+        <Button type="submit" color="primary" variant="contained">Add student to course</Button>
+
         <div className="notification">{notification}</div>
       </form>
 
       <div id="id-selector">
+
         <div id="filter-student">
-          <input className={styles.input} ref={filterStudentRef} type="text" onKeyUp={filterList(filterStudentRef, studentListRef)} placeholder="Filter"></input>
+          <input ref={filterStudentRef} className={styles.input} type="text" onKeyUp={filterList(filterStudentRef, studentListRef)} placeholder="Filter"></input>
         </div>
+
         <h1>Students:</h1>
         <ul className={styles['list-wrapper']} ref={studentListRef}>
           {students.map((student) => {
-            return <li className={styles.list} onClick={setValue(studentIdRef, student.ID)} key={student.ID} id={student.ID}>{student.Name} id: {student.ID}</li>
+            return <li className={styles.list} onClick={setStudentValue(student.ID)} key={student.ID} id={student.ID}>{student.Name} id: {student.ID}</li>
           })}
         </ul>
 
         <div id="filter-course">
           <input className={styles.input} ref={filterCourseRef} type="text" onKeyUp={filterList(filterCourseRef, courseListRef)} placeholder="Filter"></input>
         </div>
+
         <h1>Courses:</h1>
-        <ul className={styles['list-wrapper']} ref={courseListRef}>
+        <ul ref={courseListRef} className={styles['list-wrapper']}>
         {courses.map((course, index) => {
-            return <li className={styles.list} onClick={setValue(courseIdRef, course.ID)} key={index} id={course.ID}>{course.CourseCode}</li>
+            return <li className={styles.list} onClick={setCourseValue(course.ID)} key={index} id={course.ID}>{course.CourseCode}</li>
           })}
         </ul>
       </div>

@@ -1,44 +1,13 @@
 .form {
-  border: 1px solid black;
-  padding: 10px;
+  text-align: center;
 }
 
 .input {
-  margin: 5px auto;
-  display: block;
-  width: 80%;
-  padding: 10px;
+  width: 50%;
   text-align: center;
 }
 
-.input[type=submit] {
-  max-width: 200px;
-}
-
-.input[type=submit]:active {
-  box-shadow: 1px 2px;
-}
-
-.notification {
-  text-align: center;
-}
-
-.list-wrapper {
-  list-style: none;
-  max-height: 30vh;
-  overflow-y: auto;
-}
-
-.list {
-  border: 1px black solid;
-  padding: 20px;
-  user-select: none;
-}
-
-.list:hover {
-  background-color: #1ff;
-}
-
-.list:active {
-  box-shadow: 1px 3px;
+.form-input {
+  width: 50%;
+  margin: auto;
 }
