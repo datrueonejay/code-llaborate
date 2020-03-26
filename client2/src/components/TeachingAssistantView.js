@@ -26,8 +26,8 @@ function TeachingAssistantView(props) {
       <div>
         {courses.map((course, index) => {
             return (
-              <div>
-                <li key={index}>{course}</li>
+              <div key={index}>
+                <li>{course}</li>
                 <button
                   onClick={() =>
                     http

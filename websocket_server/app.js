@@ -104,7 +104,7 @@ app.post(
   }
 );
 
-app.get("/api/signout", (req, res, next) => {
+app.get("/api/signout", authenticated, (req, res, next) => {
   req.session.destroy();
   res.json("Signed out");
 });

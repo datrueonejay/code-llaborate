@@ -1,19 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
 import "../App.css";
-import "../css/Form.css";
-import "../css/List.css";
-import "../css/InstructorView.css";
+import styles from "../scss/InstructorView.module.scss";
+import { TextField, Button, FormControl, InputLabel, Input, FormHelperText } from '@material-ui/core';
 
 function InstructorView(props) {
   const api = require("../api.js");
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [notification, setNotification] = useState("");
+  const [values, setValues] = useState({
+    studentId: "",
+    courseId: "",
+    studentIdFilter: "",
+    courseIdFilter: "",
+  });
+
   const formRef = useRef(null);
-  const studentIdRef = useRef(null);
-  const courseIdRef = useRef(null);
-  const filterStudentRef = useRef(null);
-  const filterCourseRef = useRef(null);
   const studentListRef = useRef(null);
   const courseListRef = useRef(null);
 
@@ -47,26 +49,36 @@ function InstructorView(props) {
     })
   }
 
-  function setValue(ref, id) {
-    return function(e) {
-      ref.current.value = id;
-    }
+  // function setValue(ref, id) {
+  //   return function(e) {
+  //     console.log(ref.current);
+  //     ref.current.focus();
+  //   }
+  // }
+  
+  const setValue = (value, id) => event => {
+    setValues({...values, [value]: id});
   }
 
-  function filterList(inputRef, listRef) {
+  const handleChange = value => event => {
+    setValues({...values, [value]: event.target.value});
+  }
+
+  function filterList(input, listRef) {
     return function(e) {
       // this should be called when user types into the input
-      let input = inputRef.current.value.toUpperCase(); // what the user typed in
+      input = input.toUpperCase(); // what the user typed in
       let list = listRef.current.querySelectorAll("li");
 
       for(let i = 0; i < list.length ; i++) {
         let li, text;
         li = list[i];
-        text = li.textContent || li.innerText; // text of the list
-        if (text.toUpperCase().indexOf(input) > -1) {
-          li.style.display = "";
+        text = li.textContent|| li.innerText; // text of the list
+        text = text.toUpperCase();
+        if (text.indexOf(input) > -1) {
+          li.classList.remove("hide");
         } else {
-          li.style.display = "none";
+          li.classList.add("hide");
         }
       }
       
@@ -76,32 +88,87 @@ function InstructorView(props) {
   // TODO: Clean up this pile of mess
   return (
     <div>
-      <form ref={formRef} onSubmit={handleSubmit}>
+      <form className={styles.form} ref={formRef} onSubmit={handleSubmit}>
+
         <h1 className="text-center">Add student to course</h1>
-        <input ref={studentIdRef} type="text" id="studentID" name="studentID" placeholder="Student ID"></input>
-        <input ref={courseIdRef} type="text" id="courseID" name="courseID" placeholder="Course ID"></input>
-        <input type="submit" value="Add student to course"></input>
+
+        <div className={styles['form-input']}>
+          <TextField 
+            id="studentID"
+            fullWidth={true}
+            label="Student Id"
+            name="studentID"
+            onChange={handleChange('studentId')}
+            value={values.studentId}
+            helperText="The student id, for example, 3"
+            required
+          />
+        </div>
+
+        <div className={styles['form-input']}>
+          <TextField 
+            id="courseID"
+            fullWidth={true}
+            label="Course Id"
+            name="courseID"
+            onChange={handleChange('courseId')}
+            value={values.courseId}
+            helperText="The course id, for example, 2"
+            required
+          />
+        </div>
+        
+        <Button type="submit" color="primary" variant="contained">Add student to course</Button>
+
         <div className="notification">{notification}</div>
       </form>
 
       <div id="id-selector">
-        <div id="filter-student">
-          <input ref={filterStudentRef} type="text" onKeyUp={filterList(filterStudentRef, studentListRef)} placeholder="Filter"></input>
-        </div>
         <h1>Students:</h1>
-        <ul ref={studentListRef}>
+
+        <div id="filter-student">
+          <TextField 
+            className={styles.input} 
+            type="text" 
+            onKeyUp={filterList(values.studentIdFilter, studentListRef)} 
+            onChange={handleChange('studentIdFilter')} 
+            value={values.studentIdFilter} />
+        </div>
+
+        <ul className={styles['list-wrapper']} ref={studentListRef}>
           {students.map((student) => {
-            return <li onClick={setValue(studentIdRef, student.ID)} key={student.ID} id={student.ID}>{student.Name} id: {student.ID}</li>
+            return <li 
+                    className={styles.list} 
+                    onClick={setValue("studentId",student.ID)} 
+                    key={student.ID} 
+                    id={student.ID}
+                    >
+                    {student.Name} id: {student.ID}
+                    </li>
           })}
         </ul>
 
-        <div id="filter-course">
-          <input ref={filterCourseRef} type="text" onKeyUp={filterList(filterCourseRef, courseListRef)} placeholder="Filter"></input>
-        </div>
         <h1>Courses:</h1>
-        <ul ref={courseListRef}>
+
+        <div id="filter-course">
+          <TextField 
+            className={styles.input} 
+            type="text" 
+            onKeyUp={filterList(values.courseIdFilter, courseListRef)} 
+            onChange={handleChange('courseIdFilter')} 
+            value={values.courseIdFilter} />
+        </div>
+        
+        <ul ref={courseListRef} className={styles['list-wrapper']}>
         {courses.map((course, index) => {
-            return <li onClick={setValue(courseIdRef, course.ID)} key={index} id={course.ID}>{course.CourseCode}</li>
+            return <li 
+              className={styles.list} 
+              onClick={setValue("courseId", course.ID)} 
+              key={index} 
+              id={course.ID}
+              >
+              {course.CourseCode}
+              </li>
           })}
         </ul>
       </div>
