@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import "../App.css";
-import "../css/Form.css";
-import "../css/List.css";
-import "../css/InstructorView.css";
+import styles from "../scss/InstructorView.module.scss";
 
 function InstructorView(props) {
   const api = require("../api.js");
@@ -76,32 +74,32 @@ function InstructorView(props) {
   // TODO: Clean up this pile of mess
   return (
     <div>
-      <form ref={formRef} onSubmit={handleSubmit}>
+      <form className={styles.form} ref={formRef} onSubmit={handleSubmit}>
         <h1 className="text-center">Add student to course</h1>
-        <input ref={studentIdRef} type="text" id="studentID" name="studentID" placeholder="Student ID"></input>
-        <input ref={courseIdRef} type="text" id="courseID" name="courseID" placeholder="Course ID"></input>
-        <input type="submit" value="Add student to course"></input>
+        <input className={styles.input} ref={studentIdRef} type="text" id="studentID" name="studentID" placeholder="Student ID"></input>
+        <input className={styles.input} ref={courseIdRef} type="text" id="courseID" name="courseID" placeholder="Course ID"></input>
+        <input className={styles.input} type="submit" value="Add student to course"></input>
         <div className="notification">{notification}</div>
       </form>
 
       <div id="id-selector">
         <div id="filter-student">
-          <input ref={filterStudentRef} type="text" onKeyUp={filterList(filterStudentRef, studentListRef)} placeholder="Filter"></input>
+          <input className={styles.input} ref={filterStudentRef} type="text" onKeyUp={filterList(filterStudentRef, studentListRef)} placeholder="Filter"></input>
         </div>
         <h1>Students:</h1>
-        <ul ref={studentListRef}>
+        <ul className={styles['list-wrapper']} ref={studentListRef}>
           {students.map((student) => {
-            return <li onClick={setValue(studentIdRef, student.ID)} key={student.ID} id={student.ID}>{student.Name} id: {student.ID}</li>
+            return <li className={styles.list} onClick={setValue(studentIdRef, student.ID)} key={student.ID} id={student.ID}>{student.Name} id: {student.ID}</li>
           })}
         </ul>
 
         <div id="filter-course">
-          <input ref={filterCourseRef} type="text" onKeyUp={filterList(filterCourseRef, courseListRef)} placeholder="Filter"></input>
+          <input className={styles.input} ref={filterCourseRef} type="text" onKeyUp={filterList(filterCourseRef, courseListRef)} placeholder="Filter"></input>
         </div>
         <h1>Courses:</h1>
-        <ul ref={courseListRef}>
+        <ul className={styles['list-wrapper']} ref={courseListRef}>
         {courses.map((course, index) => {
-            return <li onClick={setValue(courseIdRef, course.ID)} key={index} id={course.ID}>{course.CourseCode}</li>
+            return <li className={styles.list} onClick={setValue(courseIdRef, course.ID)} key={index} id={course.ID}>{course.CourseCode}</li>
           })}
         </ul>
       </div>
