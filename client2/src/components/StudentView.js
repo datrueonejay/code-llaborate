@@ -28,8 +28,8 @@ function StudentView(props) {
       <div>
         <Logout />
         {courses.map((course, index) => {
-          return (<div>
-            <li key={index}>{course}</li>
+          return (<div key={index}>
+            <li>{course}</li>
             <button
               onClick={() =>
               http
