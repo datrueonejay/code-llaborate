@@ -1,0 +1,15 @@
+version: '3.7'
+services:
+  redis:
+    container_name: redis_container
+    image: redis
+    ports:
+      - 6379:6379
+  db:
+    container_name: mysql_container
+    build: ./db
+    image: c09db:latest
+    ports: 
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
