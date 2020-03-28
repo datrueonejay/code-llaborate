@@ -48,11 +48,11 @@ let handleSubmitSuggestion = event => {
   http.send_message(suggestion, "SUGGESTION");
 };
 
-let handleSubmitChat = event => {
-  event.preventDefault();
-  let chat = document.querySelector("#chatText").value;
-  http.send_message(chat, "CHAT");
-};
+// let handleSubmitChat = event => {
+//   event.preventDefault();
+//   let chat = document.querySelector("#chatText").value;
+//   http.send_message(chat, "CHAT");
+// };
 
 export default function Editor(props) {
   const [text, setText] = useState("");
@@ -98,7 +98,7 @@ export default function Editor(props) {
             </Button>
           </Form>
           <Suggestions suggestions={suggestions} />
-          <Form onSubmit={handleSubmitChat}>
+          {/* <Form onSubmit={handleSubmitChat}>
             <textarea
               name="chat"
               className="chatText"
@@ -108,8 +108,8 @@ export default function Editor(props) {
               {" "}
               Chat{" "}
             </Button>
-          </Form>
-          <Chat chatOut={chatOut} ></Chat>
+          </Form> */}
+          {/* <Chat chatOut={chatOut} ></Chat> */}
           <div>
             PYTHON FROM WEBSOCKET
             {pythonOut}
@@ -143,8 +143,13 @@ export default function Editor(props) {
           <div id="output">
             <span id="box"> </span>
           </div>
+
+
           <Suggestions suggestions={suggestions} />
           <Chat chatOut={chatOut}></Chat>
+
+
+
           <div>
             PYTHON FROM WEBSOCKET
             {pythonOut}

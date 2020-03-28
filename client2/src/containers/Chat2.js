@@ -1,5 +1,13 @@
 import React from "react";
+import http from "../http";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import { Button, Form } from "react-bootstrap";
+
+let handleSubmitChat = event => {
+  event.preventDefault();
+  let chat = document.querySelector("#chatText").value;
+  http.send_message(chat, "CHAT");
+};
 
 function Chat(props) {
   
@@ -18,6 +26,17 @@ function Chat(props) {
           );
         })}
       </ul>
+      <Form onSubmit={handleSubmitChat}>
+            <textarea
+              name="chat"
+              className="chatText"
+              id="chatText"
+            />
+            <Button type="submit" className="btn">
+              {" "}
+              Chat{" "}
+            </Button>
+      </Form>
     </div>
   );
 }

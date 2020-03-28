@@ -36,7 +36,7 @@ let http = (function() {
       // console.log(from);
       // console.log(res.message);
 
-      if (from === "TEACHING ASSISTANT") {
+      if (from === "TEACHING ASSISTANT" && res.type != "CHAT") {
         codeListeners.forEach(listener => {
           listener(res.message);
         });

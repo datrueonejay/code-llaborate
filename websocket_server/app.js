@@ -436,11 +436,12 @@ wss.on("session", (ws, req) => {
     // console.log(`Got the parsedMsg ${parsedMsg}`)
     // console.log(`Got the message ${parsedMsg.message}`);
     // TA CODE
-    if (req.session.user.role === "TEACHING ASSISTANT") {
+    if (req.session.user.role === "TEACHING ASSISTANT" && parsedMsg.type == "CODE" ) {
       console.log("TA MESSAGE");
 
       redisClient.hset(ws.course, "code", parsedMsg.message);
       ret = {
+        type: "CODE",
         from: req.session.user.role,
         message: parsedMsg.message
       };
@@ -476,6 +477,7 @@ wss.on("session", (ws, req) => {
         (err, suggestions) => {
           if (err) return res.status(500).end("Internal server error");
           ret = {
+            type: "SUGGESTION",
             from: req.session.user.role,
             message: suggestions
           };
