@@ -32,8 +32,9 @@ let http = (function() {
       console.log("Server: " + e.data);
       let res = JSON.parse(e.data);
       let from = res.from;
-      console.log(from)
-      console.log(res)
+      // console.log("onmessage");
+      // console.log(from);
+      // console.log(res.message);
 
       if (from === "TEACHING ASSISTANT") {
         codeListeners.forEach(listener => {
@@ -73,7 +74,7 @@ let http = (function() {
   };
 
   module.send_message = (message, type) => {
-    console.log(JSON.stringify({message:message, type:type}));
+    // console.log(JSON.stringify({message:message, type:type}));
     exampleSocket.send(JSON.stringify({message:message, type:type}));
   };
 

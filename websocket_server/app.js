@@ -424,13 +424,17 @@ wss.on("session", (ws, req) => {
 
   ws.on("message", message => {
     // parse string
+    // console.log("message Msg")
+    // console.log(message)
+
+
     let parsedMsg = JSON.parse(message);
-    console.log("parsed Msg")
-    console.log(parsedMsg)
+    // console.log("parsed Msg")
+    // console.log(parsedMsg)
 
     let ret;
-    console.log(`Got the parsedMsg ${parsedMsg}`)
-    console.log(`Got the message ${parsedMsg.message}`);
+    // console.log(`Got the parsedMsg ${parsedMsg}`)
+    // console.log(`Got the message ${parsedMsg.message}`);
     // TA CODE
     if (req.session.user.role === "TEACHING ASSISTANT") {
       console.log("TA MESSAGE");
@@ -441,15 +445,24 @@ wss.on("session", (ws, req) => {
         message: parsedMsg.message
       };
     } else if (parsedMsg.type == "CHAT"){
-      console.log("CHAT MESSAGE");
+      // console.log("CHAT MESSAGE");
+      // console.log(parsedMsg.message)
+
       redisClient.rpush(`${req.session.currSession}CHAT`, parsedMsg.message)
 
-      return redisClient.get(`${req.session.currSession}CHAT`, (err, res) => {
+      return redisClient.lrange(`${req.session.currSession}CHAT`, 0 , -1 , (err, res) => {
+          // console.log("res redis");
+          // console.log(res);
           ret = {
             type: "CHAT", //TODO: secure this?
             from: req.session.user.role,
             message: res
           }
+          wss.clients.forEach(client => {
+            if (client.course === ws.course) {
+              client.send(JSON.stringify(ret));
+            }
+          });
       })
 
     }
