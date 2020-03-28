@@ -87,10 +87,12 @@ app.post(
     let password = req.body.password;
     db.checkUser(username, password, (err, user) => {
       if (err) {
+        console.log(err);
         return res.status(500).end(err.message);
       }
       db.findClasses(user.username, (err, classes) => {
         if (err) {
+          console.log(err);
           return res.status(500).end(err.message);
         }
         console.log(classes);
@@ -421,22 +423,41 @@ wss.on("session", (ws, req) => {
   // Instructor logic
 
   ws.on("message", message => {
+    // parse string
+    let parsedMsg = JSON.parse(message);
+    console.log("parsed Msg")
+    console.log(parsedMsg)
+
     let ret;
-    console.log(`Got the message ${message}`);
+    console.log(`Got the parsedMsg ${parsedMsg}`)
+    console.log(`Got the message ${parsedMsg.message}`);
     // TA CODE
     if (req.session.user.role === "TEACHING ASSISTANT") {
       console.log("TA MESSAGE");
 
-      redisClient.hset(ws.course, "code", message);
+      redisClient.hset(ws.course, "code", parsedMsg.message);
       ret = {
         from: req.session.user.role,
-        message: message
+        message: parsedMsg.message
       };
-    } else {
+    } else if (parsedMsg.type == "CHAT"){
+      console.log("CHAT MESSAGE");
+      redisClient.rpush(`${req.session.currSession}CHAT`, parsedMsg.message)
+
+      return redisClient.get(`${req.session.currSession}CHAT`, (err, res) => {
+          ret = {
+            type: "CHAT", //TODO: secure this?
+            from: req.session.user.role,
+            message: res
+          }
+      })
+
+    }
+    else {
       console.log("STUDENT SUGGESTIONS");
-      console.log(message);
+      console.log(parsedMsg.message);
       // Student suggestions
-      redisClient.sadd(`${req.session.currSession}SUGGESTIONS`, message);
+      redisClient.sadd(`${req.session.currSession}SUGGESTIONS`, parsedMsg.message);
       return redisClient.smembers(
         `${req.session.currSession}SUGGESTIONS`,
         (err, suggestions) => {

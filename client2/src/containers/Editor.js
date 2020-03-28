@@ -4,6 +4,7 @@ import "./Editor.css";
 
 import { Button, Form } from "react-bootstrap";
 import Suggestions from "./Suggestions";
+import Chat from "./Chat2";
 
 const apiPython = require("../apiPython.js");
 
@@ -44,7 +45,13 @@ function handleSubmitFile(event) {
 let handleSubmitSuggestion = event => {
   event.preventDefault();
   let suggestion = document.querySelector("#suggestionText").value;
-  http.send_message(suggestion);
+  http.send_message(suggestion, "SUGGESTION");
+};
+
+let handleSubmitChat = event => {
+  event.preventDefault();
+  let chat = document.querySelector("#chatText").value;
+  http.send_message(chat, "CHAT");
 };
 
 export default function Editor(props) {
@@ -52,6 +59,7 @@ export default function Editor(props) {
   const [writer, setWriter] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [pythonOut, setPythonOut] = useState("");
+  const [chatOut, setChatOut] = useState([]);
   let timeout = null;
 
   useEffect(() => {
@@ -64,6 +72,9 @@ export default function Editor(props) {
     });
     http.python_listener(output => {
       setPythonOut(pythonOut + output);
+    });
+    http.chat_listener(chat => {
+      setChatOut(chat);
     });
   }, []);
 
@@ -87,6 +98,18 @@ export default function Editor(props) {
             </Button>
           </Form>
           <Suggestions suggestions={suggestions} />
+          <Form onSubmit={handleSubmitChat}>
+            <textarea
+              name="chat"
+              className="chatText"
+              id="chatText"
+            />
+            <Button type="submit" className="btn">
+              {" "}
+              Chat{" "}
+            </Button>
+          </Form>
+          <Chat chatOut={chatOut} ></Chat>
           <div>
             PYTHON FROM WEBSOCKET
             {pythonOut}
@@ -102,7 +125,7 @@ export default function Editor(props) {
                 clearTimeout(timeout);
                 let a = e.target.value;
                 timeout = setTimeout(() => {
-                  http.send_message(a);
+                  http.send_message(a, "CODE");
                 }, 500);
               }}
             ></textarea>
@@ -121,6 +144,7 @@ export default function Editor(props) {
             <span id="box"> </span>
           </div>
           <Suggestions suggestions={suggestions} />
+          <Chat chatOut={chatOut}></Chat>
           <div>
             PYTHON FROM WEBSOCKET
             {pythonOut}

@@ -4,6 +4,8 @@ let http = (function() {
   const codeListeners = [];
   const suggestionListeners = [];
   const pythonListeners = [];
+  const chatListeners = [];
+
   let module = {};
 
   const base_url = process.env.REACT_APP_API_BASE_URL || "";
@@ -29,16 +31,24 @@ let http = (function() {
     exampleSocket.onmessage = function(e) {
       console.log("Server: " + e.data);
       let res = JSON.parse(e.data);
-      let type = res.from;
-      if (type === "TEACHING ASSISTANT") {
+      let from = res.from;
+      console.log(from)
+      console.log(res)
+
+      if (from === "TEACHING ASSISTANT") {
         codeListeners.forEach(listener => {
           listener(res.message);
         });
-      } else if (type === "PYTHON") {
+      } else if (from === "PYTHON") {
         pythonListeners.forEach(listener => {
           listener(res.message);
         });
+      } else if (res.type == "CHAT") {
+        chatListeners.forEach(listener => {
+          listener(res.message);
+        });
       } else {
+        console.log("DEFAULT SUGGESTIONS")
         suggestionListeners.forEach(listener => {
           listener(res.message);
         });
@@ -58,7 +68,14 @@ let http = (function() {
     pythonListeners.push(listener);
   };
 
-  module.send_message = message => exampleSocket.send(message);
+  module.chat_listener = listener => {
+    chatListeners.push(listener);
+  };
+
+  module.send_message = (message, type) => {
+    console.log(JSON.stringify({message:message, type:type}));
+    exampleSocket.send(JSON.stringify({message:message, type:type}));
+  };
 
   module.getCourses = () => {
     return axios.get(`${base_url}/api/classes`).then(res => res.data);
