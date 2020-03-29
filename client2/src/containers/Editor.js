@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import http from "../http";
 import "./Editor.css";
 
 import { Button, Form } from "react-bootstrap";
 import Suggestions from "./Suggestions";
 import Chat from "./Chat2";
+
+import AceEditor from "react-ace";
+
+// Import a Mode (language)
+import 'brace/mode/python';
+
+// Import a Theme 
+import 'brace/theme/monokai';
 
 const apiPython = require("../apiPython.js");
 
@@ -60,7 +68,10 @@ export default function Editor(props) {
   const [suggestions, setSuggestions] = useState([]);
   const [pythonOut, setPythonOut] = useState("");
   const [chatOut, setChatOut] = useState([]);
+  const [state, setState] = useState(0);
+
   let timeout = null;
+  const editorRef = useRef(null);
 
   useEffect(() => {
     http.connect();
@@ -77,6 +88,38 @@ export default function Editor(props) {
       setChatOut(chat);
     });
   }, []);
+
+  function handleSubmitTextEditor() {
+
+    let code = state.newValue;
+  
+    apiPython.compileText(code, function(err, res) {
+      if (err) return console.log(err);
+      let outputPython = res.string;
+      let output = document.querySelector("#box");
+      let outputdiv = document.querySelector("#output");
+  
+      output.innerHTML = outputPython;
+  
+      outputdiv.style.visibility = "visible";
+      output.style.visibility = "visible";
+    });
+    
+  }
+
+  function onChange(newValue) {
+
+    clearTimeout(timeout);
+    let a = newValue;
+    timeout = setTimeout(() => {
+      http.send_message(a, "CODE");
+    }, 500);
+    
+    console.log('change', newValue);
+
+    // store this value in state!!
+    setState({ newValue: newValue});
+  }
 
   return (
     <div className="codeText">
@@ -129,11 +172,38 @@ export default function Editor(props) {
                 }, 500);
               }}
             ></textarea>
+            <AceEditor
+              id="AceEditor"
+              ref={editorRef}
+              placeholder="Start Typing Here!"
+              mode="python"
+              theme="monokai"
+              name="AceEditor"
+              // onLoad={this.onLoad}
+              onChange={onChange}
+              fontSize={14}
+              showPrintMargin={true}
+              showGutter={true}
+              highlightActiveLine={true}
+              value={state.newValue}
+              setOptions={{
+              enableBasicAutocompletion: false,
+              enableLiveAutocompletion: false,
+              enableSnippets: false,
+              showLineNumbers: true,
+              tabSize: 2,
+            }}/>
             <Button type="submit" className="btn">
               {" "}
               Run{" "}
             </Button>
+
           </Form>
+
+          <Button className="btn" onClick={handleSubmitTextEditor}>
+              {" "}
+              Run Editor{" "}
+          </Button>
 
           <Form onSubmit={handleSubmitFile} id="codeFile">
             <input type="file" name="file" accept=".py, .txt" />
