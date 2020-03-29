@@ -1,6 +1,5 @@
 import React from "react";
 import http from "../http";
-import {CopyToClipboard} from 'react-copy-to-clipboard';
 import { Button, Form } from "react-bootstrap";
 
 let handleSubmitChat = event => {
@@ -19,9 +18,6 @@ function Chat(props) {
           return (
             <li key={chat} id={chat}>
               {chat}
-              <CopyToClipboard text={chat}>
-                <button>Copy</button>
-              </CopyToClipboard>
             </li>
           );
         })}

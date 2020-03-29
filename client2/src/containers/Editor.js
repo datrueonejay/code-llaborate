@@ -125,6 +125,26 @@ export default function Editor(props) {
     <div className="codeText">
       {props.isStudent ? (
         <div>
+            <AceEditor
+              id="AceEditor"
+              ref={editorRef}
+              placeholder="Start Typing Here!"
+              mode="python"
+              theme="monokai"
+              name="AceEditor"
+              onLoad={text}
+              fontSize={14}
+              showPrintMargin={true}
+              showGutter={true}
+              highlightActiveLine={true}
+              value={text}
+              setOptions={{
+              enableBasicAutocompletion: false,
+              enableLiveAutocompletion: false,
+              enableSnippets: false,
+              showLineNumbers: true,
+              tabSize: 2,
+            }}/>
           <div>
             <p>Text below</p>
             <p>{text}</p>
