@@ -5,8 +5,6 @@ import "../scss/Home.scss";
 
 function Home(props) {
 
-    console.log(process.env.REACT_APP_DATABASE_BASE_URL);
-
     return(
         <div  className="logo">
             <Link to="/signup">Sign up!</Link>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import logo from "./logo.svg";
+import PrivateRoute from './components/PrivateRoute';
 import "./App.css";
 // import Http from "./http.js";
 // import http from "./http";
@@ -28,16 +28,19 @@ function App() {
   const dispatch = useDispatch();
 
   let isStudent = type === "STUDENT";
+  console.log(authenticate);
 
+  // Private route notes: the redirect currently goes to login, wen eed to make an unauthorized page or a 404 page ?? TODO
   return (
     <Router>
       <Switch>
         <Route exact path='/' component={Home} />
         <Route path='/signup' component={Signup} />
         <Route path='/login' component={Login} />
-        <Route path='/student' render={(props)=> <StudentView {...props} isStudent={isStudent}/>} />
-        <Route path='/ta' render={(props)=> <TeachingAssistantView {...props} isStudent={isStudent}/>} />
-        <Route path='/instructor' render={(props)=> <InstructorView {...props} />}/>
+        <PrivateRoute path='/student' for="STUDENT" component={(props)=> <StudentView {...props} isStudent={isStudent}/>} />
+        <PrivateRoute path='/ta' for="TEACHING ASSISTANT" component={(props)=> <TeachingAssistantView {...props} isStudent={isStudent}/>} />
+        <PrivateRoute path='/instructor' for="INSTRUCTOR" component={(props)=> <InstructorView {...props} />}/>
+        <PrivateRoute path='/private' for="INSTRUCTOR" component={(props) => <InstructorView {...props} />}/>
       </Switch>
     </Router>
   )

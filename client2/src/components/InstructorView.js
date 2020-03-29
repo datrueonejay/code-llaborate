@@ -9,6 +9,7 @@ import {
   Input,
   FormHelperText
 } from "@material-ui/core";
+import { Link } from 'react-router-dom';
 
 function InstructorView(props) {
   const api = require("../api.js");
@@ -189,6 +190,9 @@ function InstructorView(props) {
           })}
         </ul>
       </div>
+
+      <Link to="/private">Private</Link>
+
     </div>
   );
 }

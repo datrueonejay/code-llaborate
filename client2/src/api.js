@@ -63,6 +63,16 @@ exports.checkUser = function(username, password, callback = null) {
   //   });
 };
 
+exports.checkAuth = function(callback=null) {
+  // send(
+  //   "GET",
+  //   "/api/checkauth",
+  //   {},
+  //   callback
+  // );
+  return (null, "hi");
+}
+
 exports.getStudents = function(callback=null) {
   send(
     "GET",

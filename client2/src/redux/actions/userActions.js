@@ -11,3 +11,8 @@ export const setAuth = auth => ({
     type: "SET_AUTH",
     auth
 })
+
+
+export const purge = () => ({
+    type: 'PURGE',
+})
