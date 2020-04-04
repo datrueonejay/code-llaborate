@@ -118,9 +118,14 @@ exports.findClasses = (username, cb) => {
   });
 };
 
-exports.getStudents = cb => {
-  let sql = "SELECT Name,ID FROM Users where RoleID=1";
-  connection.query(sql, cb);
+exports.searchStudent = (query, cb) => {
+  let sql = 'SELECT Name,ID FROM Users where RoleID=1 and Name like' + connection.escape('%' + query + '%');
+  connection.query(sql, [query], cb);
+}
+
+exports.getStudents = (page=0, cb) => {
+  let sql = "SELECT Name,ID FROM Users where RoleID=1 ORDER BY ID LIMIT ?, 50";
+  connection.query(sql, [page*50], cb);
 };
 
 //TODO: perhaps change it so only the isntructors who are a part of the course can see the course???????

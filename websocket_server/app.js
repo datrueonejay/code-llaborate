@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 app.use(express.static("build"));
 
 app.use(function(req, res, next) {
-  console.log("HTTP request", req.method, req.url, req.body);
+  console.log("HTTP request", req.method, req.url, req.body, req.query);
   next();
 });
 
@@ -216,14 +216,27 @@ app.post("/api/addstudenttocourse/", authenticated, (req, res, next) => {
   });
 });
 
+app.post("/api/searchstudent/", authenticated, (req, res, next) => {
+  let searchQuery = req.body.query;
+  db.searchStudent(searchQuery, (err, results) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).end(err.message);
+    }
+    console.log(results);
+    return res.json(results);
+  })
+})
+
 app.get("/api/classes", authenticated, (req, res, next) => {
   console.log(req.session.classes);
   res.json(req.session.classes);
 });
 
 app.get("/api/students", authenticated, (req, res, next) => {
-  db.getStudents((err, results, fields) => {
-    if (err) return res.status(500).end(err.message);
+  let page = req.query.page || 0;
+  db.getStudents(page, (err, results, fields) => {
+    if (err) {console.log(err); return res.status(500).end(err.message);}
     return res.json(results);
   });
 });
