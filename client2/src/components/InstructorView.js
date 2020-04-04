@@ -20,7 +20,8 @@ function InstructorView(props) {
     studentId: "",
     courseId: "",
     studentIdFilter: "",
-    courseIdFilter: ""
+    courseIdFilter: "",
+    searchStudent: "",
   });
 
   const formRef = useRef(null);
@@ -29,7 +30,7 @@ function InstructorView(props) {
 
   useEffect(() => {
     function updateStudents() {
-      api.getStudents((err, res) => {
+      api.getStudents(0, (err, res) => {
         setStudents(res);
       });
     }
@@ -68,6 +69,13 @@ function InstructorView(props) {
   //   }
   // }
 
+  function searchStudent() {
+    api.searchStudent(values.searchStudent, (err, res) => {
+      if (err) setNotification("Could not search for student. Please try again");
+      setStudents(res);
+    })
+  }
+
   const setValue = (value, id) => event => {
     setValues({ ...values, [value]: id });
   };
@@ -96,9 +104,10 @@ function InstructorView(props) {
     };
   }
 
-  // TODO: Clean up this pile of mess
   return (
     <div>
+      <div className={styles.notification}>{notification}</div>
+
       <form className={styles.form} ref={formRef} onSubmit={handleSubmit}>
         <h1 className="text-center">Add student to course</h1>
 
@@ -132,11 +141,23 @@ function InstructorView(props) {
           Add student to course
         </Button>
 
-        <div className="notification">{notification}</div>
       </form>
 
       <div id="id-selector">
         <h1>Students:</h1>
+
+        <div id="search-student">
+          <TextField
+            className={styles.input}
+            type="text"
+            onChange={handleChange("searchStudent")}
+            value={values.searchStudent}
+            helperText="The students name, e.g JayQuelen"
+          />
+          <Button onClick={searchStudent} type="submit" color="primary" variant="contained">
+            Search
+          </Button>
+        </div>
 
         <div id="filter-student">
           <TextField
@@ -144,6 +165,7 @@ function InstructorView(props) {
             type="text"
             onKeyUp={filterList(values.studentIdFilter, studentListRef)}
             onChange={handleChange("studentIdFilter")}
+            helperText="Filter by student name"
             value={values.studentIdFilter}
           />
         </div>
@@ -175,7 +197,7 @@ function InstructorView(props) {
           />
         </div>
 
-        <ul ref={courseListRef} className={styles["list-wrapper"]}>
+        <ul ref={courseListRef} className={styles.form}>
           {courses.map((course, index) => {
             return (
               <li

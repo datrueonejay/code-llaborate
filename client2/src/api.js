@@ -73,11 +73,20 @@ exports.checkAuth = function(callback=null) {
   return (null, "hi");
 }
 
-exports.getStudents = function(callback=null) {
+exports.getStudents = function(page=0, callback=null) {
   send(
     "GET",
-    "/api/students",
+    `/api/students?page=${page}`,
     {},
+    callback
+  );
+}
+
+exports.searchStudent = function(query, callback=null) {
+  send(
+    "POST",
+    '/api/searchstudent',
+    { query },
     callback
   );
 }
