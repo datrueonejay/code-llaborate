@@ -9,48 +9,50 @@ import Chat from "./Chat2";
 import AceEditor from "react-ace";
 
 // Import a Mode (language)
-import 'brace/mode/python';
+import "brace/mode/python";
 
-// Import a Theme 
-import 'brace/theme/monokai';
+// Import a Theme
+import "brace/theme/monokai";
 
-const apiPython = require("../apiPython.js");
+// const apiPython = require("../apiPython.js");
 
 // async
-function handleSubmitText(event) {
-  event.preventDefault();
-  let code = document.querySelector('#codeText textarea[name="code"]').value;
-  apiPython.compileText(code, function(err, res) {
-    if (err) return console.log(err);
-    let outputPython = res.string;
-    let output = document.querySelector("#box");
-    let outputdiv = document.querySelector("#output");
+// function handleSubmitText(event) {
+//   event.preventDefault();
+//   let code = document.querySelector('#codeText textarea[name="code"]').value;
+//   console.log(`Code is ${code}`);
+//   console.log(document.querySelector("#AceEditor").value);
+//   apiPython.compileText(code, function (err, res) {
+//     if (err) return console.log(err);
+//     let outputPython = res.string;
+//     let output = document.querySelector("#box");
+//     let outputdiv = document.querySelector("#output");
 
-    output.innerHTML = outputPython;
+//     output.innerHTML = outputPython;
 
-    outputdiv.style.visibility = "visible";
-    output.style.visibility = "visible";
-  });
-}
+//     outputdiv.style.visibility = "visible";
+//     output.style.visibility = "visible";
+//   });
+// }
 
-function handleSubmitFile(event) {
-  event.preventDefault();
-  let file = document.querySelector('#codeFile input[name="file"]').files[0];
-  document.querySelector("#codeFile").reset();
-  apiPython.compileFile(file, function(err, res) {
-    if (err) return console.log(err);
-    let outputPython = res.string;
-    let output = document.querySelector("#box");
-    let outputdiv = document.querySelector("#output");
+// function handleSubmitFile(event) {
+//   event.preventDefault();
+//   let file = document.querySelector('#codeFile input[name="file"]').files[0];
+//   document.querySelector("#codeFile").reset();
+//   apiPython.compileFile(file, function (err, res) {
+//     if (err) return console.log(err);
+//     let outputPython = res.string;
+//     let output = document.querySelector("#box");
+//     let outputdiv = document.querySelector("#output");
 
-    output.innerHTML = outputPython;
+//     output.innerHTML = outputPython;
 
-    outputdiv.style.visibility = "visible";
-    output.style.visibility = "visible";
-  });
-}
+//     outputdiv.style.visibility = "visible";
+//     output.style.visibility = "visible";
+//   });
+// }
 
-let handleSubmitSuggestion = event => {
+let handleSubmitSuggestion = (event) => {
   event.preventDefault();
   let suggestion = document.querySelector("#suggestionText").value;
   http.send_message(suggestion, "SUGGESTION");
@@ -68,83 +70,83 @@ export default function Editor(props) {
   const [suggestions, setSuggestions] = useState([]);
   const [pythonOut, setPythonOut] = useState("");
   const [chatOut, setChatOut] = useState([]);
-  const [state, setState] = useState(0);
+  // const [state, setState] = useState(0);
+  const [code, setCode] = useState("");
 
   let timeout = null;
   const editorRef = useRef(null);
 
   useEffect(() => {
     http.connect();
-    http.code_listener(message => {
+    http.code_listener((message) => {
       setText(message);
     });
-    http.suggestion_listener(suggests => {
+    http.suggestion_listener((suggests) => {
       setSuggestions(suggests);
     });
-    http.python_listener(output => {
+    http.python_listener((output) => {
       setPythonOut(pythonOut + output);
     });
-    http.chat_listener(chat => {
+    http.chat_listener((chat) => {
       setChatOut(chat);
     });
   }, []);
 
-  function handleSubmitTextEditor() {
+  // function handleSubmitTextEditor() {
+  //   let code = state.newValue;
 
-    let code = state.newValue;
-  
-    apiPython.compileText(code, function(err, res) {
-      if (err) return console.log(err);
-      let outputPython = res.string;
-      let output = document.querySelector("#box");
-      let outputdiv = document.querySelector("#output");
-  
-      output.innerHTML = outputPython;
-  
-      outputdiv.style.visibility = "visible";
-      output.style.visibility = "visible";
-    });
-    
-  }
+  //   apiPython.compileText(code, function (err, res) {
+  //     if (err) return console.log(err);
+  //     let outputPython = res.string;
+  //     let output = document.querySelector("#box");
+  //     let outputdiv = document.querySelector("#output");
+
+  //     output.innerHTML = outputPython;
+
+  //     outputdiv.style.visibility = "visible";
+  //     output.style.visibility = "visible";
+  //   });
+  // }
 
   function onChange(newValue) {
-
     clearTimeout(timeout);
     let a = newValue;
     timeout = setTimeout(() => {
       http.send_message(a, "CODE");
     }, 500);
-    
-    console.log('change', newValue);
+
+    // console.log("change", newValue);
 
     // store this value in state!!
-    setState({ newValue: newValue});
+    setCode(newValue);
+    // setState({ newValue: newValue });
   }
 
   return (
     <div className="codeText">
       {props.isStudent ? (
         <div>
-            <AceEditor
-              id="AceEditor"
-              ref={editorRef}
-              placeholder="Start Typing Here!"
-              mode="python"
-              theme="monokai"
-              name="AceEditor"
-              onLoad={text}
-              fontSize={14}
-              showPrintMargin={true}
-              showGutter={true}
-              highlightActiveLine={true}
-              value={text}
-              setOptions={{
+          <AceEditor
+            id="AceEditor"
+            ref={editorRef}
+            placeholder="Start Typing Here!"
+            mode="python"
+            theme="monokai"
+            name="AceEditor"
+            onLoad={text}
+            fontSize={14}
+            showPrintMargin={true}
+            showGutter={true}
+            highlightActiveLine={true}
+            value={text}
+            setOptions={{
               enableBasicAutocompletion: false,
               enableLiveAutocompletion: false,
               enableSnippets: false,
               showLineNumbers: true,
               tabSize: 2,
-            }}/>
+            }}
+          />
           <div>
             <p>Text below</p>
             <p>{text}</p>
@@ -180,52 +182,61 @@ export default function Editor(props) {
         </div>
       ) : (
         <div className="Editor">
-          <Form onSubmit={handleSubmitText} id="codeText">
+          {/* <Form onSubmit={handleSubmitText} id="codeText">
             <textarea
               name="code"
               className="codeText"
-              onChange={e => {
+              onChange={(e) => {
                 clearTimeout(timeout);
                 let a = e.target.value;
                 timeout = setTimeout(() => {
                   http.send_message(a, "CODE");
                 }, 500);
               }}
-            ></textarea>
-            <AceEditor
-              id="AceEditor"
-              ref={editorRef}
-              placeholder="Start Typing Here!"
-              mode="python"
-              theme="monokai"
-              name="AceEditor"
-              // onLoad={this.onLoad}
-              onChange={onChange}
-              fontSize={14}
-              showPrintMargin={true}
-              showGutter={true}
-              highlightActiveLine={true}
-              value={state.newValue}
-              setOptions={{
+            ></textarea> */}
+          <AceEditor
+            id="AceEditor"
+            ref={editorRef}
+            placeholder="Start Typing Here!"
+            mode="python"
+            theme="monokai"
+            name="AceEditor"
+            // onLoad={this.onLoad}
+            onChange={onChange}
+            fontSize={14}
+            showPrintMargin={true}
+            showGutter={true}
+            highlightActiveLine={true}
+            value={code}
+            setOptions={{
               enableBasicAutocompletion: false,
               enableLiveAutocompletion: false,
               enableSnippets: false,
               showLineNumbers: true,
               tabSize: 2,
-            }}/>
-            <Button type="submit" className="btn">
-              {" "}
-              Run{" "}
-            </Button>
+            }}
+          />
+          {/* <Button type="submit" className="btn">
+            {" "}
+            Run{" "}
+          </Button> */}
+          {/* </Form> */}
 
-          </Form>
-
-          <Button className="btn" onClick={handleSubmitTextEditor}>
-              {" "}
-              Run Editor{" "}
+          {/* <Button className="btn" onClick={handleSubmitTextEditor}> */}
+          <Button
+            className="btn"
+            onClick={() => {
+              http.executePython(code).then((res) => {
+                console.log(res);
+              });
+            }}
+          >
+            {" "}
+            Run Editor{" "}
           </Button>
 
-          <Form onSubmit={handleSubmitFile} id="codeFile">
+          {/* <Form onSubmit={handleSubmitFile} id="codeFile"> */}
+          <Form onSubmit={() => console.log("TODO")} id="codeFile">
             <input type="file" name="file" accept=".py, .txt" />
             <input type="submit" className="btn" />
           </Form>
@@ -234,11 +245,8 @@ export default function Editor(props) {
             <span id="box"> </span>
           </div>
 
-
           <Suggestions suggestions={suggestions} />
           <Chat chatOut={chatOut}></Chat>
-
-
 
           <div>
             PYTHON FROM WEBSOCKET

@@ -4,13 +4,16 @@ const redisClient = redis.createClient(
   process.env.REDIS_PORT || 6379,
   process.env.REDIS_HOST || "localhost",
   {
-    prefix: "session"
+    prefix: "session",
   }
 );
 const SESSION_EXPIRE_TIME = 7200; // in seconds
 
 // DB api init
 const db = require("./database");
+
+// Python api init
+const python = require("./python");
 
 // Express init
 const http = require("http");
@@ -25,7 +28,7 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(express.static("build"));
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body, req.query);
   next();
 });
@@ -33,7 +36,7 @@ app.use(function(req, res, next) {
 const sessionParser = session({
   secret: process.env.SESSION_SECRET || "d3f4ults3cr3t",
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
   // cookie: { httpOnly: true, secure: true, sameSite: true }
 });
 
@@ -48,14 +51,6 @@ let authenticated = (req, res, next) => {
 app.get("/health", (req, res) => {
   return res.status(200).end("OK");
 });
-
-//////////////// Python Compiler Imports/Constants //////////////////
-let mkdirp = require("mkdirp");
-const path = require("path");
-const multer = require("multer");
-const upload = multer({ dest: path.join(__dirname, "uploads") });
-
-/////////////////////////////////////////////////////////////////
 
 // Authentication Logic based off of code from CSCC09 Lab 06
 // Sign up
@@ -160,8 +155,8 @@ app.delete(
   (req, res, next) => {
     redisClient.hget(req.body.course, "startedBy", (err, id) => {
       if (id == req.session.user.id) {
-        redisClient.del(`${req.body.course}SESSION`, number => {
-          redisClient.del(req.body.course, number => {
+        redisClient.del(`${req.body.course}SESSION`, (number) => {
+          redisClient.del(req.body.course, (number) => {
             redisClient.del(`${req.body.course}SESSION`);
 
             return res.json(`${number} session(s) deleted`);
@@ -225,8 +220,8 @@ app.post("/api/searchstudent/", authenticated, (req, res, next) => {
     }
     console.log(results);
     return res.json(results);
-  })
-})
+  });
+});
 
 app.get("/api/classes", authenticated, (req, res, next) => {
   console.log(req.session.classes);
@@ -236,7 +231,10 @@ app.get("/api/classes", authenticated, (req, res, next) => {
 app.get("/api/students", authenticated, (req, res, next) => {
   let page = req.query.page || 0;
   db.getStudents(page, (err, results, fields) => {
-    if (err) {console.log(err); return res.status(500).end(err.message);}
+    if (err) {
+      console.log(err);
+      return res.status(500).end(err.message);
+    }
     return res.json(results);
   });
 });
@@ -255,12 +253,12 @@ app.get("/api/sessions", authenticated, (req, res, next) => {
   }
   console.log("Looking for");
   console.log(
-    req.session.classes.map(val => {
+    req.session.classes.map((val) => {
       return `${val}SESSION`;
     })
   );
   redisClient.mget(
-    req.session.classes.map(val => {
+    req.session.classes.map((val) => {
       return `${val}SESSION`;
     }),
     (err, results) => {
@@ -303,123 +301,41 @@ app.post(
   }
 );
 
-//////////////// Python Compiler //////////////////
-/**
- * credits: https://stackoverflow.com/questions/16316330/how-to-write-file-if-parent-folder-doesnt-exist
- */
+// Python stuff
 
-// upload.sing('file') file variable corresponds to req
-app.post("/compile/file/", upload.single("file"), function(req, res, next) {
-  let fs = require("fs");
-  // console.log("this is file");
-
-  let file = req.file;
-  // console.log(file.path);
-
-  let filePath = file.path;
-
-  compilePython(
-    filePath,
-    function(output) {
-      // console.log("this comes back");
-      // console.log("this is output "+ output);
-      res.json({ path: filePath, string: output });
+app.post("/api/python", authenticated, (req, res, next) => {
+  let code = req.body.code;
+  const from = "PYTHON";
+  if (!code) {
+    return res.status(400).end("Bad Request");
+  }
+  python.executePython(
+    code,
+    (output) => {
+      console.log(`out ${output}`);
+      sendClients(req.session.currSession, output, from);
     },
-    req.session.currSession
+    (err) => {
+      console.log(`err ${err}`);
+      sendClients(req.session.currSession, err, from);
+    },
+    (exitCode) => {
+      console.log(`Python exited with code ${exitCode}`);
+    }
   );
 });
 
-app.post("/compile/plaintext/", upload.single("picture"), function(
-  req,
-  res,
-  next
-) {
-  let fs = require("fs");
-  // console.log("this is plain");
-  // console.log(req.body);
-  let string = req.body.code;
-  // console.log("hello");
-  // console.log(string);
-  // console.log("bye");
-
-  // full path to tmp file
-  let filePath = path.join(__dirname, "/tmp/code.txt");
-  //function to get the parent dir of tmp file
-  let getDirName = path.dirname;
-  // mks the parent dir if it doesn't exist
-  mkdirp(getDirName(filePath), function(err) {
-    if (err) throw err;
-    fs.writeFile(filePath, string, { flag: "w" }, function(err) {
-      if (err) throw err;
-      console.log("Saved!");
-      compilePython(
-        filePath,
-        function(output) {
-          // console.log("this comes back");
-          // console.log("this is output "+ output);
-          res.json({ path: filePath, string: output });
-        },
-        req.session.currSession
-      );
-    });
+let sendClients = (course, data, from) => {
+  let ret = {
+    from: from,
+    message: data,
+  };
+  wss.clients.forEach((client) => {
+    if (client.course === course) {
+      client.send(JSON.stringify(ret));
+    }
   });
-});
-
-// Function to convert an Uint8Array to a string
-var decoduint8array = function(data) {
-  return new TextDecoder("utf-8").decode(data);
 };
-
-function compilePython(path, callback, course) {
-  let output = "";
-  let pythonPath = process.env.PYTHON_PATH || "/usr/local/bin/python";
-
-  const spawn = require("child_process").spawn;
-
-  const compilescript = spawn(pythonPath, [path]);
-
-  //output
-  compilescript.stdout.on("data", data => {
-    // TODO: STREAM OUTPUT
-    let ret = {
-      from: "PYTHON",
-      message: decoduint8array(data)
-    };
-    wss.clients.forEach(client => {
-      if (client.course === course) {
-        client.send(JSON.stringify(ret));
-      }
-    });
-    output = output + decoduint8array(data);
-    // console.log(decoduint8array(data));
-  });
-
-  // error
-  compilescript.stderr.on("data", data => {
-    let ret = {
-      from: "PYTHON",
-      message: decoduint8array(data)
-    };
-    wss.clients.forEach(client => {
-      if (client.course === course) {
-        client.send(JSON.stringify(ret));
-      }
-    });
-    output = output + decoduint8array(data);
-    // console.log(decoduint8array(data));
-  });
-
-  // exit
-  compilescript.on("exit", code => {
-    console.log("Exit code : " + code);
-    console.log(output);
-    // console.log("this is the string output;");
-    callback(output);
-    //return output;
-  });
-}
-
-/////////////////////////////////////////////////////////////////
 
 // Web socket authentication based off of https://github.com/websockets/ws/blob/master/examples/express-session-parse/index.js
 
@@ -435,11 +351,10 @@ wss.on("session", (ws, req) => {
   ws.course = req.session.currSession;
   // Instructor logic
 
-  ws.on("message", message => {
+  ws.on("message", (message) => {
     // parse string
     // console.log("message Msg")
     // console.log(message)
-
 
     let parsedMsg = JSON.parse(message);
     // console.log("parsed Msg")
@@ -449,42 +364,51 @@ wss.on("session", (ws, req) => {
     // console.log(`Got the parsedMsg ${parsedMsg}`)
     // console.log(`Got the message ${parsedMsg.message}`);
     // TA CODE
-    if (req.session.user.role === "TEACHING ASSISTANT" && parsedMsg.type == "CODE" ) {
+    if (
+      req.session.user.role === "TEACHING ASSISTANT" &&
+      parsedMsg.type == "CODE"
+    ) {
       console.log("TA MESSAGE");
 
       redisClient.hset(ws.course, "code", parsedMsg.message);
       ret = {
         type: "CODE",
         from: req.session.user.role,
-        message: parsedMsg.message
+        message: parsedMsg.message,
       };
-    } else if (parsedMsg.type == "CHAT"){
+    } else if (parsedMsg.type == "CHAT") {
       // console.log("CHAT MESSAGE");
       // console.log(parsedMsg.message)
 
-      redisClient.rpush(`${req.session.currSession}CHAT`, parsedMsg.message)
+      redisClient.rpush(`${req.session.currSession}CHAT`, parsedMsg.message);
 
-      return redisClient.lrange(`${req.session.currSession}CHAT`, 0 , -1 , (err, res) => {
+      return redisClient.lrange(
+        `${req.session.currSession}CHAT`,
+        0,
+        -1,
+        (err, res) => {
           // console.log("res redis");
           // console.log(res);
           ret = {
             type: "CHAT", //TODO: secure this?
             from: req.session.user.role,
-            message: res
-          }
-          wss.clients.forEach(client => {
+            message: res,
+          };
+          wss.clients.forEach((client) => {
             if (client.course === ws.course) {
               client.send(JSON.stringify(ret));
             }
           });
-      })
-
-    }
-    else {
+        }
+      );
+    } else {
       console.log("STUDENT SUGGESTIONS");
       console.log(parsedMsg.message);
       // Student suggestions
-      redisClient.sadd(`${req.session.currSession}SUGGESTIONS`, parsedMsg.message);
+      redisClient.sadd(
+        `${req.session.currSession}SUGGESTIONS`,
+        parsedMsg.message
+      );
       return redisClient.smembers(
         `${req.session.currSession}SUGGESTIONS`,
         (err, suggestions) => {
@@ -492,9 +416,9 @@ wss.on("session", (ws, req) => {
           ret = {
             type: "SUGGESTION",
             from: req.session.user.role,
-            message: suggestions
+            message: suggestions,
           };
-          wss.clients.forEach(client => {
+          wss.clients.forEach((client) => {
             if (client.course === ws.course) {
               client.send(JSON.stringify(ret));
             }
@@ -502,7 +426,7 @@ wss.on("session", (ws, req) => {
         }
       );
     }
-    wss.clients.forEach(client => {
+    wss.clients.forEach((client) => {
       if (client.course === ws.course) {
         client.send(JSON.stringify(ret));
       }
@@ -517,7 +441,7 @@ wss.on("session", (ws, req) => {
     console.log(res);
     let ret = {
       from: "TEACHING ASSISTANT",
-      message: res
+      message: res,
     };
     return ws.send(JSON.stringify(ret));
   });
@@ -540,7 +464,7 @@ server.on("upgrade", (req, socket, head) => {
       console.log(req.session.currSession);
       redisClient.exists(req.session.currSession, (err, exists) => {
         if (exists) {
-          return wss.handleUpgrade(req, socket, head, ws => {
+          return wss.handleUpgrade(req, socket, head, (ws) => {
             console.log("Emitting request");
             wss.emit("session", ws, req);
           });
