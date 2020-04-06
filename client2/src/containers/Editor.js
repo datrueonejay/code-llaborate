@@ -122,6 +122,20 @@ export default function Editor(props) {
     // setState({ newValue: newValue });
   }
 
+  // https://stackoverflow.com/questions/55830414/how-to-read-text-file-in-react
+  let loadFile = (e) => {
+    e.preventDefault();
+    if (e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        let code = ev.target.result;
+        console.log(code);
+        setCode(code);
+      };
+      reader.readAsText(e.target.files[0]);
+    }
+  };
+
   return (
     <div className="codeText">
       {props.isStudent ? (
@@ -236,11 +250,17 @@ export default function Editor(props) {
           </Button>
 
           {/* <Form onSubmit={handleSubmitFile} id="codeFile"> */}
-          <Form onSubmit={() => console.log("TODO")} id="codeFile">
+          <Form
+            onSubmit={() => console.log("TODO")}
+            onChange={loadFile}
+            id="codeFile"
+          >
             <input type="file" name="file" accept=".py, .txt" />
-            <input type="submit" className="btn" />
+            {/* <input type="submit" className="btn" /> */}
           </Form>
-
+          <a href={`data:text/plain;charset=utf-8,${code}`} download="code.py">
+            Download Code
+          </a>
           <div id="output">
             <span id="box"> </span>
           </div>
