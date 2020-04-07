@@ -25,7 +25,7 @@ export default function StudentCodeEditor(props) {
         <AceEditor
           id="AceEditor"
           ref={editorRef}
-          placeholder="Start Typing Here!"
+          placeholder="Code Will Appear Here"
           mode="python"
           theme="monokai"
           name="AceEditor"

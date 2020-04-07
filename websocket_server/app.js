@@ -404,10 +404,11 @@ wss.on("session", (ws, req) => {
     } else {
       console.log("STUDENT SUGGESTIONS");
       console.log(parsedMsg.message);
+      console.log(parsedMsg.lineNum);
       // Student suggestions
       redisClient.sadd(
         `${req.session.currSession}SUGGESTIONS`,
-        parsedMsg.message
+        `${parsedMsg.lineNum} ${parsedMsg.message}`
       );
       return redisClient.smembers(
         `${req.session.currSession}SUGGESTIONS`,
@@ -416,7 +417,14 @@ wss.on("session", (ws, req) => {
           ret = {
             type: "SUGGESTION",
             from: req.session.user.role,
-            message: suggestions,
+            message: suggestions.map((suggestion) => {
+              // Split into line number and code
+              let firstSpace = suggestion.indexOf(" ") + 1;
+              return {
+                lineNum: suggestion.substring(0, firstSpace),
+                suggestion: suggestion.substring(firstSpace),
+              };
+            }),
           };
           wss.clients.forEach((client) => {
             if (client.course === ws.course) {

@@ -22,6 +22,7 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Logout from "../components_final/Logout.js";
 import StudentCodeEditor from "../components_final/StudentCodeEditor.js";
+import StudentSuggestion from "../components_final/StudentSuggestion.js";
 
 import Suggestions from "../components_final/Suggestions";
 import Chat from "../components_final/Chat";
@@ -161,6 +162,11 @@ export default function StudentView(props) {
       <main className={clsx(classes.content, { [classes.contentShift]: open })}>
         {/* <Editor /> */}
         <StudentCodeEditor code={code} />
+        <StudentSuggestion
+          onSuggest={(lineNum, code) => {
+            http.send_suggestion(lineNum, code);
+          }}
+        />
         <Suggestions suggestions={suggestions} />
         <Chat chatOut={chatOut}></Chat>
         <div>
