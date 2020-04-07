@@ -7,6 +7,7 @@ import { Redirect } from "react-router-dom";
 import "./Home.css";
 import { useDispatch } from "react-redux";
 import { setType, setAuth } from "../redux/actions/userActions";
+import "../scss/Home.scss";
 
 import {
   TextField,
