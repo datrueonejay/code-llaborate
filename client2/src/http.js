@@ -50,6 +50,7 @@ let http = (function () {
         });
       } else {
         console.log("DEFAULT SUGGESTIONS");
+        console.log(res.message);
         suggestionListeners.forEach((listener) => {
           listener(res.message);
         });
@@ -76,6 +77,14 @@ let http = (function () {
   module.send_message = (message, type) => {
     // console.log(JSON.stringify({message:message, type:type}));
     exampleSocket.send(JSON.stringify({ message: message, type: type }));
+  };
+
+  module.send_suggestion = (lineNum, message) => {
+    console.log(lineNum);
+    console.log(message);
+    exampleSocket.send(
+      JSON.stringify({ message: message, type: "SUGGESTION", lineNum: lineNum })
+    );
   };
 
   module.getCourses = () => {
