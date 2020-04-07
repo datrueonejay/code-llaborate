@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from "react";
 import Editor from "../containers/Editor.js";
 import http from "../http";
-import Logout from "./Logout.js";
 
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import clsx from 'clsx';
-import {Button, Drawer,AppBar, CssBaseline, TextField, Toolbar, Typography, IconButton, Divider, List, ListItem} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import clsx from "clsx";
+import {
+  Button,
+  Drawer,
+  AppBar,
+  CssBaseline,
+  TextField,
+  Toolbar,
+  Typography,
+  IconButton,
+  Divider,
+  List,
+  ListItem,
+} from "@material-ui/core";
+import MenuIcon from "@material-ui/icons/Menu";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import Logout from "../components_final/Logout.js";
 
 // credit: https://material-ui.com/components/drawers/
 
@@ -17,7 +28,7 @@ const drawerWidth = 400;
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
+    display: "flex",
   },
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
@@ -27,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   hide: {
-    display: 'none',
+    display: "none",
   },
   drawer: {
     width: drawerWidth,
@@ -37,9 +48,9 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
   },
   drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
   content: {
     flexGrow: 1,
@@ -52,7 +63,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
 }));
-
 
 export default function StudentView(props) {
   const [courses, setCourses] = useState([]);
@@ -72,84 +82,100 @@ export default function StudentView(props) {
 
   useEffect(() => {
     http
-    .getSessions()
-    .then(res => {
+      .getSessions()
+      .then((res) => {
         setCourses(res);
-    })
-    .catch(err => console.log(err));
+      })
+      .catch((err) => console.log(err));
   }, []);
 
-  if (isSession) {
-    return (
-      <div>
-        <CssBaseline />
-        <AppBar position="sticky" className={clsx(classes.appBar, {[classes.appBarShift]: open,})}>
-          <Toolbar>
-            <Typography variant="h6" noWrap className={classes.title}>Persistent drawer</Typography>
-            <Logout />
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="end"
-              onClick={handleDrawerOpen}
-              className={clsx(open && classes.hide)}
-            >
-              <MenuIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          className={classes.drawer}
-          variant="persistent"
-          anchor="right"
-          open={open}
-          classes={{
-            paper: classes.drawerPaper,}}
-        >
-          <div id="drawer_format">
+  // if (isSession) {
+  return (
+    <div>
+      <Logout />
+
+      <CssBaseline />
+      <AppBar
+        position="sticky"
+        className={clsx(classes.appBar, { [classes.appBarShift]: open })}
+      >
+        <Toolbar>
+          <Typography variant="h6" noWrap className={classes.title}>
+            Persistent drawer
+          </Typography>
+          <Logout />
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="end"
+            onClick={handleDrawerOpen}
+            className={clsx(open && classes.hide)}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        className={classes.drawer}
+        variant="persistent"
+        anchor="right"
+        open={open}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+      >
+        <div id="drawer_format">
           <div>
             <IconButton onClick={handleDrawerClose}>
-              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              {theme.direction === "rtl" ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
             </IconButton>
           </div>
 
           <Divider />
-          
+
           <TextField label="Write a message..."> </TextField>
           <Button> Send </Button>
 
           <Divider />
-          </div>
-        </Drawer>
-        <main className={clsx(classes.content, {[classes.contentShift]: open,})}>
-          <Editor isStudent={props.isStudent} />
-        </main>
-
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <Logout />
-        {courses.map((course, index) => {
-          return (<div key={index}>
-            <li>{course}</li>
-            <button
-              onClick={() =>
-              http
-              .joinSession(course)
-              .then(res => {
-              console.log(res);
-              setIsSession(true);
-              })
-              .catch(err => console.log(err))
-              }
-            > Join Session
-            </button>
-          </div>);
-        })}
-      </div>
-    )}
+        </div>
+      </Drawer>
+      <main className={clsx(classes.content, { [classes.contentShift]: open })}>
+        <Editor />
+      </main>
+    </div>
+  );
+  // } else {
+  //   return (
+  //     <div>
+  //       <Logout />
+  //       {courses.map((course, index) => {
+  //         return (
+  //           <div key={index}>
+  //             <li>{course}</li>
+  //             <button
+  //               onClick={() =>
+  //                 http
+  //                   .joinSession(course)
+  //                   .then((res) => {
+  //                     console.log(res);
+  //                     setIsSession(true);
+  //                   })
+  //                   .catch((err) => console.log(err))
+  //               }
+  //             >
+  //               {" "}
+  //               Join Session
+  //             </button>
+  //           </div>
+  //         );
+  //       })}
+  //     </div>
+  //   );
+  // }
 }
 
 //export default StudentView;

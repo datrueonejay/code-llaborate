@@ -14,6 +14,9 @@ import "brace/mode/python";
 // Import a Theme
 import "brace/theme/monokai";
 
+import { TYPE_STUDENT } from "../Constants";
+import { useSelector } from "react-redux";
+
 // const apiPython = require("../apiPython.js");
 
 // async
@@ -72,6 +75,7 @@ export default function Editor(props) {
   const [chatOut, setChatOut] = useState([]);
   // const [state, setState] = useState(0);
   const [code, setCode] = useState("");
+  const role = useSelector((state) => state.userReducer.userType);
 
   let timeout = null;
   const editorRef = useRef(null);
@@ -138,7 +142,7 @@ export default function Editor(props) {
 
   return (
     <div className="codeText">
-      {props.isStudent ? (
+      {role === TYPE_STUDENT ? (
         <div>
           <AceEditor
             id="AceEditor"
@@ -160,11 +164,9 @@ export default function Editor(props) {
               showLineNumbers: true,
               tabSize: 2,
             }}
+            readOnly
           />
-          <div>
-            <p>Text below</p>
-            <p>{text}</p>
-          </div>
+
           <Form onSubmit={handleSubmitSuggestion}>
             <textarea
               name="suggestion"

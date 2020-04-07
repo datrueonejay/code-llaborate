@@ -40,21 +40,21 @@ export default function Login(props) {
     if (err) return console.log(err);
     dispatch(setType(res.role));
     dispatch(setAuth(true));
-    let url = "";
-    switch (res.role) {
-      case "STUDENT":
-        url = "/student";
-        break;
-      case "TEACHING ASSISTANT":
-        url = "/ta";
-        break;
-      case "INSTRUCTOR":
-        url = "/instructor";
-        break;
-      default:
-        url = "/";
-        break;
-    }
+    let url = "/sessions";
+    // switch (res.role) {
+    //   case "STUDENT":
+    //     url = "/student";
+    //     break;
+    //   case "TEACHING ASSISTANT":
+    //     url = "/ta";
+    //     break;
+    //   case "INSTRUCTOR":
+    //     url = "/instructor";
+    //     break;
+    //   default:
+    //     url = "/";
+    //     break;
+    // }
 
     props.history.push(url);
   };
