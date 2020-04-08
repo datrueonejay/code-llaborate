@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Editor from "../containers/Editor.js";
-import http from "../http";
+// import Editor from "../containers/Editor.js";
+import websocket from "../http/socketController.js";
 
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -16,6 +16,7 @@ import {
   Divider,
   List,
   ListItem,
+  CircularProgress,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -79,6 +80,8 @@ export default function StudentView(props) {
   const [pythonOut, setPythonOut] = useState("");
   const [chatOut, setChatOut] = useState([]);
 
+  const [connecting, setConnecting] = useState(false);
+
   const classes = useStyles();
   const theme = useTheme();
 
@@ -91,20 +94,32 @@ export default function StudentView(props) {
   };
 
   useEffect(() => {
-    http.connect();
-    http.code_listener((message) => {
+    websocket.connect(
+      () => {
+        console.log("Connected successfully!");
+        setConnecting(false);
+      },
+      () => {
+        console.log("Could not connect");
+      }
+    );
+    websocket.code_listener((message) => {
       setCode(message);
     });
-    http.suggestion_listener((suggests) => {
+    websocket.suggestion_listener((suggests) => {
       setSuggestions(suggests);
     });
-    http.python_listener((output) => {
+    websocket.python_listener((output) => {
       setPythonOut(pythonOut + output);
     });
-    http.chat_listener((chat) => {
+    websocket.chat_listener((chat) => {
       setChatOut(chat);
     });
   }, []);
+
+  if (connecting) {
+    return <CircularProgress />;
+  }
 
   return (
     <div>
@@ -164,7 +179,7 @@ export default function StudentView(props) {
         <StudentCodeEditor code={code} />
         <StudentSuggestion
           onSuggest={(lineNum, code) => {
-            http.send_suggestion(lineNum, code);
+            websocket.send_suggestion(lineNum, code);
           }}
         />
         <Suggestions suggestions={suggestions} />

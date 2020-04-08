@@ -321,6 +321,7 @@ app.post("/api/python", authenticated, (req, res, next) => {
     },
     (exitCode) => {
       console.log(`Python exited with code ${exitCode}`);
+      return res.json("OK");
     }
   );
 });

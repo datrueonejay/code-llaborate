@@ -3,8 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
 import "./App.css";
-// import Http from "./http.js";
-// import http from "./http";
 
 //old
 import Login from "./containers/Login.js";
@@ -15,13 +13,13 @@ import Signup from "./containers/Signup.js";
 // import TeachingAssistantView from "./components/TeachingAssistantView";
 
 // new
-import Home from "./pages/Home.js";
+import Home from "./pages/HomePage.js";
 import StudentView from "./pages/StudentPage.js";
 import TeachingAssistantView from "./pages/TAPage.js";
 
 import { setAuth } from "./redux/actions/userActions";
-import SelectCourse from "./containers/SelectCourse";
-import Sessions from "./pages/Sessions";
+// import SelectCourse from "./containers/SelectCourse";
+import Sessions from "./pages/SessionsPage";
 
 import InstructorView from "./components/InstructorView";
 

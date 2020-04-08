@@ -1,37 +1,54 @@
 import React, { useState, useEffect } from "react";
 import TaCodeEditor from "../components_final/TaCodeEditor.js";
-import http from "../http";
+// import http from "../http";
+import websocket from "../http/socketController.js";
+import api from "../http/apiController.js";
+
 import Logout from "../components_final/Logout.js";
 
 import Suggestions from "../components_final/Suggestions";
 import Chat from "../components_final/Chat";
+import { CircularProgress } from "@material-ui/core";
 
 function TeachingAssistantView(props) {
   const [suggestions, setSuggestions] = useState([]);
   const [pythonOut, setPythonOut] = useState("");
   const [chatOut, setChatOut] = useState([]);
 
+  const [connecting, setConnecting] = useState(true);
+
   useEffect(() => {
-    http.connect();
-    http.suggestion_listener((suggests) => {
+    websocket.connect(
+      () => {
+        console.log("Connected successfully!");
+        setConnecting(false);
+      },
+      () => {
+        console.log("Could not connect");
+      }
+    );
+    websocket.suggestion_listener((suggests) => {
       setSuggestions(suggests);
     });
-    http.python_listener((output) => {
+    websocket.python_listener((output) => {
       setPythonOut(pythonOut + output);
     });
-    http.chat_listener((chat) => {
+    websocket.chat_listener((chat) => {
       setChatOut(chat);
     });
   }, []);
 
+  if (connecting) {
+    return <CircularProgress />;
+  }
   return (
     <div>
       <Logout />
 
       <TaCodeEditor
-        onCodeChange={(code) => http.send_message(code, "CODE")}
+        onCodeChange={(code) => websocket.send_code(code)}
         onExecute={(code) =>
-          http.executePython(code).then((res) => {
+          api.executePython(code).then((res) => {
             console.log(res);
           })
         }

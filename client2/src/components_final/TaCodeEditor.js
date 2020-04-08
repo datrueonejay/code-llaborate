@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import http from "../http";
 import "./Editor.css";
 
 import { Button, Form } from "react-bootstrap";
@@ -20,7 +19,6 @@ export default function TaCodeEditor(props) {
 
   function onChange(newValue) {
     props.onCodeChange(newValue);
-    // http.send_message(newValue, "CODE");
     setCode(newValue);
   }
 
@@ -67,11 +65,6 @@ export default function TaCodeEditor(props) {
 
         <Button
           className="btn"
-          //   onClick={() => {
-          //     http.executePython(code).then((res) => {
-          //       console.log(res);
-          //     });
-          //   }}
           onClick={() => {
             props.onExecute(code);
           }}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import http from "../http";
 import "./Editor.css";
 
 import AceEditor from "react-ace";
@@ -11,13 +10,7 @@ import "brace/mode/python";
 import "brace/theme/monokai";
 
 export default function StudentCodeEditor(props) {
-  // const [code, setCode] = useState("");
-
   const editorRef = useRef(null);
-
-  // function onChange(newValue) {
-  //   setCode(newValue);
-  // }
 
   return (
     <div className="codeText">

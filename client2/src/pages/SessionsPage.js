@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Editor from "../containers/Editor.js";
+// import Editor from "../containers/Editor.js";
 import { TYPE_TA, TYPE_STUDENT } from "../Constants";
-import http from "../http";
+// import http from "../http";
+import api from "../http/apiController.js";
 import Logout from "../components_final/Logout.js";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -29,15 +30,15 @@ export default function Sessions(props) {
 
   useEffect(() => {
     if (role === TYPE_STUDENT) {
-      http
+      api
         .getSessions()
         .then((res) => {
           setCourses(res);
         })
         .catch((err) => console.log(err));
     } else if (role === TYPE_TA) {
-      http
-        .getCourses()
+      api
+        .getUserCourses()
         .then((res) => {
           setCourses(res);
         })
@@ -56,7 +57,7 @@ export default function Sessions(props) {
               variant="contained"
               onClick={() => {
                 if (role === TYPE_STUDENT) {
-                  http
+                  api
                     .joinSession(course)
                     .then((res) => {
                       console.log(res);
@@ -64,7 +65,7 @@ export default function Sessions(props) {
                     })
                     .catch((err) => console.log(err));
                 } else if (role === TYPE_TA) {
-                  http
+                  api
                     .startSession(course)
                     .then((res) => {
                       console.log(res);

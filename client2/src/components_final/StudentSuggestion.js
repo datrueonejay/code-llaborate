@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import http from "../http";
 import "./Editor.css";
 
 import { TextField } from "@material-ui/core";
@@ -57,11 +56,6 @@ export default function StudentSuggestion(props) {
         />
         <Button
           className="btn"
-          //   onClick={() => {
-          //     http.executePython(code).then((res) => {
-          //       console.log(res);
-          //     });
-          //   }}
           onClick={() => {
             props.onSuggest(lineNum, code);
           }}
