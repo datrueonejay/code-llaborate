@@ -1,11 +1,10 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { Route, Redirect } from 'react-router-dom';
-
+import { Route, Redirect } from "react-router-dom";
 
 // const PrivateRoute = ({ component: Component, auth: auth, ...rest }) => (
-//   <Route {...rest} render={props => 
+//   <Route {...rest} render={props =>
 //     auth === true
 //     ? (<Component {...props} />)
 //     : (<Redirect to="/login" />)
@@ -13,21 +12,21 @@ import { Route, Redirect } from 'react-router-dom';
 // );
 
 function PrivateRoute(props) {
-  const authenticated = useSelector(state => state.userReducer.auth);
-  const type = useSelector(state => state.userReducer.userType);
+  const authenticated = useSelector((state) => state.userReducer.auth);
+  const type = useSelector((state) => state.userReducer.userType);
 
   if (props.for) {
     if (type == props.for) {
-      return (<props.component />)
+      return <props.component />;
     } else {
-      return (<Redirect to="/login" />)
+      return <Redirect to="/" />;
     }
   }
 
   if (authenticated) {
-    return (<props.component />)
+    return <props.component />;
   } else {
-    return (<Redirect to="/login" />)
+    return <Redirect to="/" />;
   }
 }
 

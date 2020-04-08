@@ -4,34 +4,18 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
 import "./App.css";
 
-//old
-import Login from "./containers/Login.js";
-import Signup from "./containers/Signup.js";
-// import Editor from "./containers/Editor.js";
-// import Home from "./components/Home.js";
-// import StudentView from "./components/StudentView";
-// import TeachingAssistantView from "./components/TeachingAssistantView";
-
 // new
 import Home from "./pages/HomePage.js";
 import StudentView from "./pages/StudentPage.js";
 import TeachingAssistantView from "./pages/TAPage.js";
 
-import { setAuth } from "./redux/actions/userActions";
-// import SelectCourse from "./containers/SelectCourse";
 import Sessions from "./pages/SessionsPage";
 
-import InstructorView from "./components/InstructorView";
+import InstructorView from "./pages/InstructorPage.js";
 
 function App() {
-  const [text, setText] = useState("");
-  const [writer, setWriter] = useState(false);
-  // const [authenticate, setAuthenticate] = useState(false);
-  let timeout = null;
-
   const authenticate = useSelector((state) => state.userReducer.auth);
   const type = useSelector((state) => state.userReducer.userType);
-  const dispatch = useDispatch();
 
   let isStudent = type === "STUDENT";
   console.log(authenticate);
@@ -41,8 +25,6 @@ function App() {
     <Router>
       <Switch>
         <Route exact path="/" component={Home} />
-        <Route path="/signup" component={Signup} />
-        <Route path="/login" component={Login} />
         <Route path="/sessions" component={Sessions} />
         <PrivateRoute
           path="/student"

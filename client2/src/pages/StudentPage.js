@@ -21,12 +21,12 @@ import {
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import Logout from "../components_final/Logout.js";
-import StudentCodeEditor from "../components_final/StudentCodeEditor.js";
-import StudentSuggestion from "../components_final/StudentSuggestion.js";
+import Logout from "../components/Logout.js";
+import StudentCodeEditor from "../components/StudentCodeEditor.js";
+import StudentSuggestion from "../components/StudentSuggestion.js";
 
-import Suggestions from "../components_final/Suggestions";
-import Chat from "../components_final/Chat";
+import Suggestions from "../components/Suggestions";
+import Chat from "../components/Chat";
 
 // credit: https://material-ui.com/components/drawers/
 

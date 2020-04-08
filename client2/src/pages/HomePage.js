@@ -3,7 +3,6 @@
  */
 
 import React, { useState } from "react";
-import { Redirect } from "react-router-dom";
 import "./Home.css";
 import { useDispatch } from "react-redux";
 import { setType, setAuth } from "../redux/actions/userActions";
@@ -16,7 +15,9 @@ import {
   InputLabel,
   MenuItem,
 } from "@material-ui/core";
-const api = require("../api.js");
+
+import { TYPE_INSTRUCTOR } from "../Constants.js";
+const authentication = require("../http/autheticationController");
 
 export default function Login(props) {
   const [username, setUsername] = useState("");
@@ -27,12 +28,26 @@ export default function Login(props) {
 
   let submit = (login) => {
     if (login) {
-      api.checkUser(username, password, callback);
+      authentication
+        .login(username, password)
+        .then((res) => {
+          callback(null, res);
+        })
+        .catch((err) => {
+          callback(err, null);
+        });
     } else {
       if (!name) {
         alert("Ensure name is set");
       } else {
-        api.addUser(username, password, role, name, callback);
+        authentication
+          .signup(username, password, role, name)
+          .then((res) => {
+            callback(null, res);
+          })
+          .catch((err) => {
+            callback(err, null);
+          });
       }
     }
   };
@@ -41,22 +56,7 @@ export default function Login(props) {
     if (err) return console.log(err);
     dispatch(setType(res.role));
     dispatch(setAuth(true));
-    let url = "/sessions";
-    // switch (res.role) {
-    //   case "STUDENT":
-    //     url = "/student";
-    //     break;
-    //   case "TEACHING ASSISTANT":
-    //     url = "/ta";
-    //     break;
-    //   case "INSTRUCTOR":
-    //     url = "/instructor";
-    //     break;
-    //   default:
-    //     url = "/";
-    //     break;
-    // }
-
+    let url = res.role === TYPE_INSTRUCTOR ? "/instructor" : "/sessions";
     props.history.push(url);
   };
 

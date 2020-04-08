@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { TYPE_TA, TYPE_STUDENT } from "../Constants";
 // import http from "../http";
 import api from "../http/apiController.js";
-import Logout from "../components_final/Logout.js";
+import Logout from "../components/Logout.js";
 
 import { useSelector, useDispatch } from "react-redux";
 

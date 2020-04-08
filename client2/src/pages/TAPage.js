@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import TaCodeEditor from "../components_final/TaCodeEditor.js";
+import TaCodeEditor from "../components/TaCodeEditor.js";
 // import http from "../http";
 import websocket from "../http/socketController.js";
 import api from "../http/apiController.js";
 
-import Logout from "../components_final/Logout.js";
+import Logout from "../components/Logout.js";
 
-import Suggestions from "../components_final/Suggestions";
-import Chat from "../components_final/Chat";
+import Suggestions from "../components/Suggestions";
+import Chat from "../components/Chat";
 import { CircularProgress } from "@material-ui/core";
 
 function TeachingAssistantView(props) {
