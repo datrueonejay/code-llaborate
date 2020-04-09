@@ -31,8 +31,14 @@
   color: #61dafb;
 }
 
+
+/*
+  Make sure content is still accessible by screen readers(??) so we have to keep it on the page
+*/
 .hide {
-  display: none;
+  position: absolute !important;
+  top: -6980px !important;
+  left: -6980px !important;
 }
 
 @keyframes App-logo-spin {
