@@ -4,10 +4,8 @@ import styles from "../scss/InstructorView.module.scss";
 import {
   TextField,
   Button,
-  FormControl,
-  InputLabel,
-  Input,
-  FormHelperText,
+  ListItem,
+  ListItemText,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 
@@ -29,27 +27,20 @@ function InstructorView(props) {
   const courseListRef = useRef(null);
 
   useEffect(() => {
-    function updateStudents() {
+    function getStudents() {
       api.getStudents(0).then((res) => {
         setStudents(res);
       });
-
-      //   api.getStudents(0, (err, res) => {
-      //     setStudents(res);
-      //   });
     }
 
-    function updateCourses() {
-      api.getCourses((res) => {
+    function getCourses() {
+      api.getCourses().then((res) => {
         setCourses(res);
       });
-      //   api.getCourses((err, res) => {
-      //     setCourses(res);
-      //   });
     }
 
-    updateStudents();
-    updateCourses();
+    getStudents();
+    getCourses();
   }, []);
 
   function handleSubmit(e) {
@@ -116,7 +107,7 @@ function InstructorView(props) {
     return function (e) {
       // this should be called when user types into the input
       input = input.toUpperCase(); // what the user typed in
-      let list = listRef.current.querySelectorAll("li");
+      let list = listRef.current.querySelectorAll("span");
 
       for (let i = 0; i < list.length; i++) {
         let li, text;
@@ -124,9 +115,9 @@ function InstructorView(props) {
         text = li.textContent || li.innerText; // text of the list
         text = text.toUpperCase();
         if (text.indexOf(input) > -1) {
-          li.classList.remove("hide");
+          li.parentNode.parentNode.classList.remove("hide");
         } else {
-          li.classList.add("hide");
+          li.parentNode.parentNode.classList.add("hide");
         }
       }
     };
@@ -170,81 +161,96 @@ function InstructorView(props) {
         </Button>
       </form>
 
-      <div id="id-selector">
-        <h1>Students:</h1>
+      <div className={styles.center} id="id-selector">
+        <div className={styles.students}>
+          <h1>Students:</h1>
+          <div id="search-student">
+            <TextField
+              className={styles.input}
+              type="text"
+              onChange={handleChange("searchStudent")}
+              value={values.searchStudent}
+              helperText="Search for a student, e.g JayQuelen"
+            />
+            <Button
+              onClick={searchStudent}
+              type="submit"
+              color="primary"
+              variant="contained"
+            >
+              Search
+            </Button>
+          </div>
 
-        <div id="search-student">
-          <TextField
-            className={styles.input}
-            type="text"
-            onChange={handleChange("searchStudent")}
-            value={values.searchStudent}
-            helperText="The students name, e.g JayQuelen"
-          />
-          <Button
-            onClick={searchStudent}
-            type="submit"
-            color="primary"
-            variant="contained"
-          >
-            Search
-          </Button>
+          <div id="filter-student">
+            <TextField
+              className={styles.input}
+              type="text"
+              onKeyUp={filterList(values.studentIdFilter, studentListRef)}
+              onChange={handleChange("studentIdFilter")}
+              helperText="Filter by student name"
+              value={values.studentIdFilter}
+            />
+          </div>
+
+          <ul className={styles["list-wrapper"]} ref={studentListRef}>
+            {students.map((student) => {
+              return (
+                <ListItem 
+                  button
+                  divider
+                  onClick={setValue("studentId", student.ID)}
+                  key={student.ID}
+                  id={student.ID}
+                >
+                  <ListItemText
+                    className={styles.center}
+                    alignItems='center'
+                    primary={student.Name}
+                    secondary={`Id: ${student.ID}`}
+                  />
+                </ListItem>
+              );
+            })}
+          </ul>
         </div>
 
-        <div id="filter-student">
-          <TextField
-            className={styles.input}
-            type="text"
-            onKeyUp={filterList(values.studentIdFilter, studentListRef)}
-            onChange={handleChange("studentIdFilter")}
-            helperText="Filter by student name"
-            value={values.studentIdFilter}
-          />
+
+        <div className={styles.students}>
+          <h1>Courses:</h1>
+
+          <div id="filter-course">
+            <TextField
+              className={styles.input}
+              type="text"
+              helperText="Filter by course name"
+              onKeyUp={filterList(values.courseIdFilter, courseListRef)}
+              onChange={handleChange("courseIdFilter")}
+              value={values.courseIdFilter}
+            />
+          </div>
+
+          <ul ref={courseListRef} className={styles.form}>
+            {courses.map((course, index) => {
+              return (
+                <ListItem
+                  button
+                  divider
+                  onClick={setValue("courseId", course.ID)}
+                  key={index}
+                  id={course.ID}
+                >
+                  <ListItemText
+                  className={styles.input}
+                    primary={course.CourseCode}
+                    secondary={`Id: ${course.ID}`}
+                  />
+                </ListItem>
+              );
+            })}
+          </ul>
         </div>
-
-        <ul className={styles["list-wrapper"]} ref={studentListRef}>
-          {students.map((student) => {
-            return (
-              <li
-                className={styles.list}
-                onClick={setValue("studentId", student.ID)}
-                key={student.ID}
-                id={student.ID}
-              >
-                {student.Name} id: {student.ID}
-              </li>
-            );
-          })}
-        </ul>
-
-        <h1>Courses:</h1>
-
-        <div id="filter-course">
-          <TextField
-            className={styles.input}
-            type="text"
-            onKeyUp={filterList(values.courseIdFilter, courseListRef)}
-            onChange={handleChange("courseIdFilter")}
-            value={values.courseIdFilter}
-          />
-        </div>
-
-        <ul ref={courseListRef} className={styles.form}>
-          {courses.map((course, index) => {
-            return (
-              <li
-                className={styles.list}
-                onClick={setValue("courseId", course.ID)}
-                key={index}
-                id={course.ID}
-              >
-                {course.CourseCode}
-              </li>
-            );
-          })}
-        </ul>
       </div>
-
       <Link to="/private">Private</Link>
     </div>
   );
