@@ -118,30 +118,35 @@ app.post(
       if (!isStudent) {
         // Valid instructor
         if (req.session.classes.includes(parseInt(req.body.course))) {
-          req.session.currSession = req.body.course;
-          console.log(`creating session ${req.body.course}SESSION`);
-          redisClient.set(`${req.body.course}SESSION`, "");
-          redisClient.expire(`${req.body.course}SESSION`, SESSION_EXPIRE_TIME);
-          redisClient.hset(req.body.course, "startedBy", req.session.user.id);
-          redisClient.hset(req.body.course, "code", "");
-          redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
-          // Remove any old suggestions
-          redisClient.del(`${req.body.course}SUGGESTIONS`);
-          return res.json("CREATED");
+          return redisClient.exists(`${req.body.course}SESSION`, (err, num) => {
+            // If session already exists
+            if (num > 0) {
+              return res.status(400).end("Session already exists");
+            } else {
+              // Session does not exist
+              req.session.currSession = req.body.course;
+              console.log(`creating session ${req.body.course}SESSION`);
+              redisClient.set(`${req.body.course}SESSION`, "");
+              redisClient.expire(
+                `${req.body.course}SESSION`,
+                SESSION_EXPIRE_TIME
+              );
+              console.log(
+                `${req.body.course} started by  ${req.session.user.id}`
+              );
+              redisClient.hset(
+                req.body.course,
+                "startedBy",
+                req.session.user.id
+              );
+              redisClient.hset(req.body.course, "code", "");
+              redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
+              // Remove any old suggestions
+              redisClient.del(`${req.body.course}SUGGESTIONS`);
+              return res.json("CREATED");
+            }
+          });
         }
-        // db.verifyPersonClass(
-        //   req.session.user.username,
-        //   req.body.course,
-        //   req.session.user.roleId,
-        //   (err, res) => {
-        //     if (err) return res.status(500).end(err);
-        //     if (res) {
-        //       let session = uuid();
-        //       res.session.sessionId = session;
-        //       redisClient.hmset();
-        //     }
-        //   }
-        // );
       }
       return res.status(401).end("Access denied");
     });
@@ -153,15 +158,20 @@ app.delete(
   authenticated,
   [body("course").escape()],
   (req, res, next) => {
+    console.log("request is");
+    console.log(req.body);
     redisClient.hget(req.body.course, "startedBy", (err, id) => {
+      if (!id) {
+        return res.status(400).end("No session exists");
+      }
       if (id == req.session.user.id) {
-        redisClient.del(`${req.body.course}SESSION`, (number) => {
-          redisClient.del(req.body.course, (number) => {
-            redisClient.del(`${req.body.course}SESSION`);
-
+        return redisClient.del(
+          `${req.body.course}SESSION`,
+          req.body.course,
+          (err, number) => {
             return res.json(`${number} session(s) deleted`);
-          });
-        });
+          }
+        );
       } else {
         return res
           .status(401)
@@ -225,7 +235,23 @@ app.post("/api/searchstudent/", authenticated, (req, res, next) => {
 
 app.get("/api/classes", authenticated, (req, res, next) => {
   console.log(req.session.classes);
-  res.json(req.session.classes);
+  return redisClient.mget(
+    req.session.classes.map((course) => {
+      return `${course}SESSION`;
+    }),
+    (err, sessions) => {
+      console.log("ASOPDJASOIJ");
+      console.log(sessions);
+      return res.json(
+        req.session.classes.map((val, index) => {
+          return {
+            course: val,
+            exists: sessions[index] === "", // If sessions exists
+          };
+        })
+      );
+    }
+  );
 });
 
 app.get("/api/students", authenticated, (req, res, next) => {
@@ -272,7 +298,7 @@ app.get("/api/sessions", authenticated, (req, res, next) => {
       req.session.classes.forEach((course, index) => {
         // console.log(res)
         if (results[index] !== null) {
-          ret.push(course);
+          ret.push({ course: course, exists: true });
         }
       });
       console.log(ret);
@@ -287,13 +313,12 @@ app.post(
   [body("course").escape()],
   (req, res, next) => {
     if (req.session.classes.includes(parseInt(req.body.course))) {
-      redisClient.exists(req.body.course, (err, exists) => {
-        console.log(exists);
-        if (exists) {
+      redisClient.exists(req.body.course, (err, num) => {
+        if (num > 0) {
           req.session.currSession = req.body.course;
           return res.json("OK");
         }
-        return res.status(401).end("No Session Exists");
+        return res.status(400).end("No Session Exists");
       });
     } else {
       return res.status(401).end("Access denied");
@@ -471,15 +496,13 @@ server.on("upgrade", (req, socket, head) => {
     if (pathname === "/api/session") {
       console.log("YEEE");
       console.log(req.session.currSession);
-      redisClient.exists(req.session.currSession, (err, exists) => {
-        if (exists) {
+      redisClient.exists(req.session.currSession, (err, num) => {
+        if (num > 0) {
           return wss.handleUpgrade(req, socket, head, (ws) => {
             console.log("Emitting request");
             wss.emit("session", ws, req);
           });
         }
-        console.log("YasdsEEE");
-
         return socket.destroy();
       });
     } else {

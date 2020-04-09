@@ -22,9 +22,11 @@ import {
   List,
   ListItem,
 } from "@material-ui/core";
+import { setSession } from "../redux/actions/userActions";
 
 export default function Sessions(props) {
   const [courses, setCourses] = useState([]);
+  const dispatch = useDispatch();
 
   const role = useSelector((state) => state.userReducer.userType);
 
@@ -33,6 +35,7 @@ export default function Sessions(props) {
       api
         .getSessions()
         .then((res) => {
+          console.log(res);
           setCourses(res);
         })
         .catch((err) => console.log(err));
@@ -40,6 +43,7 @@ export default function Sessions(props) {
       api
         .getUserCourses()
         .then((res) => {
+          console.log(res);
           setCourses(res);
         })
         .catch((err) => console.log(err));
@@ -49,25 +53,32 @@ export default function Sessions(props) {
   return (
     <div>
       <Logout />
-      {courses.map((course, index) => {
+      {courses.map((courseInfo, index) => {
+        let course = courseInfo.course;
+        let sessionExists = courseInfo.exists;
         return (
           <div key={index}>
             <li>{course}</li>
             <Button
               variant="contained"
               onClick={() => {
-                if (role === TYPE_STUDENT) {
+                if (role === TYPE_STUDENT || sessionExists) {
                   api
                     .joinSession(course)
                     .then((res) => {
                       console.log(res);
-                      props.history.push("/student");
+                      dispatch(setSession(course));
+                      props.history.push(
+                        role === TYPE_STUDENT ? "/student" : "/ta"
+                      );
                     })
                     .catch((err) => console.log(err));
                 } else if (role === TYPE_TA) {
                   api
                     .startSession(course)
                     .then((res) => {
+                      dispatch(setSession(course));
+
                       console.log(res);
                       props.history.push("/ta");
                     })
@@ -76,7 +87,9 @@ export default function Sessions(props) {
               }}
             >
               {" "}
-              {role === TYPE_STUDENT ? "Join Session" : "Create Session"}
+              {role === TYPE_STUDENT || sessionExists
+                ? "Join Session"
+                : "Create Session"}
             </Button>
           </div>
         );

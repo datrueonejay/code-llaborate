@@ -46,3 +46,12 @@ exports.startSession = (courseId) => {
     })
     .then((res) => res.data);
 };
+
+exports.stopSession = (courseId) => {
+  console.log(courseId);
+  return axios
+    .delete(`/api/deleteSession`, {
+      data: { course: courseId },
+    })
+    .then((res) => res.data);
+};
