@@ -9,6 +9,9 @@ import "brace/mode/python";
 // Import a Theme
 import "brace/theme/monokai";
 
+// Import Extra tools
+import 'brace/ext/language_tools';
+
 export default function StudentCodeEditor(props) {
   const editorRef = useRef(null);
 

@@ -21,7 +21,7 @@ function Logout() {
 
   return (
     <div className="logout">
-      <Link to="/" onClick={(e) => onClick()}>
+      <Link className="logoutLink" to="/" onClick={(e) => onClick()}>
         {" "}
         Logout!{" "}
       </Link>

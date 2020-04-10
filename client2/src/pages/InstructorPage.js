@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../App.css";
-import styles from "../scss/InstructorView.module.scss";
+import {useStyles} from "../styles/InstructorView.module.js";
 import {
   TextField,
   Button,
@@ -25,6 +25,7 @@ function InstructorView(props) {
   const formRef = useRef(null);
   const studentListRef = useRef(null);
   const courseListRef = useRef(null);
+  const styles = useStyles();
 
   useEffect(() => {
     function getStudents() {
@@ -125,12 +126,12 @@ function InstructorView(props) {
 
   return (
     <div>
-      <div className={styles.notification}>{notification}</div>
+      <div className={styles.notificationClass}>{notification}</div>
 
-      <form className={styles.form} ref={formRef} onSubmit={handleSubmit}>
+      <form className={styles.formClass} ref={formRef} onSubmit={handleSubmit}>
         <h1 className="text-center">Add student to course</h1>
 
-        <div className={styles["form-input"]}>
+        <div className={styles.formInputClass}>
           <TextField
             id="studentID"
             fullWidth={true}
@@ -143,7 +144,7 @@ function InstructorView(props) {
           />
         </div>
 
-        <div className={styles["form-input"]}>
+        <div className={styles.formInputClass}>
           <TextField
             id="courseID"
             fullWidth={true}
@@ -161,12 +162,12 @@ function InstructorView(props) {
         </Button>
       </form>
 
-      <div className={styles.center} id="id-selector">
-        <div className={styles.students}>
+      <div className={styles.centerClass} id="id-selector">
+        <div className={styles.studentsClass}>
           <h1>Students:</h1>
           <div id="search-student">
             <TextField
-              className={styles.input}
+              className={styles.inputClass}
               type="text"
               onChange={handleChange("searchStudent")}
               value={values.searchStudent}
@@ -184,7 +185,7 @@ function InstructorView(props) {
 
           <div id="filter-student">
             <TextField
-              className={styles.input}
+              className={styles.inputClass}
               type="text"
               onKeyUp={filterList(values.studentIdFilter, studentListRef)}
               onChange={handleChange("studentIdFilter")}
@@ -193,7 +194,7 @@ function InstructorView(props) {
             />
           </div>
 
-          <ul className={styles["list-wrapper"]} ref={studentListRef}>
+          <ul className={styles.listWrapperClass} ref={studentListRef}>
             {students.map((student) => {
               return (
                 <ListItem 
@@ -204,8 +205,7 @@ function InstructorView(props) {
                   id={student.ID}
                 >
                   <ListItemText
-                    className={styles.center}
-                    alignItems='center'
+                    className={styles.centerClass}
                     primary={student.Name}
                     secondary={`Id: ${student.ID}`}
                   />
@@ -216,12 +216,12 @@ function InstructorView(props) {
         </div>
 
 
-        <div className={styles.students}>
+        <div className={styles.studentsClass}>
           <h1>Courses:</h1>
 
           <div id="filter-course">
             <TextField
-              className={styles.input}
+              className={styles.inputClass}
               type="text"
               helperText="Filter by course name"
               onKeyUp={filterList(values.courseIdFilter, courseListRef)}
@@ -230,7 +230,7 @@ function InstructorView(props) {
             />
           </div>
 
-          <ul ref={courseListRef} className={styles.form}>
+          <ul ref={courseListRef} className={styles.formClass}>
             {courses.map((course, index) => {
               return (
                 <ListItem
@@ -241,7 +241,7 @@ function InstructorView(props) {
                   id={course.ID}
                 >
                   <ListItemText
-                  className={styles.input}
+                  className={styles.inputClass}
                     primary={course.CourseCode}
                     secondary={`Id: ${course.ID}`}
                   />
