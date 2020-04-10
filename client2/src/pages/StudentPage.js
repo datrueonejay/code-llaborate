@@ -20,10 +20,7 @@ import clsx from "clsx";
 //   CircularProgress,
 // } from "@material-ui/core";
 
-import {
-  CssBaseline,
-  CircularProgress,
-} from "@material-ui/core";
+import { CssBaseline, CircularProgress } from "@material-ui/core";
 
 // import MenuIcon from "@material-ui/icons/Menu";
 // import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -35,9 +32,8 @@ import StudentSuggestion from "../components/StudentSuggestion.js";
 
 import Suggestions from "../components/Suggestions";
 import Chat from "../components/Chat";
-import {useStyles} from "../styles/StudentPageStyle.js";
+import { useStyles } from "../styles/StudentPageStyle.js";
 // import styles from "../scss/StudentPage.scss";
-
 
 // credit: https://material-ui.com/components/drawers/
 
@@ -140,7 +136,7 @@ export default function StudentView(props) {
       <Logout />
 
       <CssBaseline />
-      <Drawer chatOut={chatOut}> </Drawer>
+      {/* <Drawer chatOut={chatOut}> </Drawer> */}
       <main className={clsx(classes.content, { [classes.contentShift]: open })}>
         {/* <Editor /> */}
         <StudentCodeEditor code={code} />
@@ -152,7 +148,10 @@ export default function StudentView(props) {
         <Suggestions suggestions={suggestions} />
         <Chat
           chatOut={chatOut}
-          sendChat={(message) => websocket.send_chat(message)}
+          sendChat={(message) => {
+            console.log(message);
+            websocket.send_chat(message);
+          }}
         ></Chat>
         <div>
           PYTHON FROM WEBSOCKET

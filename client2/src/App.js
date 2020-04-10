@@ -12,7 +12,7 @@ import TeachingAssistantView from "./pages/TAPage.js";
 import Sessions from "./pages/SessionsPage";
 
 import InstructorView from "./pages/InstructorPage.js";
-import SignUp from "./pages/SignUp";
+import SignUp from "./pages/SignUpPage";
 
 function App() {
   const authenticate = useSelector((state) => state.userReducer.auth);

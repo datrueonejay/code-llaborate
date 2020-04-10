@@ -7,7 +7,7 @@ const redisClient = redis.createClient(
     prefix: "session",
   }
 );
-const crypto = require('crypto');
+const crypto = require("crypto");
 const SESSION_EXPIRE_TIME = 7200; // in seconds
 
 // DB api init
@@ -51,9 +51,10 @@ let authenticated = (req, res, next) => {
 let isInstructor = (req, res, next) => {
   console.log("session", req.session);
   console.log("role", req.session.user.role);
-  if (!req.session.user.role === "INSTRUCTOR") return res.status(401).end("Access denied");
+  if (!req.session.user.role === "INSTRUCTOR")
+    return res.status(401).end("Access denied");
   next();
-}
+};
 
 // Health Check
 app.get("/health", (req, res) => {
@@ -184,14 +185,19 @@ app.post(
   isInstructor,
   [body("courseID").escape()],
   (req, res, next) => {
-    let code = crypto.createHash('md5').update(Date.now().toString()).digest('hex');
+    let code = crypto
+      .createHash("md5")
+      .update(Date.now().toString())
+      .digest("hex");
     redisClient.set(code, req.body.courseID);
-    redisClient.get(code), () => {console.log(code)}
+    redisClient.get(code),
+      () => {
+        console.log(code);
+      };
 
     return res.json(code);
   }
-
-)
+);
 
 app.delete(
   "/api/deleteSession",
