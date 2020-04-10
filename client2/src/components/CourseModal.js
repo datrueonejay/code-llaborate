@@ -4,7 +4,8 @@ import {
   TextField,
   Button
 } from '@material-ui/core';
-import styles from "../scss/Modal.module.scss";
+//import styles from "../scss/Modal.module.scss";
+import {useStyles} from "../styles/Modal.module.js";
 const api = require("../http/apiController.js");
 
 function CourseModal(props) {
@@ -12,6 +13,7 @@ function CourseModal(props) {
   const [code, setCode] = useState("");
 
   const formRef = useRef(null);
+  const styles = useStyles();
 
   function openModal() {
     setOpen(true);
@@ -39,10 +41,10 @@ function CourseModal(props) {
         open={open}
         onClose={closeModal}
       >
-        <div className={`${styles.modal}`}>
-          <div className={styles.center}>
+        <div className={`${styles.modalClass}`}>
+          <div className={styles.centerClass}>
             <form ref={formRef} onSubmit={createCourseCode}>
-              <div className={styles["form-input"]}>
+              <div>
                 <TextField
                   id="courseID"
                   fullWidth={true}
