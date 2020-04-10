@@ -50,6 +50,13 @@ export default function Sessions(props) {
     }
   }, []);
 
+
+  function joinCourse() {
+    api.joinCourse().then((res) => {
+      console.log("joined course");
+    })
+  }
+
   return (
     <div>
       <Logout />
@@ -94,6 +101,20 @@ export default function Sessions(props) {
           </div>
         );
       })}
+
+      <form onSubmit={joinCourse}>
+        <div style={ {width: '50%', margin: 'auto'}}>
+          <TextField
+            id="courseCode"
+            fullWidth={true}
+            label="Course Code"
+            name="courseCode"
+            helperText="The course Code, for example, 241tw5ge48hre15tewg48rh51r"
+            required
+          />
+          <Button type='submit' color="primary">Join Course</Button>
+        </div>
+      </form>
     </div>
   );
 }

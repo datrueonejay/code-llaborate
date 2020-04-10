@@ -155,7 +155,13 @@ exports.addToCourse = (userID, courseID, cb) => {
   });
 };
 
-// exports.
+
+exports.checkCourse = (courseID, cb) => {
+  findCourse(courseID, (err, result) => {
+    if (err) return cb(err, null);
+    return cb(null, result);
+  })
+}
 
 function findClasses(username, cb) {
   let sql =
@@ -174,6 +180,11 @@ function findUser(username, cb) {
   let sql =
     "SELECT user.ID, RoleID, Username, name, Role, Salt, Password from Users as user INNER JOIN Roles as role where role.ID = user.RoleID and user.username=?";
   connection.query(sql, [username], cb);
+}
+
+function findCourse(courseID, cb) {
+  let sql = "SELECT * from Courses WHERE ID=?";
+  connection.query(sql, [courseID], cb);
 }
 
 function findRole(role, cb) {

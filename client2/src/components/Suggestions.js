@@ -7,10 +7,10 @@ function Suggestions(props) {
     <div>
       <h1>Student Suggestions</h1>
       <List>
-        {props.suggestions.map((items) => {
+        {props.suggestions.map((items, index) => {
           let { lineNum, suggestion } = items;
           return (
-            <li key={suggestion} id={suggestion}>
+            <li key={index} id={suggestion}>
               {suggestion} for line {lineNum}
               <CopyToClipboard text={suggestion}>
                 <button>Copy</button>

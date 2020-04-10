@@ -14,9 +14,9 @@ function Chat(props) {
     <div>
       <h1>Chat</h1>
       <ul>
-        {props.chatOut.map((chat) => {
+        {props.chatOut.map((chat, index) => {
           return (
-            <li key={chat} id={chat}>
+            <li key={index} id={chat}>
               {chat}
             </li>
           );

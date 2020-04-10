@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Modal,
   TextField,
@@ -11,6 +11,8 @@ function CourseModal(props) {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
 
+  const formRef = useRef(null);
+
   function openModal() {
     setOpen(true);
   }
@@ -19,10 +21,16 @@ function CourseModal(props) {
     setOpen(false);
   }
 
-  function createCourseCode() {
-    api.createCourseCode().then((res) => {
+  function createCourseCode(e) {
+    e.preventDefault();
+    let formData = new FormData(e.target);
+    let courseID = formData.get("courseID");
+
+    api.createCourseCode(courseID).then((res) => {
       setCode(res);
     })
+
+    formRef.current.reset();
   }
   return(
     <div>
@@ -33,8 +41,20 @@ function CourseModal(props) {
       >
         <div className={`${styles.modal}`}>
           <div className={styles.center}>
-            <Button color="primary" onClick={createCourseCode}>Get Code</Button>
-            {code == "" ? null : `\nYour Code: ${code}`}
+            <form ref={formRef} onSubmit={createCourseCode}>
+              <div className={styles["form-input"]}>
+                <TextField
+                  id="courseID"
+                  fullWidth={true}
+                  label="Course Id"
+                  name="courseID"
+                  helperText="The course id, for example, 2"
+                  required
+                />
+                <Button type='submit' color="primary">Get Code</Button>
+              </div>
+            </form>
+            {code === "" ? null : `\nYour Course Code: ${code}`}
             <p>Want to JayJay?</p>
           </div>
         </div>

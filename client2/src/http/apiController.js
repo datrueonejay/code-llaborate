@@ -23,9 +23,9 @@ exports.addToCourse = (userID, courseID) => {
     .then((res) => res.data);
 };
 
-exports.createCourseCode = () => {
+exports.createCourseCode = (courseID) => {
   return axios
-    .post("/api/createcoursecode", {  })
+    .post("/api/createcoursecode", { courseID })
     .then((res) => res.data);
 }
 
