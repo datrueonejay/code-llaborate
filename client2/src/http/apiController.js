@@ -45,6 +45,12 @@ exports.joinSession = (courseId) => {
     .then((res) => res.data);
 };
 
+exports.joinCourse = (courseCode) => {
+  return axios
+    .post('/api/joincourse', {courseCode})
+    .then((res) => res.data);
+}
+
 exports.startSession = (courseId) => {
   return axios
     .post(`/api/createSession`, {

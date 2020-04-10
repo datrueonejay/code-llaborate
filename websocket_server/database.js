@@ -119,7 +119,7 @@ exports.findClasses = (username, cb) => {
 };
 
 exports.searchUser = (query, cb) => {
-  let sql = 'SELECT Name,ID FROM Users where Name like' + connection.escape('%' + query + '%');
+  let sql = 'SELECT Name, Users.ID, Role FROM Users inner join Roles where Roles.ID = Users.RoleID and Name like' + connection.escape('%' + query + '%');
   connection.query(sql, [query], cb);
 }
 

@@ -86,8 +86,6 @@ app.post(
   }
 );
 
-
-// query param: [coursecode] 
 app.post(
   "/api/login",
   [body("username").escape(), body("password").escape()],
@@ -121,6 +119,30 @@ app.get("/api/signout", authenticated, (req, res, next) => {
   req.session.destroy();
   res.json("Signed out");
 });
+
+app.post("/api/joincourse",
+  authenticated, 
+  [body("courseCode").escape()],
+  (req, res, next) => {
+    let courseCode = req.body.courseCode;
+    getCourseIdFromCode(courseCode).then((courseID) => {
+      userID = req.session.user.id;
+      console.log(courseID);
+      console.log(userID);
+      db.checkCourse(courseID, (err, results) => {
+        if (err) return res.status(400).end("Bad request");
+  
+        // if course found
+        if (results.length > 0) {
+          db.addToCourse(userID, courseID, (err, results) => {
+            if (err) return res.status(400).end("Bad request");
+  
+            return res.json(results);
+          })
+        }
+      })
+    });
+})
 
 // Course and sessions logic
 app.post(
@@ -280,7 +302,10 @@ app.delete(
   }
 );
 
-app.post("/api/addtocourse/", authenticated, (req, res, next) => {
+app.post("/api/addtocourse/", 
+  authenticated, 
+  [body("userID").escape(), body("courseID").escape()],
+  (req, res, next) => {
   let userID = req.body.userID;
   let courseID = req.body.courseID;
   db.addToCourse(userID, courseID, (err, results) => {
@@ -292,15 +317,18 @@ app.post("/api/addtocourse/", authenticated, (req, res, next) => {
   });
 });
 
-app.post("/api/searchuser/", authenticated, (req, res, next) => {
-  let searchQuery = req.body.query;
-  db.searchUser(searchQuery, (err, results) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).end(err.message);
-    }
-    console.log(results);
-    return res.json(results);
+app.post("/api/searchuser/",
+  authenticated, 
+  [body("query").escape()],
+  (req, res, next) => {
+    let searchQuery = req.body.query;
+    db.searchUser(searchQuery, (err, results) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).end(err.message);
+      }
+      console.log(results);
+      return res.json(results);
   });
 });
 
@@ -591,10 +619,14 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 function getCourseIdFromCode(courseCode) {
-  redisClient.get("courseCodes", (err, reply) => {
-    if (err) return "";
-    let courseCodes = JSON.parse(reply);
-    return Object.keys(courseCodes).find((key) => courseCodes[key] === courseCode)
+
+  return new Promise(function(resolve, reject) {
+    redisClient.get("courseCodes", (err, reply) => {
+      if (err) reject();
+      let courseCodes = JSON.parse(reply);
+      console.log("courseCodes", courseCodes);
+      resolve(Object.keys(courseCodes).find((key) => courseCodes[key] === courseCode))
+    })
   })
 }
 

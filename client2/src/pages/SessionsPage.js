@@ -26,6 +26,8 @@ import { setSession } from "../redux/actions/userActions";
 
 export default function Sessions(props) {
   const [courses, setCourses] = useState([]);
+  const [courseCode, setCourseCode] = useState("");
+  const [formNotification, setFormNotification] = useState("");
   const dispatch = useDispatch();
 
   const role = useSelector((state) => state.userReducer.userType);
@@ -51,10 +53,17 @@ export default function Sessions(props) {
   }, []);
 
 
-  function joinCourse() {
-    api.joinCourse().then((res) => {
+  function joinCourse(e) {
+    e.preventDefault();
+
+    api.joinCourse(courseCode).then((res) => {
       console.log("joined course");
+      setFormNotification("Successfully joined course!");
     })
+  }
+
+  function handleChange(e) {
+    setCourseCode(e.target.value);
   }
 
   return (
@@ -109,10 +118,12 @@ export default function Sessions(props) {
             fullWidth={true}
             label="Course Code"
             name="courseCode"
+            onChange={handleChange}
             helperText="The course Code, for example, 241tw5ge48hre15tewg48rh51r"
             required
           />
           <Button type='submit' color="primary">Join Course</Button>
+          <div id="notification">{formNotification}</div>
         </div>
       </form>
     </div>
