@@ -118,13 +118,13 @@ exports.findClasses = (username, cb) => {
   });
 };
 
-exports.searchStudent = (query, cb) => {
-  let sql = 'SELECT Name,ID FROM Users where RoleID=1 and Name like' + connection.escape('%' + query + '%');
+exports.searchUser = (query, cb) => {
+  let sql = 'SELECT Name,ID FROM Users where Name like' + connection.escape('%' + query + '%');
   connection.query(sql, [query], cb);
 }
 
-exports.getStudents = (page=0, cb) => {
-  let sql = "SELECT Name,ID FROM Users where RoleID=1 ORDER BY ID LIMIT ?, 50";
+exports.getUsers = (page=0, cb) => {
+  let sql = "SELECT Name, Users.ID, Role FROM Users inner join Roles on Users.ID = Roles.ID ORDER BY ID LIMIT ?, 50";
   connection.query(sql, [page*50], cb);
 };
 
@@ -134,7 +134,7 @@ exports.getCourses = cb => {
   connection.query(sql, cb);
 };
 
-exports.addStudentToCourse = (studentID, courseID, cb) => {
+exports.addToCourse = (userID, courseID, cb) => {
   // // Make sure it is a real user
   // findUserById(studentID, (err, res) => {
   //   if (err) return cb(err, null);
@@ -146,12 +146,12 @@ exports.addStudentToCourse = (studentID, courseID, cb) => {
   //     connection.query(sql, [studentID, courseID], cb);
   //   });
   // });
-  checkUserCourse(studentID, courseID, (err, res) => {
+  checkUserCourse(userID, courseID, (err, res) => {
     if (err) {
       return cb(err, null);
     }
     let sql = "INSERT INTO UserCourses VALUES (?, ?)";
-    connection.query(sql, [studentID, courseID], cb);
+    connection.query(sql, [userID, courseID], cb);
   });
 };
 
@@ -165,7 +165,7 @@ function findClasses(username, cb) {
 
 function findPersonClass(username, course, role, cb) {
   let sql =
-    "SELECT * FROM UserCourses as c inner join users where c.UserID = Users.ID and Username=? and CourseID=? and RoleID=?";
+    "SELECT * FROM UserCourses as c inner join Users where c.UserID = Users.ID and Username=? and CourseID=? and RoleID=?";
   connection.query(sql, [username, course, role], cb);
 }
 
@@ -192,7 +192,7 @@ function findCourseById(courseID, cb) {
   connection.query(sql, [courseID], cb);
 }
 
-function checkUserCourse(studentID, courseID, cb) {
+function checkUserCourse(userId, courseID, cb) {
   let sql = "SELECT * FROM UserCourses WHERE UserID=? and CourseID=?";
-  connection.query(sql, [studentID, courseID], cb);
+  connection.query(sql, [userId, courseID], cb);
 }

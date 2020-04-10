@@ -1,12 +1,12 @@
 const axios = require("axios");
 
 // General api endpoints
-exports.getStudents = (page = 0) => {
-  return axios.get(`/api/students?page=${page}`).then((res) => res.data);
+exports.getUsers = (page = 0) => {
+  return axios.get(`/api/users?page=${page}`).then((res) => res.data);
 };
 
-exports.searchStudent = (query) => {
-  return axios.post("/api/searchstudent", { query }).then((res) => res.data);
+exports.searchUser = (query) => {
+  return axios.post("/api/searchuser", { query }).then((res) => res.data);
 };
 
 exports.getCourses = () => {
@@ -17,11 +17,17 @@ exports.getUserCourses = () => {
   return axios.get(`/api/classes`).then((res) => res.data);
 };
 
-exports.addStudentToCourse = (studentID, courseID) => {
+exports.addToCourse = (userID, courseID) => {
   return axios
-    .post("/api/addstudenttocourse", { studentID, courseID })
+    .post("/api/addtocourse", { userID, courseID })
     .then((res) => res.data);
 };
+
+exports.createCourseCode = () => {
+  return axios
+    .post("/api/createcoursecode", {  })
+    .then((res) => res.data);
+}
 
 // python endpoints
 exports.executePython = (code) => {

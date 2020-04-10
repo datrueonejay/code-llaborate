@@ -8,6 +8,8 @@ import {
   ListItemText,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
+import CourseModal from "../components/CourseModal"
+import ContentList from "../components/ContentList"
 
 function InstructorView(props) {
   const api = require("../http/apiController.js");
@@ -20,56 +22,46 @@ function InstructorView(props) {
     studentIdFilter: "",
     courseIdFilter: "",
     searchStudent: "",
+    modal: false,
   });
 
   const formRef = useRef(null);
-  const studentListRef = useRef(null);
-  const courseListRef = useRef(null);
 
   useEffect(() => {
-    function getStudents() {
-      api.getStudents(0).then((res) => {
-        setStudents(res);
-      });
-    }
-
-    function getCourses() {
-      api.getCourses().then((res) => {
-        setCourses(res);
-      });
-    }
-
-    getStudents();
+    getUsers();
     getCourses();
   }, []);
+
+  function getUsers() {
+    api.getUsers(0).then((res) => {
+      setStudents(res);
+    });
+  }
+
+  function getCourses() {
+    api.getCourses().then((res) => {
+      setCourses(res);
+    });
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
     let formData = new FormData(e.target);
-    let studentID = formData.get("studentID");
+    let userID = formData.get("userID");
     let courseID = formData.get("courseID");
 
     api
-      .addStudentToCourse(studentID, courseID)
+      .addToCourse(userID, courseID)
       .then((res) => {
-        setNotification("Successfully added student to the course");
+        setNotification("Successfully added user to the course");
       })
       .catch((err) => {
         console.log(err);
-        setNotification("Student is already in the course or IDs do not exist");
+        setNotification("User is already in the course or IDs do not exist");
       })
       .finally(() => {
         formRef.current.reset();
       });
-    // api.addStudentToCourse(studentID, courseID, (err, res) => {
-    //   if (err) {
-    //     console.log(err);
-    //     setNotification("Student is already in the course or IDs do not exist");
-    //   } else {
-    //     setNotification("Successfully added student to the course");
-    //   }
-    //   formRef.current.reset();
-    // });
   }
 
   // function setValue(ref, id) {
@@ -80,19 +72,18 @@ function InstructorView(props) {
   // }
 
   function searchStudent() {
-    api
-      .searchStudent(values.searchStudent)
-      .then((res) => {
-        setStudents(res);
-      })
-      .catch((err) => {
-        setNotification("Could not search for student. Please try again");
-      });
-    // api.searchStudent(values.searchStudent, (err, res) => {
-    //   if (err)
-    //     setNotification("Could not search for student. Please try again");
-    //   setStudents(res);
-    // });
+    if (values.searchStudent === '') {
+      getUsers();
+    } else {
+      api
+        .searchUser(values.searchStudent)
+        .then((res) => {
+          setStudents(res);
+        })
+        .catch((err) => {
+          setNotification("Could not search for student. Please try again");
+        });
+    }
   }
 
   const setValue = (value, id) => (event) => {
@@ -103,42 +94,23 @@ function InstructorView(props) {
     setValues({ ...values, [value]: event.target.value });
   };
 
-  function filterList(input, listRef) {
-    return function (e) {
-      // this should be called when user types into the input
-      input = input.toUpperCase(); // what the user typed in
-      let list = listRef.current.querySelectorAll("span");
-
-      for (let i = 0; i < list.length; i++) {
-        let li, text;
-        li = list[i];
-        text = li.textContent || li.innerText; // text of the list
-        text = text.toUpperCase();
-        if (text.indexOf(input) > -1) {
-          li.parentNode.parentNode.classList.remove("hide");
-        } else {
-          li.parentNode.parentNode.classList.add("hide");
-        }
-      }
-    };
-  }
-
   return (
     <div>
+      <CourseModal open={values.modal}/>
       <div className={styles.notification}>{notification}</div>
 
       <form className={styles.form} ref={formRef} onSubmit={handleSubmit}>
-        <h1 className="text-center">Add student to course</h1>
+        <h1 className="text-center">Add student or TA to course</h1>
 
         <div className={styles["form-input"]}>
           <TextField
-            id="studentID"
+            id="userID"
             fullWidth={true}
-            label="Student Id"
-            name="studentID"
+            label="User Id"
+            name="userID"
             onChange={handleChange("studentId")}
             value={values.studentId}
-            helperText="The student id, for example, 3"
+            helperText="The user id, for example, 3"
             required
           />
         </div>
@@ -157,20 +129,20 @@ function InstructorView(props) {
         </div>
 
         <Button type="submit" color="primary" variant="contained">
-          Add student to course
+          Add to course
         </Button>
       </form>
 
       <div className={styles.center} id="id-selector">
         <div className={styles.students}>
-          <h1>Students:</h1>
-          <div id="search-student">
+          <h1>Users:</h1>
+          <div id="search-user">
             <TextField
               className={styles.input}
               type="text"
               onChange={handleChange("searchStudent")}
               value={values.searchStudent}
-              helperText="Search for a student, e.g JayQuelen"
+              helperText="Search for a User, e.g JayQuelen"
             />
             <Button
               onClick={searchStudent}
@@ -181,77 +153,17 @@ function InstructorView(props) {
               Search
             </Button>
           </div>
-
-          <div id="filter-student">
-            <TextField
-              className={styles.input}
-              type="text"
-              onKeyUp={filterList(values.studentIdFilter, studentListRef)}
-              onChange={handleChange("studentIdFilter")}
-              helperText="Filter by student name"
-              value={values.studentIdFilter}
-            />
-          </div>
-
-          <ul className={styles["list-wrapper"]} ref={studentListRef}>
-            {students.map((student) => {
-              return (
-                <ListItem 
-                  button
-                  divider
-                  onClick={setValue("studentId", student.ID)}
-                  key={student.ID}
-                  id={student.ID}
-                >
-                  <ListItemText
-                    className={styles.center}
-                    alignItems='center'
-                    primary={student.Name}
-                    secondary={`Id: ${student.ID}`}
-                  />
-                </ListItem>
-              );
-            })}
-          </ul>
+          
+          <ContentList type="users" setValue={setValue} value="studentId" list={students} helperText="Filter by title"/>
         </div>
 
 
         <div className={styles.students}>
           <h1>Courses:</h1>
-
-          <div id="filter-course">
-            <TextField
-              className={styles.input}
-              type="text"
-              helperText="Filter by course name"
-              onKeyUp={filterList(values.courseIdFilter, courseListRef)}
-              onChange={handleChange("courseIdFilter")}
-              value={values.courseIdFilter}
-            />
-          </div>
-
-          <ul ref={courseListRef} className={styles.form}>
-            {courses.map((course, index) => {
-              return (
-                <ListItem
-                  button
-                  divider
-                  onClick={setValue("courseId", course.ID)}
-                  key={index}
-                  id={course.ID}
-                >
-                  <ListItemText
-                  className={styles.input}
-                    primary={course.CourseCode}
-                    secondary={`Id: ${course.ID}`}
-                  />
-                </ListItem>
-              );
-            })}
-          </ul>
+          <ContentList type="courses" setValue={setValue} value="courseId" list={courses} helperText="Filter by Course code"/>
         </div>
+
       </div>
-      <Link to="/private">Private</Link>
     </div>
   );
 }

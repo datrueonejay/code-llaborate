@@ -7,6 +7,7 @@ const redisClient = redis.createClient(
     prefix: "session",
   }
 );
+const crypto = require('crypto');
 const SESSION_EXPIRE_TIME = 7200; // in seconds
 
 // DB api init
@@ -46,6 +47,13 @@ let authenticated = (req, res, next) => {
   if (!req.session.user) return res.status(401).end("Access denied");
   next();
 };
+
+let isInstructor = (req, res, next) => {
+  console.log("session", req.session);
+  console.log("role", req.session.user.role);
+  if (!req.session.user.role === "INSTRUCTOR") return res.status(401).end("Access denied");
+  next();
+}
 
 // Health Check
 app.get("/health", (req, res) => {
@@ -171,6 +179,20 @@ app.post(
   }
 );
 
+app.post(
+  "/api/createCourseCode",
+  isInstructor,
+  [body("courseID").escape()],
+  (req, res, next) => {
+    let code = crypto.createHash('md5').update(Date.now().toString()).digest('hex');
+    redisClient.set(code, req.body.courseID);
+    redisClient.get(code), () => {console.log(code)}
+
+    return res.json(code);
+  }
+
+)
+
 app.delete(
   "/api/deleteSession",
   authenticated,
@@ -228,20 +250,21 @@ app.delete(
   }
 );
 
-app.post("/api/addstudenttocourse/", authenticated, (req, res, next) => {
-  let studentID = req.body.studentID;
+app.post("/api/addtocourse/", authenticated, (req, res, next) => {
+  let userID = req.body.userID;
   let courseID = req.body.courseID;
-  db.addStudentToCourse(studentID, courseID, (err, results) => {
+  db.addToCourse(userID, courseID, (err, results) => {
     if (err) {
+      console.log(err.message);
       return res.status(500).end(err.message);
     }
-    return res.json("Successfully added student to course");
+    return res.json("Successfully added user to course");
   });
 });
 
-app.post("/api/searchstudent/", authenticated, (req, res, next) => {
+app.post("/api/searchuser/", authenticated, (req, res, next) => {
   let searchQuery = req.body.query;
-  db.searchStudent(searchQuery, (err, results) => {
+  db.searchUser(searchQuery, (err, results) => {
     if (err) {
       console.log(err);
       return res.status(500).end(err.message);
@@ -272,9 +295,9 @@ app.get("/api/classes", authenticated, (req, res, next) => {
   );
 });
 
-app.get("/api/students", authenticated, (req, res, next) => {
+app.get("/api/users", authenticated, (req, res, next) => {
   let page = req.query.page || 0;
-  db.getStudents(page, (err, results, fields) => {
+  db.getUsers(page, (err, results, fields) => {
     if (err) {
       console.log(err);
       return res.status(500).end(err.message);
