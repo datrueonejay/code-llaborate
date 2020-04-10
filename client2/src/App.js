@@ -12,6 +12,7 @@ import TeachingAssistantView from "./pages/TAPage.js";
 import Sessions from "./pages/SessionsPage";
 
 import InstructorView from "./pages/InstructorPage.js";
+import SignUp from "./pages/SignUp";
 
 function App() {
   const authenticate = useSelector((state) => state.userReducer.auth);
@@ -26,6 +27,7 @@ function App() {
       <Switch>
         <Route exact path="/" component={Home} />
         <Route path="/sessions" component={Sessions} />
+        <Route path="/signup" component={SignUp} />
         <PrivateRoute
           path="/student"
           for="STUDENT"
