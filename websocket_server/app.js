@@ -80,12 +80,12 @@ app.post(
   (req, res, next) => {
     let username = req.body.username;
     let password = req.body.password;
-    db.checkUser(username, password, (err, user) => {
+    return db.checkUser(username, password, (err, user) => {
       if (err) {
         console.log(err);
         return res.status(500).end(err.message);
       }
-      db.findClasses(user.username, (err, classes) => {
+      return db.findClasses(user.username, (err, classes) => {
         if (err) {
           console.log(err);
           return res.status(500).end(err.message);
@@ -125,24 +125,42 @@ app.post(
             } else {
               // Session does not exist
               req.session.currSession = req.body.course;
-              console.log(`creating session ${req.body.course}SESSION`);
-              redisClient.set(`${req.body.course}SESSION`, "");
-              redisClient.expire(
-                `${req.body.course}SESSION`,
-                SESSION_EXPIRE_TIME
-              );
-              console.log(
-                `${req.body.course} started by  ${req.session.user.id}`
-              );
-              redisClient.hset(
+              redisClient.set(`${req.body.course}SESSION`, "", (err, reply) => {
+                if (err) {
+                  return res.status(500).end("Internal Server Error");
+                }
+                redisClient.expire(
+                  `${req.body.course}SESSION`,
+                  SESSION_EXPIRE_TIME
+                );
+              });
+
+              redisClient.hmset(
                 req.body.course,
+                "code",
+                "",
                 "startedBy",
-                req.session.user.id
+                req.session.user.id,
+                "suggestions",
+                JSON.stringify([]),
+                "chat",
+                JSON.stringify([]),
+                (err, reply) => {
+                  if (err) {
+                    return res.status(500).end("Internal Server Error");
+                  }
+                  redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
+                }
               );
-              redisClient.hset(req.body.course, "code", "");
-              redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
-              // Remove any old suggestions
-              redisClient.del(`${req.body.course}SUGGESTIONS`);
+              // redisClient.hset(
+              //   req.body.course,
+              //   "startedBy",
+              //   req.session.user.id
+              // );
+              // redisClient.hset(req.body.course, "code", "");
+              // redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
+              // // Remove any old suggestions
+              // redisClient.del(`${req.body.course}SUGGESTIONS`);
               return res.json("CREATED");
             }
           });
@@ -378,17 +396,9 @@ wss.on("session", (ws, req) => {
   // Instructor logic
 
   ws.on("message", (message) => {
-    // parse string
-    // console.log("message Msg")
-    // console.log(message)
-
     let parsedMsg = JSON.parse(message);
-    // console.log("parsed Msg")
-    // console.log(parsedMsg)
 
     let ret;
-    // console.log(`Got the parsedMsg ${parsedMsg}`)
-    // console.log(`Got the message ${parsedMsg.message}`);
     // TA CODE
     if (
       req.session.user.role === "TEACHING ASSISTANT" &&
@@ -403,62 +413,59 @@ wss.on("session", (ws, req) => {
         message: parsedMsg.message,
       };
     } else if (parsedMsg.type == "CHAT") {
-      // console.log("CHAT MESSAGE");
-      // console.log(parsedMsg.message)
+      // redisClient.rpush(`${req.session.currSession}CHAT`, parsedMsg.message);
+      return redisClient.hget(ws.course, "chat", (err, chat) => {
+        if (err) return;
+        let messages = JSON.parse(chat);
+        messages.push(parsedMsg.message);
+        return redisClient.hset(
+          ws.course,
+          "chat",
+          JSON.stringify(messages),
+          (err, reply) => {
+            if (err) return;
+            return sendClients(ws.course, parsedMsg.message, "CHAT");
 
-      redisClient.rpush(`${req.session.currSession}CHAT`, parsedMsg.message);
-
-      return redisClient.lrange(
-        `${req.session.currSession}CHAT`,
-        0,
-        -1,
-        (err, res) => {
-          // console.log("res redis");
-          // console.log(res);
-          ret = {
-            type: "CHAT", //TODO: secure this?
-            from: req.session.user.role,
-            message: res,
-          };
-          wss.clients.forEach((client) => {
-            if (client.course === ws.course) {
-              client.send(JSON.stringify(ret));
-            }
-          });
-        }
-      );
+            // return sendClients(ws.course, messages, req.session.user.role);
+          }
+        );
+      });
     } else {
-      console.log("STUDENT SUGGESTIONS");
-      console.log(parsedMsg.message);
-      console.log(parsedMsg.lineNum);
-      // Student suggestions
-      redisClient.sadd(
-        `${req.session.currSession}SUGGESTIONS`,
-        `${parsedMsg.lineNum} ${parsedMsg.message}`
-      );
-      return redisClient.smembers(
-        `${req.session.currSession}SUGGESTIONS`,
-        (err, suggestions) => {
-          if (err) return res.status(500).end("Internal server error");
-          ret = {
-            type: "SUGGESTION",
-            from: req.session.user.role,
-            message: suggestions.map((suggestion) => {
-              // Split into line number and code
-              let firstSpace = suggestion.indexOf(" ") + 1;
-              return {
-                lineNum: suggestion.substring(0, firstSpace),
-                suggestion: suggestion.substring(firstSpace),
-              };
-            }),
-          };
-          wss.clients.forEach((client) => {
-            if (client.course === ws.course) {
-              client.send(JSON.stringify(ret));
-            }
-          });
-        }
-      );
+      return redisClient.hget(ws.course, "suggestions", (err, suggestions) => {
+        if (err) return;
+        let suggestionsList = JSON.parse(suggestions);
+        console.log(suggestionsList);
+        suggestionsList.forEach((suggestion) => {
+          // Already suggested
+          if (
+            suggestion.message === parsedMsg.message &&
+            suggestion.lineNum === parsedMsg.lineNum
+          ) {
+            return;
+            // return sendClients(
+            //   ws.course,
+            //   suggestionsList,
+            //   req.session.user.role
+            // );
+          }
+        });
+
+        let newSuggestion = {
+          suggestion: parsedMsg.message,
+          lineNum: parsedMsg.lineNum,
+        };
+
+        suggestionsList.push(newSuggestion);
+        return redisClient.hset(
+          ws.course,
+          "suggestions",
+          JSON.stringify(suggestionsList),
+          (err, reply) => {
+            if (err) return;
+            return sendClients(ws.course, newSuggestion, "SUGGESTION");
+          }
+        );
+      });
     }
     wss.clients.forEach((client) => {
       if (client.course === ws.course) {
@@ -467,18 +474,37 @@ wss.on("session", (ws, req) => {
     });
   });
 
-  redisClient.hget(req.session.currSession, "code", (err, res) => {
-    if (err) {
-      console.log(err);
-      return ws.send("Error retrieving initial message");
-    }
+  redisClient.hgetall(req.session.currSession, (err, res) => {
     console.log(res);
-    let ret = {
-      from: "TEACHING ASSISTANT",
-      message: res,
-    };
-    return ws.send(JSON.stringify(ret));
+    console.log("HEHEH");
+    console.log(typeof res);
+    console.log("code");
+
+    let code = res.code;
+    console.log("suggestions");
+
+    let suggestions = JSON.parse(res.suggestions);
+    console.log("chat");
+
+    let chat = JSON.parse(res.chat);
+
+    // let { code, suggestions, chat } = res;
+    console.log("SENDING");
+    sendClients(ws.course, { code, suggestions, chat }, "INITIAL");
   });
+
+  // redisClient.hget(req.session.currSession, "code", (err, res) => {
+  //   if (err) {
+  //     console.log(err);
+  //     return ws.send("Error retrieving initial message");
+  //   }
+  //   console.log(res);
+  //   let ret = {
+  //     from: "TEACHING ASSISTANT",
+  //     message: res,
+  //   };
+  //   return ws.send(JSON.stringify(ret));
+  // });
 });
 
 server.on("upgrade", (req, socket, head) => {

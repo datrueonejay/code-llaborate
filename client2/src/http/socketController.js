@@ -17,7 +17,7 @@ let http = (function () {
 
     exampleSocket.onopen = (e) => {
       console.log("connection and opened");
-      console.log("Server: " + e.data);
+      console.log(e);
       onopen();
     };
 
@@ -31,6 +31,7 @@ let http = (function () {
       console.log("Server: " + e.data);
       let res = JSON.parse(e.data);
       let from = res.from;
+      console.log(`message from ${from}`);
       if (from === "TEACHING ASSISTANT" && res.type != "CHAT") {
         codeListeners.forEach((listener) => {
           listener(res.message);
@@ -39,9 +40,32 @@ let http = (function () {
         pythonListeners.forEach((listener) => {
           listener(res.message);
         });
-      } else if (res.type == "CHAT") {
+      } else if (from == "CHAT") {
         chatListeners.forEach((listener) => {
           listener(res.message);
+        });
+      } else if (from === "INITIAL") {
+        // console.log(typeof res.message);
+        // initialListeners.forEach((listener) => {
+        //   listener(res.message);
+        // });
+        let { code, suggestions, chat } = res.message;
+        console.log(code);
+        console.log(typeof suggestions);
+        console.log(chat);
+        codeListeners.forEach((listener) => {
+          listener(code);
+        });
+        suggestions.forEach((suggestion) => {
+          console.log(suggestion);
+          suggestionListeners.forEach((listener) => {
+            listener(suggestion);
+          });
+        });
+        chat.forEach((message) => {
+          chatListeners.forEach((listener) => {
+            listener(message);
+          });
         });
       } else {
         console.log("DEFAULT SUGGESTIONS");

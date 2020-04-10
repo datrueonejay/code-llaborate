@@ -36,17 +36,18 @@ function TeachingAssistantView(props) {
       }
     );
     websocket.code_listener((code) => {
+      console.log("settings code");
       setCode(code);
     });
 
-    websocket.suggestion_listener((suggests) => {
-      setSuggestions(suggests);
+    websocket.suggestion_listener((suggestion) => {
+      setSuggestions((old) => old.concat(suggestion));
     });
     websocket.python_listener((output) => {
-      setPythonOut(pythonOut + output);
+      setPythonOut((old) => old.concat(output));
     });
-    websocket.chat_listener((chat) => {
-      setChatOut(chat);
+    websocket.chat_listener((message) => {
+      setChatOut((old) => old.concat(message));
     });
   }, []);
 
@@ -73,15 +74,23 @@ function TeachingAssistantView(props) {
       </Link>
 
       <TaCodeEditor
-        onCodeChange={(code) => websocket.send_code(code)}
+        onCodeChange={(code) => {
+          console.log("ASOIDJ");
+          websocket.send_code(code);
+        }}
         onExecute={(code) =>
           api.executePython(code).then((res) => {
             console.log(res);
           })
         }
+        code={code}
+        onReadFile={(code) => setCode(code)}
       />
       <Suggestions suggestions={suggestions} />
-      <Chat chatOut={chatOut}></Chat>
+      <Chat
+        chatOut={chatOut}
+        sendChat={(message) => websocket.send_chat(message)}
+      ></Chat>
       <div>
         PYTHON FROM WEBSOCKET
         {pythonOut}

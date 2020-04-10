@@ -106,14 +106,14 @@ export default function StudentView(props) {
     websocket.code_listener((message) => {
       setCode(message);
     });
-    websocket.suggestion_listener((suggests) => {
-      setSuggestions(suggests);
+    websocket.suggestion_listener((suggestion) => {
+      setSuggestions((old) => old.concat(suggestion));
     });
     websocket.python_listener((output) => {
-      setPythonOut(pythonOut + output);
+      setPythonOut((old) => old.concat(output));
     });
-    websocket.chat_listener((chat) => {
-      setChatOut(chat);
+    websocket.chat_listener((message) => {
+      setChatOut((old) => old.concat(message));
     });
   }, []);
 
@@ -183,7 +183,10 @@ export default function StudentView(props) {
           }}
         />
         <Suggestions suggestions={suggestions} />
-        <Chat chatOut={chatOut}></Chat>
+        <Chat
+          chatOut={chatOut}
+          sendChat={(message) => websocket.send_chat(message)}
+        ></Chat>
         <div>
           PYTHON FROM WEBSOCKET
           {pythonOut}
