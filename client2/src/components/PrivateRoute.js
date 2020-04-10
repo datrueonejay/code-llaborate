@@ -16,7 +16,7 @@ function PrivateRoute(props) {
   const type = useSelector((state) => state.userReducer.userType);
 
   if (props.for) {
-    if (type == props.for) {
+    if (type === props.for) {
       return <props.component />;
     } else {
       return <Redirect to="/" />;
