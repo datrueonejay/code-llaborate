@@ -4,10 +4,7 @@ import {useStyles} from "../styles/InstructorView.module.js";
 import {
   TextField,
   Button,
-  ListItem,
-  ListItemText,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
 import CourseModal from "../components/CourseModal"
 import ContentList from "../components/ContentList"
 
