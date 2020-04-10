@@ -2,13 +2,14 @@ import React from "react";
 // import http from "../http";
 import { Button, Form } from "react-bootstrap";
 
-let handleSubmitChat = (event) => {
-  event.preventDefault();
-  let chat = document.querySelector("#chatText").value;
-  // http.send_message(chat, "CHAT");
-};
-
 function Chat(props) {
+  let handleSubmitChat = (event) => {
+    event.preventDefault();
+    props.sendChat(document.querySelector("#chatText").value);
+    // let chat = document.querySelector("#chatText").value;
+    // http.send_message(chat, "CHAT");
+  };
+
   return (
     <div>
       <h1>Chat</h1>

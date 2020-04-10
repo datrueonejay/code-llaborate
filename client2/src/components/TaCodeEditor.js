@@ -13,13 +13,13 @@ import "brace/mode/python";
 import "brace/theme/monokai";
 
 export default function TaCodeEditor(props) {
-  const [code, setCode] = useState("");
+  // const [code, setCode] = useState(props.code);
 
   const editorRef = useRef(null);
 
   function onChange(newValue) {
     props.onCodeChange(newValue);
-    setCode(newValue);
+    // setCode(newValue);
   }
 
   // https://stackoverflow.com/questions/55830414/how-to-read-text-file-in-react
@@ -29,9 +29,10 @@ export default function TaCodeEditor(props) {
       const reader = new FileReader();
       reader.onload = (ev) => {
         let code = ev.target.result;
-        console.log(code);
-        props.onCodeChange(code);
-        setCode(code);
+        props.onReadFile(code);
+        onChange(code);
+        // props.onCodeChange(code);
+        // setCode(code);
       };
       reader.readAsText(e.target.files[0]);
     }
@@ -49,11 +50,11 @@ export default function TaCodeEditor(props) {
           name="AceEditor"
           // onLoad={this.onLoad}
           onChange={onChange}
+          value={props.code}
           fontSize={14}
           showPrintMargin={true}
           showGutter={true}
           highlightActiveLine={true}
-          value={code}
           setOptions={{
             enableBasicAutocompletion: false,
             enableLiveAutocompletion: false,
@@ -66,7 +67,7 @@ export default function TaCodeEditor(props) {
         <Button
           className="btn"
           onClick={() => {
-            props.onExecute(code);
+            props.onExecute(props.code);
           }}
         >
           {" "}
@@ -76,7 +77,10 @@ export default function TaCodeEditor(props) {
         <Form onChange={loadFile} id="codeFile">
           <input type="file" name="file" accept=".py, .txt" />
         </Form>
-        <a href={`data:text/plain;charset=utf-8,${code}`} download="code.py">
+        <a
+          href={`data:text/plain;charset=utf-8,${props.code}`}
+          download="code.py"
+        >
           Download Code
         </a>
       </div>
