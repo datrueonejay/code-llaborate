@@ -60,7 +60,7 @@ function TeachingAssistantView(props) {
       <Logout />
       <Link to="/sessions">
         <Button
-          variant="filled" //TODO: fix this warning
+          variant="outlined"
           onClick={() => {
             api.stopSession(session).then((res) => {
               dispatch(setSession(null));
