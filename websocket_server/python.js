@@ -17,7 +17,12 @@ const upload = multer({ dest: path.join(__dirname, "uploads") });
 exports.executePython = (code, onOutput, onError, onExit) => {
   let filename = randomString();
 
-  let filePath = path.join(__dirname, `/tmp/${filename}.py`);
+  // python /usr/src/app/pypy/pypy/sandbox/pypy_interact.py --tmp=/usr/src/app/pypy/pypy/sandbox/tmp --timeout=3 /usr/src/app/pypy/pypy/goal/pypy-c -S /tmp/test.py
+  // let tmpPath = path.join(__dirname, `/pypy/pypy/sandbox/tmp`);
+  let codePath = `/tmp/${filename}.py`;
+  let pypyInteractPath = path.join(__dirname, `/pypy/pypy/sandbox/pypy_interact.py`);
+  let pypySandbox = path.join(__dirname, `/pypy/pypy/goal/pypy-c`);
+  let filePath = path.join(__dirname, `/pypy/pypy/sandbox/tmp/${filename}.py`);
 
   let getDirName = path.dirname;
 
@@ -28,8 +33,9 @@ exports.executePython = (code, onOutput, onError, onExit) => {
       if (err) throw err;
       // Execute python code
       // TODO: Replace with pypy sandbox
-
-      let compileScript = spawn(pythonPath, [filePath]);
+      //TODO: timeout
+      //let compileScript = spawn(pythonPath, [filePath]);
+      let compileScript = spawn(pythonPath, [ pypyInteractPath, `--tmp=${getDirName(filePath)}`, "--timeout=3", pypySandbox, "-S",  codePath]);
 
       compileScript.stdout.on("data", (data) => {
         let string = byteToString(data);
