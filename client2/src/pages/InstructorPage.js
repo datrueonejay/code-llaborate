@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../App.css";
-import {useStyles} from "../styles/InstructorView.module.js";
-import {
-  TextField,
-  Button,
-} from "@material-ui/core";
-import CourseModal from "../components/CourseModal"
-import ContentList from "../components/ContentList"
+import { useStyles } from "../styles/InstructorView.module.js";
+import { TextField, Button } from "@material-ui/core";
+import CourseModal from "../components/CourseModal";
+import ContentList from "../components/ContentList";
+import clsx from "clsx";
+
+import useSharedStyles from "../styles/SharedStyles.module";
 
 function InstructorView(props) {
   const api = require("../http/apiController.js");
@@ -21,6 +21,8 @@ function InstructorView(props) {
     searchStudent: "",
     modal: false,
   });
+
+  const sharedStyles = useSharedStyles();
 
   const formRef = useRef(null);
 
@@ -69,7 +71,7 @@ function InstructorView(props) {
   // }
 
   function searchStudent() {
-    if (values.searchStudent === '') {
+    if (values.searchStudent === "") {
       getUsers();
     } else {
       api
@@ -92,10 +94,10 @@ function InstructorView(props) {
   };
 
   const styles = useStyles();
-  
+
   return (
-    <div>
-      <CourseModal open={values.modal}/>
+    <div className={clsx(sharedStyles.background)}>
+      <CourseModal open={values.modal} />
       <div className={styles.notificationClass}>{notification}</div>
 
       <form className={styles.formClass} ref={formRef} onSubmit={handleSubmit}>
@@ -152,16 +154,26 @@ function InstructorView(props) {
               Search
             </Button>
           </div>
-          
-          <ContentList type="users" setValue={setValue} value="studentId" list={students} helperText="Filter by title"/>
-        </div>
 
+          <ContentList
+            type="users"
+            setValue={setValue}
+            value="studentId"
+            list={students}
+            helperText="Filter by title"
+          />
+        </div>
 
         <div className={styles.studentsClass}>
           <h1>Courses:</h1>
-          <ContentList type="courses" setValue={setValue} value="courseId" list={courses} helperText="Filter by Course code"/>
+          <ContentList
+            type="courses"
+            setValue={setValue}
+            value="courseId"
+            list={courses}
+            helperText="Filter by Course code"
+          />
         </div>
-
       </div>
     </div>
   );

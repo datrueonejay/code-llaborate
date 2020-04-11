@@ -13,6 +13,7 @@ import { CircularProgress, Button } from "@material-ui/core";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { setSession } from "../redux/actions/userActions";
+import useSharedStyles from "../styles/SharedStyles.module";
 
 function TeachingAssistantView(props) {
   const [suggestions, setSuggestions] = useState([]);
@@ -24,7 +25,7 @@ function TeachingAssistantView(props) {
   const [connecting, setConnecting] = useState(true);
 
   const dispatch = useDispatch();
-
+  const sharedStyles = useSharedStyles();
   useEffect(() => {
     websocket.connect(
       () => {
@@ -56,7 +57,7 @@ function TeachingAssistantView(props) {
   }
 
   return (
-    <div>
+    <div className={sharedStyles.background}>
       <Logout />
       <Link to="/sessions">
         <Button

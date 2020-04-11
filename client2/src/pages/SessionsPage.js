@@ -24,6 +24,8 @@ import {
 } from "@material-ui/core";
 import { setSession } from "../redux/actions/userActions";
 
+import useSharedStyles from "../styles/SharedStyles.module";
+
 export default function Sessions(props) {
   const [courses, setCourses] = useState([]);
   const [courseCode, setCourseCode] = useState("");
@@ -31,6 +33,7 @@ export default function Sessions(props) {
   const dispatch = useDispatch();
 
   const role = useSelector((state) => state.userReducer.userType);
+  const sharedStyles = useSharedStyles();
 
   useEffect(() => {
     if (role === TYPE_STUDENT) {
@@ -52,14 +55,13 @@ export default function Sessions(props) {
     }
   }, []);
 
-
   function joinCourse(e) {
     e.preventDefault();
 
     api.joinCourse(courseCode).then((res) => {
       console.log("joined course");
       setFormNotification("Successfully joined course!");
-    })
+    });
   }
 
   function handleChange(e) {
@@ -67,7 +69,7 @@ export default function Sessions(props) {
   }
 
   return (
-    <div>
+    <div className={sharedStyles.background}>
       <Logout />
       {courses.map((courseInfo, index) => {
         let course = courseInfo.course;
@@ -112,7 +114,7 @@ export default function Sessions(props) {
       })}
 
       <form onSubmit={joinCourse}>
-        <div style={ {width: '50%', margin: 'auto'}}>
+        <div style={{ width: "50%", margin: "auto" }}>
           <TextField
             id="courseCode"
             fullWidth={true}
@@ -122,7 +124,9 @@ export default function Sessions(props) {
             helperText="The course Code, for example, 241tw5ge48hre15tewg48rh51r"
             required
           />
-          <Button type='submit' color="primary">Join Course</Button>
+          <Button type="submit" color="primary">
+            Join Course
+          </Button>
           <div id="notification">{formNotification}</div>
         </div>
       </form>

@@ -33,52 +33,8 @@ import StudentSuggestion from "../components/StudentSuggestion.js";
 import Suggestions from "../components/Suggestions";
 import Chat from "../components/Chat";
 import { useStyles } from "../styles/StudentPageStyle.js";
-// import styles from "../scss/StudentPage.scss";
 
-// credit: https://material-ui.com/components/drawers/
-
-// const drawerWidth = 400;
-
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     display: "flex",
-//   },
-//   appBar: {
-//     backgroundColor: "#262626",
-//   },
-//   appBarShift: {
-//     width: `calc(100% - ${drawerWidth}px)`,
-//     marginRight: drawerWidth,
-//   },
-//   menuButton: {
-//     marginRight: theme.spacing(2),
-//   },
-//   hide: {
-//     display: "none",
-//   },
-//   drawer: {
-//     width: drawerWidth,
-//     flexShrink: 0,
-//   },
-//   drawerPaper: {
-//     width: drawerWidth,
-//   },
-//   drawerHeader: {
-//     display: "flex",
-//     alignItems: "center",
-//     justifyContent: "flex-end",
-//   },
-//   content: {
-//     flexGrow: 1,
-//     marginRight: 0,
-//   },
-//   contentShift: {
-//     marginRight: drawerWidth,
-//   },
-//   title: {
-//     flexGrow: 1,
-//   },
-// }));
+import useSharedStyles from "../styles/SharedStyles.module";
 
 export default function StudentView(props) {
   // const [courses, setCourses] = useState([]);
@@ -93,6 +49,7 @@ export default function StudentView(props) {
   const [connecting, setConnecting] = useState(false);
 
   const classes = useStyles();
+  const sharedStyles = useSharedStyles();
   // const theme = useTheme();
 
   // const handleDrawerOpen = () => {
@@ -132,7 +89,7 @@ export default function StudentView(props) {
   }
 
   return (
-    <div>
+    <div className={sharedStyles.background}>
       <Logout />
 
       <CssBaseline />

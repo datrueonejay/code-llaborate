@@ -10,6 +10,10 @@ let sharedStyles = makeStyles((theme) => ({
   errorText: {
     color: "#CF6679",
   },
+  background: {
+    backgroundColor: "#121212",
+    height: "100%",
+  },
 }));
 
 export default sharedStyles;
