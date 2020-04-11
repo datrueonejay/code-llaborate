@@ -21,11 +21,16 @@ import {
   Divider,
   List,
   ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
 } from "@material-ui/core";
 import { setSession } from "../redux/actions/userActions";
 
 import useSharedStyles from "../styles/SharedStyles.module";
-
+import AddRoundedIcon from "@material-ui/icons/AddRounded";
+import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
+import useStyles from "../styles/SessionsPageStyles.module";
 export default function Sessions(props) {
   const [courses, setCourses] = useState([]);
   const [courseCode, setCourseCode] = useState("");
@@ -34,6 +39,7 @@ export default function Sessions(props) {
 
   const role = useSelector((state) => state.userReducer.userType);
   const sharedStyles = useSharedStyles();
+  const styles = useStyles();
 
   useEffect(() => {
     if (role === TYPE_STUDENT) {
@@ -70,15 +76,36 @@ export default function Sessions(props) {
 
   return (
     <div className={sharedStyles.background}>
+      <div className={sharedStyles.title}>Code-llaborate</div>
+
       <Logout />
-      {courses.map((courseInfo, index) => {
-        let course = courseInfo.course;
-        let sessionExists = courseInfo.exists;
-        return (
-          <div key={index}>
-            <li>{course}</li>
-            <Button
-              variant="contained"
+
+      <form onSubmit={joinCourse}>
+        <div className={styles.joinCourseContainer}>
+          <TextField
+            id="courseCode"
+            fullWidth={true}
+            label="Course Code"
+            name="courseCode"
+            onChange={handleChange}
+            variant="filled"
+            helperText="The course Code, for example, 241tw5ge48hre15tewg48rh51r"
+            required
+          />
+          <Button type="submit" color="primary" variant="contained">
+            Join Course
+          </Button>
+          <div id="notification">{formNotification}</div>
+        </div>
+      </form>
+      <List>
+        <ListSubheader component="div">Courses</ListSubheader>
+        {courses.map((courseInfo, index) => {
+          let course = courseInfo.course;
+          let sessionExists = courseInfo.exists;
+          return (
+            <ListItem
+              button
               onClick={() => {
                 if (role === TYPE_STUDENT || sessionExists) {
                   api
@@ -104,32 +131,25 @@ export default function Sessions(props) {
                 }
               }}
             >
-              {" "}
-              {role === TYPE_STUDENT || sessionExists
-                ? "Join Session"
-                : "Create Session"}
-            </Button>
-          </div>
-        );
-      })}
-
-      <form onSubmit={joinCourse}>
-        <div style={{ width: "50%", margin: "auto" }}>
-          <TextField
-            id="courseCode"
-            fullWidth={true}
-            label="Course Code"
-            name="courseCode"
-            onChange={handleChange}
-            helperText="The course Code, for example, 241tw5ge48hre15tewg48rh51r"
-            required
-          />
-          <Button type="submit" color="primary">
-            Join Course
-          </Button>
-          <div id="notification">{formNotification}</div>
-        </div>
-      </form>
+              <ListItemIcon>
+                {role === TYPE_STUDENT || sessionExists ? (
+                  <PlayArrowRoundedIcon />
+                ) : (
+                  <AddRoundedIcon />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                className={styles.sessionText}
+                primary={
+                  role === TYPE_STUDENT || sessionExists
+                    ? `Join Session for course ${course}`
+                    : `Create Session for course ${course}`
+                }
+              />
+            </ListItem>
+          );
+        })}
+      </List>
     </div>
   );
 }

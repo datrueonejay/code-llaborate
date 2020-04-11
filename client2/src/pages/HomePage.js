@@ -64,7 +64,7 @@ export default function Login(props) {
       alignItems="center"
       className={homePageStyles.loginPage}
     >
-      <h1 className={sharedStyles.title}>Code-llaborate</h1>
+      <div className={sharedStyles.title}>Code-llaborate</div>
       <form onSubmit={(e) => submit(e)} className={homePageStyles.loginForm}>
         <Grid container direction="column" spacing={2}>
           <Grid item>
