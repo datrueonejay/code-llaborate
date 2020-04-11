@@ -29,6 +29,11 @@ exports.createCourseCode = (courseID) => {
     .then((res) => res.data);
 }
 
+exports.sendEmail = () => {
+  return axios
+    .post("/api/sendemail", {})
+    .then((res) => res.data);
+}
 // python endpoints
 exports.executePython = (code) => {
   return axios.post(`/api/python`, { code: code }).then((res) => res.data);

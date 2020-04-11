@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Modal,
   TextField,
@@ -7,6 +7,7 @@ import {
 //import styles from "../scss/Modal.module.scss";
 import {useStyles} from "../styles/Modal.module.js";
 const api = require("../http/apiController.js");
+const nodemailer = require('nodemailer');
 
 function CourseModal(props) {
   const [open, setOpen] = useState(false);
@@ -14,6 +15,7 @@ function CourseModal(props) {
 
   const formRef = useRef(null);
   const styles = useStyles();
+
 
   function openModal() {
     setOpen(true);
@@ -34,6 +36,16 @@ function CourseModal(props) {
 
     formRef.current.reset();
   }
+
+  async function sendEmail(e) {
+    e.preventDefault();
+    let formData = new FormData(e.target);
+    let to = formData.get("to");
+    console.log(to);
+
+    api.sendEmail();
+  }
+
   return(
     <div>
       <Button color="primary" onClick={openModal} onClose={closeModal}>Create Course Code</Button>
@@ -43,6 +55,7 @@ function CourseModal(props) {
       >
         <div className={`${styles.modalClass}`}>
           <div className={styles.centerClass}>
+            <p>Create Course Code</p>
             <form ref={formRef} onSubmit={createCourseCode}>
               <div>
                 <TextField
@@ -57,7 +70,20 @@ function CourseModal(props) {
               </div>
             </form>
             {code === "" ? null : `\nYour Course Code: ${code}`}
-            <p>Want to JayJay?</p>
+            <p>Send email</p>
+            <form onSubmit={sendEmail}>
+              <div>
+                <TextField
+                  id="to"
+                  fullWidth={true}
+                  label="Recepicient of email"
+                  name="to"
+                  helperText="Email address"
+                  required
+                />
+                <Button type='submit' color="primary">Send Email</Button>
+              </div>
+            </form>
           </div>
         </div>
       </Modal>
