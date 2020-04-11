@@ -18,6 +18,8 @@ import Drawer from "../components/Drawer.js";
 import useStyles from "../styles/TaStudentPageStyles.module.js";
 import clsx from "clsx";
 import AceEditor from "react-ace";
+import "brace/theme/terminal";
+import PythonOutput from "../components/PythonOutput.js";
 
 function TeachingAssistantView(props) {
   const [suggestions, setSuggestions] = useState([]);
@@ -98,21 +100,7 @@ function TeachingAssistantView(props) {
           onReadFile={(code) => setCode(code)}
         />
         <Suggestions suggestions={suggestions} />
-        <div className={sharedStyles.flexGrow}>
-          <div className={sharedStyles.subTitle}>Code Output</div>
-          <AceEditor
-            id="AceEditor2"
-            mode="python"
-            theme="monokai"
-            name="AceEditor2"
-            value={pythonOut}
-            fontSize={14}
-            width="100%"
-            readOnly
-            highlightActiveLine={false}
-            wrapEnabled={true}
-          />
-        </div>
+        <PythonOutput pythonOut={pythonOut} />
       </div>
     </div>
   );

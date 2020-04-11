@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../App.css";
 import { useStyles } from "../styles/InstructorView.module.js";
-import { TextField, Button } from "@material-ui/core";
+import { TextField, Button, Typography } from "@material-ui/core";
 import CourseModal from "../components/CourseModal";
 import ContentList from "../components/ContentList";
 import clsx from "clsx";
+import Logout from "../components/Logout";
 
 import useSharedStyles from "../styles/SharedStyles.module";
 
@@ -97,11 +98,15 @@ function InstructorView(props) {
 
   return (
     <div className={clsx(sharedStyles.background)}>
+      <Logout />
       <CourseModal open={values.modal} />
       <div className={styles.notificationClass}>{notification}</div>
 
       <form className={styles.formClass} ref={formRef} onSubmit={handleSubmit}>
-        <h1 className="text-center">Add student or TA to course</h1>
+        <Typography color="textPrimary" variant="h3">
+          Add student or TA to course
+        </Typography>
+        {/* <h1 className="text-center">Add student or TA to course</h1> */}
 
         <div className={styles.formInputClass}>
           <TextField

@@ -26,6 +26,7 @@ import useSharedStyles from "../styles/SharedStyles.module";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import AceEditor from "react-ace";
+import PythonOutput from "../components/PythonOutput.js";
 
 export default function StudentView(props) {
   // const [courses, setCourses] = useState([]);
@@ -116,43 +117,8 @@ export default function StudentView(props) {
             }}
           />
         </div>
-
-        <div className={sharedStyles.flexGrow}>
-          <div className={sharedStyles.subTitle}>Code Output</div>
-          <AceEditor
-            id="AceEditor2"
-            mode="python"
-            theme="monokai"
-            name="AceEditor2"
-            value={pythonOut}
-            fontSize={14}
-            width="100%"
-            readOnly
-            wrapEnabled={true}
-          />
-        </div>
+        <PythonOutput pythonOut={pythonOut} />
       </div>
-      {/* <main className={clsx(classes.content, { [classes.contentShift]: open })}>
-        <Editor />
-        <StudentCodeEditor code={code} />
-        <StudentSuggestion
-          onSuggest={(lineNum, code) => {
-            websocket.send_suggestion(lineNum, code);
-          }}
-        />
-        <Suggestions suggestions={suggestions} />
-        <Chat
-          chatOut={chatOut}
-          sendChat={(message) => {
-            console.log(message);
-            websocket.send_chat(message);
-          }}
-        ></Chat>
-        <div>
-          PYTHON FROM WEBSOCKET
-          {pythonOut}
-        </div>
-      </main> */}
     </div>
   );
 }

@@ -23,7 +23,7 @@ const session = require("express-session");
 const helmet = require("helmet");
 const { body } = require("express-validator");
 const bodyParser = require("body-parser");
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 const app = express();
 app.use(helmet());
@@ -145,7 +145,7 @@ app.post(
 
             if (err) return res.status(400).end("Bad request");
 
-            return db.findClasses(user.username, (err, classes) => {
+            return db.findClasses(req.session.user.username, (err, classes) => {
               if (err) {
                 console.log(err);
                 return res.status(500).end(err.message);
@@ -399,29 +399,34 @@ app.post(
   }
 );
 
-app.post("/api/sendemail", authenticated, [body("recipient").escape()], (req, res, next) => {
-  let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "ENTERHERE", // generated ethereal user
-      pass: 'ENTERHERE' // generated ethereal password
-    }
-  });
+app.post(
+  "/api/sendemail",
+  authenticated,
+  [body("recipient").escape()],
+  (req, res, next) => {
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "ENTERHERE", // generated ethereal user
+        pass: "ENTERHERE", // generated ethereal password
+      },
+    });
 
-  let message = {
-    from: "turtlebear41@gmail.com",
-    to: "tapexov866@2go-mail.com",
-    subject: "Join my course!",
-    text: "Plaintext version of the message",
-    html: "<p>OMEGALUL</p>"
-  };
+    let message = {
+      from: "turtlebear41@gmail.com",
+      to: "tapexov866@2go-mail.com",
+      subject: "Join my course!",
+      text: "Plaintext version of the message",
+      html: "<p>OMEGALUL</p>",
+    };
 
-  transporter.sendMail(message, function (err, info) {
-    if (err) return res.status(500).end("Internal Server Error");
-    console.log(info);
-    return res.json(info);
-  })
-})
+    transporter.sendMail(message, function (err, info) {
+      if (err) return res.status(500).end("Internal Server Error");
+      console.log(info);
+      return res.json(info);
+    });
+  }
+);
 
 app.get("/api/classes", authenticated, (req, res, next) => {
   console.log(req.session.classes);
