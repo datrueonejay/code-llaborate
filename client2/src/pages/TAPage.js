@@ -8,12 +8,16 @@ import Logout from "../components/Logout.js";
 
 import Suggestions from "../components/Suggestions";
 import Chat from "../components/Chat";
-import { CircularProgress, Button } from "@material-ui/core";
+import { CircularProgress, Button, CssBaseline, Grid } from "@material-ui/core";
 
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { setSession } from "../redux/actions/userActions";
 import useSharedStyles from "../styles/SharedStyles.module";
+import Drawer from "../components/Drawer.js";
+import useStyles from "../styles/TaStudentPageStyles.module.js";
+import clsx from "clsx";
+import AceEditor from "react-ace";
 
 function TeachingAssistantView(props) {
   const [suggestions, setSuggestions] = useState([]);
@@ -26,6 +30,7 @@ function TeachingAssistantView(props) {
 
   const dispatch = useDispatch();
   const sharedStyles = useSharedStyles();
+  const styles = useStyles();
   useEffect(() => {
     websocket.connect(
       () => {
@@ -57,11 +62,16 @@ function TeachingAssistantView(props) {
   }
 
   return (
-    <div className={sharedStyles.background}>
-      <Logout />
+    <div className={clsx(sharedStyles.background, styles.container)}>
+      <Drawer
+        chatOut={chatOut}
+        sendChat={(message) => {
+          websocket.send_chat(message);
+        }}
+      />
       <Link to="/sessions">
         <Button
-          variant="outlined"
+          variant="contained"
           onClick={() => {
             api.stopSession(session).then((res) => {
               dispatch(setSession(null));
@@ -69,32 +79,40 @@ function TeachingAssistantView(props) {
               // returnToSessions();
             });
           }}
+          color="primary"
         >
           Destroy and Leave Session
         </Button>
       </Link>
-
-      <TaCodeEditor
-        onCodeChange={(code) => {
-          console.log("ASOIDJ");
-          websocket.send_code(code);
-        }}
-        onExecute={(code) =>
-          api.executePython(code).then((res) => {
-            console.log(res);
-          })
-        }
-        code={code}
-        onReadFile={(code) => setCode(code)}
-      />
-      <Suggestions suggestions={suggestions} />
-      <Chat
-        chatOut={chatOut}
-        sendChat={(message) => websocket.send_chat(message)}
-      ></Chat>
-      <div>
-        PYTHON FROM WEBSOCKET
-        {pythonOut}
+      <div className={styles.bodyContainer}>
+        <TaCodeEditor
+          onCodeChange={(code) => {
+            websocket.send_code(code);
+          }}
+          onExecute={(code) =>
+            api.executePython(code).then((res) => {
+              console.log(res);
+            })
+          }
+          code={code}
+          onReadFile={(code) => setCode(code)}
+        />
+        <Suggestions suggestions={suggestions} />
+        <div className={sharedStyles.flexGrow}>
+          <div className={sharedStyles.subTitle}>Code Output</div>
+          <AceEditor
+            id="AceEditor2"
+            mode="python"
+            theme="monokai"
+            name="AceEditor2"
+            value={pythonOut}
+            fontSize={14}
+            width="100%"
+            readOnly
+            highlightActiveLine={false}
+            wrapEnabled={true}
+          />
+        </div>
       </div>
     </div>
   );

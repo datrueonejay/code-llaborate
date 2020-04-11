@@ -1,10 +1,14 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-let sharedStyles = makeStyles((theme) => ({
+let useSharedStyles = makeStyles((theme) => ({
   title: {
     color: "#FFFFFF",
     fontSize: "45px",
     textAlign: "center",
+  },
+  subTitle: {
+    color: "#FFFFFF",
+    fontSize: "20px",
   },
   fullwidth: {
     width: "100%",
@@ -16,6 +20,9 @@ let sharedStyles = makeStyles((theme) => ({
     backgroundColor: "#121212",
     height: "100%",
   },
+  flexGrow: {
+    flexGrow: 2,
+  },
 }));
 
-export default sharedStyles;
+export default useSharedStyles;

@@ -5,22 +5,7 @@ import websocket from "../http/socketController.js";
 //import { makeStyles, useTheme } from "@material-ui/core/styles";
 import clsx from "clsx";
 
-// import {
-//   Button,
-//   // Drawer,
-//   AppBar,
-//   CssBaseline,
-//   TextField,
-//   Toolbar,
-//   Typography,
-//   IconButton,
-//   Divider,
-//   List,
-//   ListItem,
-//   CircularProgress,
-// } from "@material-ui/core";
-
-import { CssBaseline, CircularProgress } from "@material-ui/core";
+import { CssBaseline, CircularProgress, Button } from "@material-ui/core";
 
 // import MenuIcon from "@material-ui/icons/Menu";
 // import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -32,9 +17,15 @@ import StudentSuggestion from "../components/StudentSuggestion.js";
 
 import Suggestions from "../components/Suggestions";
 import Chat from "../components/Chat";
-import { useStyles } from "../styles/StudentPageStyle.js";
+// import { useStyles } from "../styles/StudentPageStyle.js";
+import useStyles from "../styles/TaStudentPageStyles.module.js";
+
+import { setSession } from "../redux/actions/userActions";
 
 import useSharedStyles from "../styles/SharedStyles.module";
+import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import AceEditor from "react-ace";
 
 export default function StudentView(props) {
   // const [courses, setCourses] = useState([]);
@@ -48,7 +39,7 @@ export default function StudentView(props) {
 
   const [connecting, setConnecting] = useState(false);
 
-  const classes = useStyles();
+  const styles = useStyles();
   const sharedStyles = useSharedStyles();
   // const theme = useTheme();
 
@@ -59,6 +50,7 @@ export default function StudentView(props) {
   // const handleDrawerClose = () => {
   //   setOpen(false);
   // };
+  const dispatch = useDispatch();
 
   useEffect(() => {
     websocket.connect(
@@ -89,19 +81,59 @@ export default function StudentView(props) {
   }
 
   return (
-    <div className={sharedStyles.background}>
-      <Logout />
-
-      <CssBaseline />
+    <div className={clsx(sharedStyles.background, styles.container)}>
       <Drawer
-       chatOut={chatOut}
-       sendChat={(message) => {
-        console.log(message);
-        websocket.send_chat(message);
-      }}
-      ></Drawer>
-      <main className={clsx(classes.content, { [classes.contentShift]: open })}>
-        {/* <Editor /> */}
+        chatOut={chatOut}
+        sendChat={(message) => {
+          console.log(message);
+          websocket.send_chat(message);
+        }}
+      />
+      <Link to="/sessions">
+        <Button
+          variant="contained"
+          onClick={() => {
+            dispatch(setSession(null));
+          }}
+          color="primary"
+        >
+          Leave Session
+        </Button>
+      </Link>
+      <div className={styles.bodyContainer}>
+        <StudentCodeEditor code={code} />
+        <div
+          className={clsx(
+            sharedStyles.flexGrow,
+            styles.studentSuggestionContainer
+          )}
+        >
+          <Suggestions suggestions={suggestions} height={300} />
+
+          <StudentSuggestion
+            onSuggest={(lineNum, code) => {
+              websocket.send_suggestion(lineNum, code);
+            }}
+          />
+        </div>
+
+        <div className={sharedStyles.flexGrow}>
+          <div className={sharedStyles.subTitle}>Code Output</div>
+          <AceEditor
+            id="AceEditor2"
+            mode="python"
+            theme="monokai"
+            name="AceEditor2"
+            value={pythonOut}
+            fontSize={14}
+            width="100%"
+            readOnly
+            wrapEnabled={true}
+          />
+        </div>
+      </div>
+      {/* <main className={clsx(classes.content, { [classes.contentShift]: open })}>
+        <Editor />
         <StudentCodeEditor code={code} />
         <StudentSuggestion
           onSuggest={(lineNum, code) => {
@@ -109,18 +141,18 @@ export default function StudentView(props) {
           }}
         />
         <Suggestions suggestions={suggestions} />
-        {/* <Chat
+        <Chat
           chatOut={chatOut}
           sendChat={(message) => {
             console.log(message);
             websocket.send_chat(message);
           }}
-        ></Chat> */}
+        ></Chat>
         <div>
           PYTHON FROM WEBSOCKET
           {pythonOut}
         </div>
-      </main>
+      </main> */}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Editor.css";
 
-import { Button, Form } from "react-bootstrap";
+// import { Button, Form } from "react-bootstrap";
+import { Button, Input } from "@material-ui/core";
 import Suggestions from "./Suggestions";
 
 import AceEditor from "react-ace";
@@ -11,11 +11,19 @@ import "brace/mode/python";
 
 // Import a Theme
 import "brace/theme/monokai";
+import useStyles from "../styles/CodeEditorStyles.module";
+import useSharedStyles from "../styles/SharedStyles.module";
+
+import clsx from "clsx";
 
 export default function TaCodeEditor(props) {
   // const [code, setCode] = useState(props.code);
 
+  // Snippet taken from https://stackoverflow.com/questions/40589302/how-to-enable-file-upload-on-reacts-material-ui-simple-input
+
   const editorRef = useRef(null);
+  const styles = useStyles();
+  const sharedStyles = useSharedStyles();
 
   function onChange(newValue) {
     props.onCodeChange(newValue);
@@ -39,49 +47,66 @@ export default function TaCodeEditor(props) {
   };
 
   return (
-    <div className="codeText">
-      <div className="Editor">
-        <AceEditor
-          id="AceEditor"
-          ref={editorRef}
-          placeholder="Start Typing Here!"
-          mode="python"
-          theme="monokai"
-          name="AceEditor"
-          // onLoad={this.onLoad}
-          onChange={onChange}
-          value={props.code}
-          fontSize={14}
-          showPrintMargin={true}
-          showGutter={true}
-          highlightActiveLine={true}
-          setOptions={{
-            enableBasicAutocompletion: false,
-            enableLiveAutocompletion: false,
-            enableSnippets: false,
-            showLineNumbers: true,
-            tabSize: 2,
-          }}
-        />
+    <div className={clsx(styles.editorContainer, sharedStyles.flexGrow)}>
+      <div className={sharedStyles.subTitle}>Code Editor</div>
+      <AceEditor
+        id="AceEditor"
+        ref={editorRef}
+        placeholder="Start Typing Here!"
+        mode="python"
+        theme="monokai"
+        name="AceEditor"
+        // onLoad={this.onLoad}
+        onChange={onChange}
+        value={props.code}
+        fontSize={14}
+        showPrintMargin={true}
+        showGutter={true}
+        highlightActiveLine={true}
+        setOptions={{
+          enableBasicAutocompletion: false,
+          enableLiveAutocompletion: false,
+          enableSnippets: false,
+          showLineNumbers: true,
+          tabSize: 2,
+        }}
+        width="100%"
+      />
+      <Button
+        onClick={() => {
+          props.onExecute(props.code);
+        }}
+        color="primary"
+        variant="contained"
+      >
+        Run Editor
+      </Button>
+      <div className={styles.fileButtonsContainer}>
+        <form onChange={loadFile} id="codeFile" className={styles.fileButtons}>
+          <Button
+            variant="contained"
+            component="label"
+            color="primary"
+            fullWidth
+          >
+            Load File
+            <input
+              type="file"
+              name="file"
+              accept=".py, .txt"
+              style={{ display: "none" }}
+            />
+          </Button>
+        </form>
 
-        <Button
-          className="btn"
-          onClick={() => {
-            props.onExecute(props.code);
-          }}
-        >
-          {" "}
-          Run Editor{" "}
-        </Button>
-
-        <Form onChange={loadFile} id="codeFile">
-          <input type="file" name="file" accept=".py, .txt" />
-        </Form>
         <a
           href={`data:text/plain;charset=utf-8,${props.code}`}
           download="code.py"
+          className={clsx(styles.fileButtons, styles.downloadAnchor)}
         >
-          Download Code
+          <Button variant="contained" color="primary" fullWidth>
+            Download Code
+          </Button>
         </a>
       </div>
     </div>
