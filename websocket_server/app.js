@@ -73,14 +73,17 @@ app.post(
     let password = req.body.password;
     let role = req.body.role;
     let name = req.body.name;
+    if (!username || !password || !role || !name) {
+      return res.status(400).end("Bad request");
+    }
     db.addUser(role, username, password, name, (err, user) => {
-      if (err) return res.status(500).end(err.message);
+      if (err) {
+        console.error(err);
+        return res.status(400).end(err);
+      }
       req.session.user = user;
       req.session.classes = [];
       req.session.currSession = null;
-      console.log(user);
-      console.log("1");
-
       return res.json(user);
     });
   }
@@ -92,22 +95,23 @@ app.post(
   (req, res, next) => {
     let username = req.body.username;
     let password = req.body.password;
+    if (!username || !password) {
+      return res.status(400).end("Bad request");
+    }
+
     return db.checkUser(username, password, (err, user) => {
       if (err) {
-        console.log(err);
-        return res.status(500).end(err.message);
+        console.error(err);
+        return res.status(401).end("Invalid Username and Password Combination");
       }
       return db.findClasses(user.username, (err, classes) => {
         if (err) {
-          console.log(err);
-          return res.status(500).end(err.message);
+          console.error(err);
+          return res.status(500).end(err);
         }
-        console.log(classes);
         req.session.user = user;
         req.session.classes = classes;
         req.session.currSession = null;
-        console.log(req.session);
-
         return res.json(user);
       });
     });

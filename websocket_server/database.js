@@ -6,11 +6,11 @@ let connection = mysql.createConnection({
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "password",
   database: process.env.DB_DATABASE || "JayJayRay",
-  insecureAuth: true
+  insecureAuth: true,
 });
 
 let connect = () =>
-  connection.connect(function(err) {
+  connection.connect(function (err) {
     if (err) {
       console.log(err);
       connect();
@@ -22,13 +22,13 @@ let connect = () =>
 
 exports.addUser = (role, username, password, name, cb) => {
   let roleId;
-  findRole(role, function(err, results) {
+  findRole(role, function (err, results) {
     if (err || results.length === 0) return cb("Error finding role", null);
     roleId = results[0].ID;
     role = results[0].Role;
   });
 
-  findUser(username, function(err, results) {
+  findUser(username, function (err, results) {
     if (results.length > 0) {
       return cb("User already exists", null);
     }
@@ -42,27 +42,25 @@ exports.addUser = (role, username, password, name, cb) => {
 
     let sql =
       "INSERT INTO Users(RoleID, Username, Password, Salt, Name) VALUES (?, ? ,? ,? ,?)";
-    connection.query(sql, [roleId, username, saltedHash, salt, name], function(
-      err,
-      result,
-      fields
-    ) {
-      if (err) return cb(err, null);
-      console.log(result);
-      cb(null, {
-        id: result.insertId,
-        roleId: roleId,
-        username: username,
-        name: name,
-        role: role
-      });
-      // cb(null, results);
-    });
+    connection.query(
+      sql,
+      [roleId, username, saltedHash, salt, name],
+      (err, result, fields) => {
+        if (err) return cb(err.message, null);
+        cb(null, {
+          id: result.insertId,
+          roleId: roleId,
+          username: username,
+          name: name,
+          role: role,
+        });
+      }
+    );
   });
 };
 
 exports.checkUser = (username, password, cb) => {
-  findUser(username, function(err, results) {
+  findUser(username, function (err, results) {
     if (err) return cb(err, null);
     if (results.length > 0) {
       // Sauce from lab7 CSCC09
@@ -81,7 +79,7 @@ exports.checkUser = (username, password, cb) => {
           name: results[0].name,
           username: results[0].Username,
           role: results[0].Role,
-          roleId: results[0].RoleID
+          roleId: results[0].RoleID,
         };
         return cb(null, ret);
       }
@@ -106,7 +104,7 @@ exports.verifyPersonClass = (username, course, role, cb) => {
 
 exports.findClasses = (username, cb) => {
   findClasses(username, (err, res) => {
-    if (err) return cb(err, null);
+    if (err) return cb(err.message, null);
     console.log("DATABASE");
     console.log(res);
     return cb(
@@ -119,17 +117,20 @@ exports.findClasses = (username, cb) => {
 };
 
 exports.searchUser = (query, cb) => {
-  let sql = 'SELECT Name, Users.ID, Role FROM Users inner join Roles where Roles.ID = Users.RoleID and Name like' + connection.escape('%' + query + '%');
+  let sql =
+    "SELECT Name, Users.ID, Role FROM Users inner join Roles where Roles.ID = Users.RoleID and Name like" +
+    connection.escape("%" + query + "%");
   connection.query(sql, [query], cb);
-}
+};
 
-exports.getUsers = (page=0, cb) => {
-  let sql = "SELECT Name, Users.ID, Role FROM Users inner join Roles on Users.ID = Roles.ID ORDER BY ID LIMIT ?, 50";
-  connection.query(sql, [page*50], cb);
+exports.getUsers = (page = 0, cb) => {
+  let sql =
+    "SELECT Name, Users.ID, Role FROM Users inner join Roles on Users.ID = Roles.ID ORDER BY ID LIMIT ?, 50";
+  connection.query(sql, [page * 50], cb);
 };
 
 //TODO: perhaps change it so only the isntructors who are a part of the course can see the course???????
-exports.getCourses = cb => {
+exports.getCourses = (cb) => {
   let sql = "SELECT * from Courses";
   connection.query(sql, cb);
 };
@@ -155,13 +156,12 @@ exports.addToCourse = (userID, courseID, cb) => {
   });
 };
 
-
 exports.checkCourse = (courseID, cb) => {
   findCourse(courseID, (err, result) => {
     if (err) return cb(err, null);
     return cb(null, result);
-  })
-}
+  });
+};
 
 function findClasses(username, cb) {
   let sql =

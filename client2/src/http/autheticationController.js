@@ -8,15 +8,29 @@ exports.signup = (username, password, role, name) => {
       role: role,
       name: name,
     })
-    .then((res) => res.data);
+    .then((res) => res.data)
+    .catch((err) => {
+      console.log(err.response);
+      throw err.response.data || err.response.responseText;
+    });
 };
 
 exports.login = (username, password) => {
   return axios
     .post("/api/login", { username: username, password: password })
-    .then((res) => res.data);
+    .then((res) => res.data)
+    .catch((err) => {
+      console.log(err.response);
+      throw err.response.data || err.response.responseText;
+    });
 };
 
 exports.signout = () => {
-  return axios.get("/api/signout").then((res) => res.data);
+  return axios
+    .get("/api/signout")
+    .then((res) => res.data)
+    .catch((err) => {
+      console.log(err.response);
+      throw err.response.data || err.response.responseText;
+    });
 };

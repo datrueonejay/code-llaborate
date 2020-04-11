@@ -3,10 +3,11 @@
  */
 
 import React, { useState } from "react";
-import "./Home.css";
+// import "./Home.css";
 import { useDispatch } from "react-redux";
 import { setType, setAuth } from "../redux/actions/userActions";
-import "../scss/Home.scss";
+import useStyles from "../styles/HomePageStyles.module";
+import useSharedStyles from "../styles/SharedStyles.module";
 
 import { Link } from "react-router-dom";
 
@@ -16,6 +17,8 @@ import {
   Select,
   InputLabel,
   MenuItem,
+  Grid,
+  FormControl,
 } from "@material-ui/core";
 
 import { TYPE_INSTRUCTOR } from "../Constants.js";
@@ -26,8 +29,11 @@ export default function SignUp(props) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
-  const dispatch = useDispatch();
+  const [notificationText, setNotificationText] = useState("");
 
+  const dispatch = useDispatch();
+  const homePageStyles = useStyles();
+  const sharedStyles = useSharedStyles();
   let submit = (e) => {
     e.preventDefault();
 
@@ -42,7 +48,10 @@ export default function SignUp(props) {
   };
 
   let callback = (err, res) => {
-    if (err) return console.log(err);
+    if (err) {
+      console.error(err);
+      return setNotificationText(err);
+    }
     dispatch(setType(res.role));
     dispatch(setAuth(true));
     let url = res.role === TYPE_INSTRUCTOR ? "/instructor" : "/sessions";
@@ -50,46 +59,79 @@ export default function SignUp(props) {
   };
 
   return (
-    <div className="Login">
-      <h1>Code-llaborate</h1>
-      <form className="form" onSubmit={(e) => submit(e)}>
-        <TextField
-          id="username"
-          label="Username"
-          type="text"
-          required
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <TextField
-          id="password"
-          label="Password"
-          type="password"
-          required
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <TextField
-          id="name"
-          label="Name"
-          type="text"
-          required
-          onChange={(e) => setName(e.target.value)}
-        />
-        <InputLabel id="label">Role</InputLabel>
-        <Select
-          labelId="label"
-          id="roleSelect"
-          required
-          onChange={(e) => setRole(e.target.value)}
-        >
-          <MenuItem value="STUDENT">Student</MenuItem>
-          <MenuItem value="TEACHING ASSISTANT">TA</MenuItem>
-          <MenuItem value="INSTRUCTOR">Instructor</MenuItem>
-        </Select>
-        <Button variant="contained" type="submit">
-          Sign Up
-        </Button>
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      className={homePageStyles.loginPage}
+    >
+      {" "}
+      <h1 className={sharedStyles.title}>Code-llaborate</h1>
+      <form
+        className="form"
+        onSubmit={(e) => submit(e)}
+        className={homePageStyles.loginForm}
+      >
+        <Grid container direction="column" spacing={2}>
+          <Grid item>
+            <TextField
+              id="username"
+              label="Username"
+              type="text"
+              variant="filled"
+              required
+              fullWidth
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              id="password"
+              label="Password"
+              type="password"
+              variant="filled"
+              required
+              fullWidth
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              id="name"
+              label="Name"
+              type="text"
+              variant="filled"
+              required
+              fullWidth
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <FormControl required className={sharedStyles.fullwidth}>
+              <InputLabel id="label">Role</InputLabel>
+              <Select
+                labelId="label"
+                id="roleSelect"
+                onChange={(e) => setRole(e.target.value)}
+                required
+              >
+                <MenuItem value="STUDENT">Student</MenuItem>
+                <MenuItem value="TEACHING ASSISTANT">TA</MenuItem>
+                <MenuItem value="INSTRUCTOR">Instructor</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item>
+            <Button variant="contained" type="submit" fullWidth color="primary">
+              Sign Up
+            </Button>
+          </Grid>
+        </Grid>
       </form>
-      <Link to="/">Back to login</Link>
-    </div>
+      <Link to="/" className={homePageStyles.signUpElement}>
+        Back to login
+      </Link>
+      <div className={sharedStyles.errorText}>{notificationText}</div>
+    </Grid>
   );
 }

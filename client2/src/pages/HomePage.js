@@ -3,10 +3,13 @@
  */
 
 import React, { useState } from "react";
-import "./Home.css";
+// import "./Home.css";
 import { useDispatch } from "react-redux";
 import { setType, setAuth } from "../redux/actions/userActions";
-import "../scss/Home.scss";
+import useStyles from "../styles/HomePageStyles.module";
+import useSharedStyles from "../styles/SharedStyles.module";
+
+// import "../scss/Home.scss";
 
 import {
   TextField,
@@ -14,6 +17,8 @@ import {
   Select,
   InputLabel,
   MenuItem,
+  Grid,
+  Box,
 } from "@material-ui/core";
 
 import { TYPE_INSTRUCTOR } from "../Constants.js";
@@ -23,11 +28,14 @@ const authentication = require("../http/autheticationController");
 export default function Login(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [notificationText, setNotificationText] = useState("");
   const dispatch = useDispatch();
+
+  const homePageStyles = useStyles();
+  const sharedStyles = useSharedStyles();
 
   let submit = (e) => {
     e.preventDefault();
-    console.log(e);
     authentication
       .login(username, password)
       .then((res) => {
@@ -39,7 +47,10 @@ export default function Login(props) {
   };
 
   let callback = (err, res) => {
-    if (err) return console.log(err);
+    if (err) {
+      console.error(err);
+      return setNotificationText(err);
+    }
     dispatch(setType(res.role));
     dispatch(setAuth(true));
     let url = res.role === TYPE_INSTRUCTOR ? "/instructor" : "/sessions";
@@ -47,28 +58,49 @@ export default function Login(props) {
   };
 
   return (
-    <div className="Login">
-      <h1>Code-llaborate</h1>
-      <form className="form" onSubmit={(e) => submit(e)}>
-        <TextField
-          id="username"
-          label="Username"
-          type="text"
-          required
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <TextField
-          id="password"
-          label="Password"
-          type="password"
-          required
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button variant="contained" type="submit">
-          Login
-        </Button>
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      className={homePageStyles.loginPage}
+    >
+      <h1 className={sharedStyles.title}>Code-llaborate</h1>
+      <form onSubmit={(e) => submit(e)} className={homePageStyles.loginForm}>
+        <Grid container direction="column" spacing={2}>
+          <Grid item>
+            <TextField
+              id="username"
+              label="Username"
+              type="text"
+              variant="filled"
+              required
+              fullWidth
+              onChange={(e) => setUsername(e.target.value)}
+              color="white"
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              id="password"
+              label="Password"
+              type="password"
+              variant="filled"
+              required
+              fullWidth
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <Button variant="contained" fullWidth type="submit" color="primary">
+              Login
+            </Button>
+          </Grid>
+        </Grid>
       </form>
-      <Link to="/signup">Sign Up Here</Link>
-    </div>
+      <Link to="/signup" className={homePageStyles.signUpElement}>
+        Sign Up Here
+      </Link>
+      <div className={sharedStyles.errorText}>{notificationText}</div>
+    </Grid>
   );
 }
