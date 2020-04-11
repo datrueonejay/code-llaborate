@@ -1,6 +1,22 @@
 import React from "react";
 // import http from "../http";
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
+import  "../scss/Chat.scss"
+
+import {
+  Button,
+  Drawer,
+  AppBar,
+  CssBaseline,
+  TextField,
+  Toolbar,
+  Typography,
+  IconButton,
+  Divider,
+  List,
+  ListItem,
+  CircularProgress,
+} from "@material-ui/core";
 
 function Chat(props) {
   let handleSubmitChat = (event) => {
@@ -13,6 +29,8 @@ function Chat(props) {
   return (
     <div>
       <h1>Chat</h1>
+      <nav className="listMessage">
+
       <ul>
         {props.chatOut.map((chat, index) => {
           return (
@@ -22,12 +40,16 @@ function Chat(props) {
           );
         })}
       </ul>
+
+      </nav>
       <Form onSubmit={handleSubmitChat}>
-        <textarea name="chat" className="chatText" id="chatText" />
+        <div>
+        <TextField label="Send a message..." name="chat" className="chatText" id="chatText" > </TextField>
         <Button type="submit" className="btn">
           {" "}
           Chat{" "}
         </Button>
+        </div>
       </Form>
     </div>
   );

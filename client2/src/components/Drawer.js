@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 import { Form } from "react-bootstrap";
+import Chat from "../components/Chat";
+import websocket from "../http/socketController.js";
 
 import clsx from "clsx";
 import {
@@ -35,6 +37,7 @@ let handleSubmitChat = (event) => {
 export default function StudentView(props) {
 
     const [open, setOpen] = useState(false);
+    const [chatOut, setChatOut] = useState([]);
 
     const classes = useStyles();
     const theme = useTheme();
@@ -88,33 +91,15 @@ export default function StudentView(props) {
                 <ChevronLeftIcon />
             )}
             </IconButton>
-            <p> Chat </p>
         </div>
 
-        <div>
-        <h1>Chat</h1>
-        <ul>
-            {props.chatOut.map((chat) => {
-            return (
-                <li key={chat} id={chat}>
-                {chat}
-                </li>
-            );
-            })}
-        </ul>
-        <Form onSubmit={handleSubmitChat}>
-            <textarea name="chat" className="chatText" id="chatText" />
-            <Button type="submit" className="btn">
-            {" "}
-            Chat{" "}
-            </Button>
-        </Form>
-        </div>
-
-        <Divider />
-
-        <TextField label="Write a message..."> </TextField>
-        <Button> Send </Button>
+        <Chat
+          chatOut={props.chatOut}
+          sendChat={(message) => {
+            console.log(message);
+            websocket.send_chat(message);
+          }}
+        ></Chat>
 
         <Divider />
         </div>

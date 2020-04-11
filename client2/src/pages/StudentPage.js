@@ -93,7 +93,13 @@ export default function StudentView(props) {
       <Logout />
 
       <CssBaseline />
-      {/* <Drawer chatOut={chatOut}> </Drawer> */}
+      <Drawer
+       chatOut={chatOut}
+       sendChat={(message) => {
+        console.log(message);
+        websocket.send_chat(message);
+      }}
+      ></Drawer>
       <main className={clsx(classes.content, { [classes.contentShift]: open })}>
         {/* <Editor /> */}
         <StudentCodeEditor code={code} />
@@ -103,13 +109,13 @@ export default function StudentView(props) {
           }}
         />
         <Suggestions suggestions={suggestions} />
-        <Chat
+        {/* <Chat
           chatOut={chatOut}
           sendChat={(message) => {
             console.log(message);
             websocket.send_chat(message);
           }}
-        ></Chat>
+        ></Chat> */}
         <div>
           PYTHON FROM WEBSOCKET
           {pythonOut}
