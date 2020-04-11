@@ -67,6 +67,9 @@ export default function Sessions(props) {
     api.joinCourse(courseCode).then((res) => {
       console.log("joined course");
       setFormNotification("Successfully joined course!");
+    })
+    .catch((err) => {
+      setFormNotification(err);
     });
   }
 
