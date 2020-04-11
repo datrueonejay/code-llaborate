@@ -29,7 +29,7 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(express.static("build"));
 
-redisClient.set("courseCodes", JSON.stringify({}));
+// redisClient.set("courseCodes", JSON.stringify({}));
 
 app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body, req.query);
@@ -110,39 +110,52 @@ app.post(
 
         return res.json(user);
       });
-
     });
   }
 );
 
 app.get("/api/signout", authenticated, (req, res, next) => {
   req.session.destroy();
-  res.json("Signed out");
+  return res.json("Signed out");
 });
 
-app.post("/api/joincourse",
-  authenticated, 
+app.post(
+  "/api/joincourse",
+  authenticated,
   [body("courseCode").escape()],
   (req, res, next) => {
     let courseCode = req.body.courseCode;
-    getCourseIdFromCode(courseCode).then((courseID) => {
+    return getCourseIdFromCode(courseCode).then((courseID) => {
       userID = req.session.user.id;
       console.log(courseID);
       console.log(userID);
-      db.checkCourse(courseID, (err, results) => {
+      return db.checkCourse(courseID, (err, results) => {
+        console.log(err);
         if (err) return res.status(400).end("Bad request");
-  
+
         // if course found
         if (results.length > 0) {
-          db.addToCourse(userID, courseID, (err, results) => {
+          return db.addToCourse(userID, courseID, (err, results) => {
+            console.log(err);
+
             if (err) return res.status(400).end("Bad request");
-  
+
+            return db.findClasses(user.username, (err, classes) => {
+              if (err) {
+                console.log(err);
+                return res.status(500).end(err.message);
+              }
+              req.session.classes = classes;
+              return res.json(classes);
+            });
+
             return res.json(results);
-          })
+          });
         }
-      })
+      });
     });
-})
+  }
+);
 
 // Course and sessions logic
 app.post(
@@ -217,31 +230,76 @@ app.post(
     let courseID = req.body.courseID;
     let courseCodes;
 
-    redisClient.get("courseCodes", (err, reply) => {
-      if (err) return res.status(500).end("Redis client broke");
-      courseCodes = JSON.parse(reply);
-      console.log("courseCodes", courseCodes);
+    // Check if the hash with course code key exists
 
-      // check if code already exists
-      if (code = courseCodes[courseID]) {
-        console.log("COde already exists", courseID, code);
-        return res.json(code);
-      }
+    // If not, create the hash with the key and value of random string
 
+    //
+    return db.checkCourse(courseID, (err, result) => {
+      if (err) return res.status(422).end("Bad input");
+      return redisClient.hget("courseCodes", courseID, (err, reply) => {
+        console.log(err);
+        if (err) return res.status(500).end("Internal Server Error");
+        console.log(reply);
+        if (!reply) {
+          let code = crypto
+            .createHash("md5")
+            .update(req.body.courseID + Date.now().toString())
+            .digest("hex");
+          return redisClient.hset(
+            "courseCodes",
+            courseID,
+            code,
+            (err, reply2) => {
+              redisClient.expire(`courseCodes`, SESSION_EXPIRE_TIME);
+              return res.json(code);
+            }
+          );
+        } else {
+          return res.json(reply);
+        }
+      });
+    });
 
-      // Not in redis, need to create a new course code
-      db.checkCourse(courseID, (err, result) => {
-        if (err) return res.status(422).end("Bad input");
-        let code = crypto
-        .createHash("md5")
-        .update(req.body.courseID + Date.now().toString())
-        .digest("hex");
-        console.log("Code didnt exist, setting new code for", courseID, code, "\n----------------------------------------------------------------");
-        redisClient.set("courseCodes", JSON.stringify({...courseCodes, [courseID]: code}));
-        return res.json(code);
-      })
+    // return redisClient.exists("courseCodes", (err, num) => {
+    //   if (num > 0) {
+    //     return redisClient.get("courseCodes", (err, reply) => {
 
-    })
+    //       if (err) return res.status(500).end("Redis client broke");
+
+    //       courseCodes = JSON.parse(reply);
+    //       console.log("courseCodes", courseCodes);
+
+    //       // check if code already exists
+    //       if ((code = courseCodes[courseID])) {
+    //         console.log("COde already exists", courseID, code);
+    //         return res.json(code);
+    //       }
+
+    //       // Not in redis, need to create a new course code
+    //       db.checkCourse(courseID, (err, result) => {
+    //         if (err) return res.status(422).end("Bad input");
+    //         let code = crypto
+    //           .createHash("md5")
+    //           .update(req.body.courseID + Date.now().toString())
+    //           .digest("hex");
+    //         console.log(
+    //           "Code didnt exist, setting new code for",
+    //           courseID,
+    //           code,
+    //           "\n----------------------------------------------------------------"
+    //         );
+    //         redisClient.set(
+    //           "courseCodes",
+    //           JSON.stringify({ ...courseCodes, [courseID]: code })
+    //         );
+    //         return res.json(code);
+    //       });
+    //     });
+    //   } else {
+
+    //   }
+    // })
   }
 );
 
@@ -302,23 +360,26 @@ app.delete(
   }
 );
 
-app.post("/api/addtocourse/", 
-  authenticated, 
+app.post(
+  "/api/addtocourse/",
+  authenticated,
   [body("userID").escape(), body("courseID").escape()],
   (req, res, next) => {
-  let userID = req.body.userID;
-  let courseID = req.body.courseID;
-  db.addToCourse(userID, courseID, (err, results) => {
-    if (err) {
-      console.log(err.message);
-      return res.status(500).end(err.message);
-    }
-    return res.json("Successfully added user to course");
-  });
-});
+    let userID = req.body.userID;
+    let courseID = req.body.courseID;
+    db.addToCourse(userID, courseID, (err, results) => {
+      if (err) {
+        console.log(err.message);
+        return res.status(500).end(err.message);
+      }
+      return res.json("Successfully added user to course");
+    });
+  }
+);
 
-app.post("/api/searchuser/",
-  authenticated, 
+app.post(
+  "/api/searchuser/",
+  authenticated,
   [body("query").escape()],
   (req, res, next) => {
     let searchQuery = req.body.query;
@@ -329,8 +390,9 @@ app.post("/api/searchuser/",
       }
       console.log(results);
       return res.json(results);
-  });
-});
+    });
+  }
+);
 
 app.get("/api/classes", authenticated, (req, res, next) => {
   console.log(req.session.classes);
@@ -619,15 +681,16 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 function getCourseIdFromCode(courseCode) {
-
-  return new Promise(function(resolve, reject) {
-    redisClient.get("courseCodes", (err, reply) => {
+  return new Promise(function (resolve, reject) {
+    redisClient.hgetall("courseCodes", (err, courseCodes) => {
       if (err) reject();
-      let courseCodes = JSON.parse(reply);
+      // let courseCodes = JSON.parse(reply);
       console.log("courseCodes", courseCodes);
-      resolve(Object.keys(courseCodes).find((key) => courseCodes[key] === courseCode))
-    })
-  })
+      resolve(
+        Object.keys(courseCodes).find((key) => courseCodes[key] === courseCode)
+      );
+    });
+  });
 }
 
 server.listen(8080);
