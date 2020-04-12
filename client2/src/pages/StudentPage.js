@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from "react";
-// import Editor from "../containers/Editor.js";
 import websocket from "../http/socketController.js";
 
-//import { makeStyles, useTheme } from "@material-ui/core/styles";
 import clsx from "clsx";
 
 import { CssBaseline, CircularProgress, Button } from "@material-ui/core";
 
-// import MenuIcon from "@material-ui/icons/Menu";
-// import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-// import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Logout from "../components/Logout.js";
 import Drawer from "../components/Drawer.js";
 import StudentCodeEditor from "../components/StudentCodeEditor.js";
@@ -24,15 +19,11 @@ import { setSession } from "../redux/actions/userActions";
 
 import useSharedStyles from "../styles/SharedStyles.module";
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import AceEditor from "react-ace";
+import { useDispatch } from "react-redux";
 import PythonOutput from "../components/PythonOutput.js";
 
 export default function StudentView(props) {
-  // const [courses, setCourses] = useState([]);
-  // const [isSession, setIsSession] = useState(false);
   const [open, setOpen] = useState(false);
-
   const [code, setCode] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [pythonOut, setPythonOut] = useState("");
@@ -42,15 +33,6 @@ export default function StudentView(props) {
 
   const styles = useStyles();
   const sharedStyles = useSharedStyles();
-  // const theme = useTheme();
-
-  // const handleDrawerOpen = () => {
-  //   setOpen(true);
-  // };
-
-  // const handleDrawerClose = () => {
-  //   setOpen(false);
-  // };
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -90,6 +72,7 @@ export default function StudentView(props) {
           websocket.send_chat(message);
         }}
       />
+      <div className={sharedStyles.leaveSession}>
       <Link to="/sessions">
         <Button
           variant="contained"
@@ -101,6 +84,7 @@ export default function StudentView(props) {
           Leave Session
         </Button>
       </Link>
+      </div>
       <div className={styles.bodyContainer}>
         <StudentCodeEditor code={code} />
         <div
@@ -109,16 +93,19 @@ export default function StudentView(props) {
             styles.studentSuggestionContainer
           )}
         >
+          <div className={sharedStyles.sessionSuggestion} >
           <Suggestions suggestions={suggestions} height={300} />
+          
 
           <StudentSuggestion
             onSuggest={(lineNum, code) => {
               websocket.send_suggestion(lineNum, code);
             }}
           />
+          </div>
         </div>
-        <PythonOutput pythonOut={pythonOut} />
       </div>
+      <PythonOutput pythonOut={pythonOut} />
     </div>
   );
 }

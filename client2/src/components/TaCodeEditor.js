@@ -73,6 +73,7 @@ export default function TaCodeEditor(props) {
         width="100%"
       />
       <Button
+        className={styles.runEditorButton}
         onClick={() => {
           props.onExecute(props.code);
         }}

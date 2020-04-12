@@ -28,6 +28,10 @@ let useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
   },
+  runEditorButton: {
+    marginTop: 5,
+    marginBottom: 5,
+  }
 }));
 
 export default useStyles;

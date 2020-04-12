@@ -71,6 +71,7 @@ function TeachingAssistantView(props) {
           websocket.send_chat(message);
         }}
       />
+      <div className={sharedStyles.leaveSession}>
       <Link to="/sessions">
         <Button
           variant="contained"
@@ -86,6 +87,7 @@ function TeachingAssistantView(props) {
           Destroy and Leave Session
         </Button>
       </Link>
+      </div>
       <div className={styles.bodyContainer}>
         <TaCodeEditor
           onCodeChange={(code) => {
@@ -100,8 +102,8 @@ function TeachingAssistantView(props) {
           onReadFile={(code) => setCode(code)}
         />
         <Suggestions suggestions={suggestions} />
-        <PythonOutput pythonOut={pythonOut} />
       </div>
+      <PythonOutput pythonOut={pythonOut} />
     </div>
   );
 }
