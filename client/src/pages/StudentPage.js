@@ -81,25 +81,29 @@ export default function StudentView(props) {
       />
 
       <div className={styles.bodyContainer}>
+        <div className={sharedStyles.sessionEditorDiv}>
         <StudentCodeEditor code={code} />
+        </div>
+        <div className={sharedStyles.sessionSuggestionDiv}>
+
         <div
           className={clsx(
             sharedStyles.flexGrow,
             styles.studentSuggestionContainer
           )}
         >
-          <div className={sharedStyles.sessionSuggestion}>
             <Suggestions suggestions={suggestions} height={300} />
-
             <StudentSuggestion
               onSuggest={(lineNum, code) => {
                 websocket.send_suggestion(lineNum, code);
               }}
             />
-          </div>
+        </div>
         </div>
       </div>
+      <div className={styles.bodyContainer}>
       <PythonOutput pythonOut={pythonOut} />
+      </div>
     </div>
   );
 }

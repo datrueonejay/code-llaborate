@@ -77,6 +77,7 @@ function TeachingAssistantView(props) {
         leaveText={"End and Leave Session"}
       />
       <div className={styles.bodyContainer}>
+        <div className={sharedStyles.sessionEditorDiv}>
         <TaCodeEditor
           onCodeChange={(code) => {
             setCode(code);
@@ -86,9 +87,15 @@ function TeachingAssistantView(props) {
           code={code}
           onReadFile={(code) => setCode(code)}
         />
+        </div>
+        <div className={sharedStyles.sessionSuggestionDiv}>
+
         <Suggestions suggestions={suggestions} />
+        </div>
       </div>
+      <div className={styles.bodyContainer}>
       <PythonOutput pythonOut={pythonOut} />
+      </div>
     </div>
   );
 }

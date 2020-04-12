@@ -2,9 +2,6 @@ import React from "react";
 import useSharedStyles from "../styles/SharedStyles.module";
 import AceEditor from "react-ace";
 
-import "ace-builds/src-noconflict/theme-terminal";
-import "ace-builds/src-noconflict/mode-text";
-
 
 function PythonOutput(props) {
   const sharedStyles = useSharedStyles();

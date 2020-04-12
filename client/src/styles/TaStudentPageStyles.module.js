@@ -4,12 +4,11 @@ let useStyles = makeStyles((theme) => ({
   container: {
     display: "flex",
     flexDirection: "column",
-    padding: 10,
   },
   bodyContainer: {
     display: "flex",
     justifyContent: "center",
-    padding: 10,
+    padding: 15,
     alignItems: "flex-end",
   },
   studentSuggestionContainer: {

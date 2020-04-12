@@ -34,8 +34,13 @@ let useSharedStyles = makeStyles((theme) => ({
   hideOverflowY: {
     overflowY: "hidden",
   },
-  sessionSuggestion: {
-    paddingLeft: 15,
+  sessionEditorDiv: {
+    width: "50%",
+    paddingRight: 35,
+  },
+  sessionSuggestionDiv: {
+    width: "50%",
+    paddingLeft: 35,
   },
   leaveSession: {
     margin: 10,

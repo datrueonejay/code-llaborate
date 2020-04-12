@@ -16,9 +16,18 @@ import InstructorView from "./pages/InstructorPage.js";
 import SignUp from "./pages/SignUpPage";
 import NotFound from "./pages/NotFoundPage";
 
-import "ace-builds/src-noconflict/theme-monokai";
-import "ace-builds/src-noconflict/mode-python";
-import "ace-builds/webpack-resolver";
+
+// Import a Mode (language)
+import "brace/mode/python";
+import "brace/mode/text";
+
+// Import a Theme
+import "brace/theme/monokai";
+import "brace/theme/terminal";
+
+// Import Extra tools
+import "brace/ext/language_tools";
+
 
 const darkTheme = createMuiTheme({
   palette: {
