@@ -5,7 +5,6 @@ import {
   Button,
   Typography
 } from '@material-ui/core';
-//import styles from "../scss/Modal.module.scss";
 import {useStyles} from "../styles/Modal.module.js";
 const api = require("../http/apiController.js");
 

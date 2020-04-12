@@ -1,7 +1,6 @@
 import React from "react";
 // import http from "../http";
 import { Form } from "react-bootstrap";
-import "../scss/Chat.scss";
 import { FixedSizeList as List } from "react-window";
 
 import {
