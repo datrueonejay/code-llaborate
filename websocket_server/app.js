@@ -28,10 +28,16 @@ const nodemailer = require("nodemailer");
 // Redis Connect
 const RedisStore = require("connect-redis")(session);
 
+//Swagger documentation
+const swaggerUi = require("swagger-ui-express");
+const apiDocs = require("./docs.json");
+
 const app = express();
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(express.static("build"));
+
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(apiDocs));
 
 app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body, req.query);
@@ -330,6 +336,9 @@ app.post(
   [body("query").escape()],
   (req, res, next) => {
     let searchQuery = req.body.query;
+    if (!searchQuery) {
+      return res.status(400).end("Bad Request");
+    }
     db.searchUser(searchQuery, (err, results) => {
       if (err) {
         return res.status(500).end(err.message);
@@ -438,6 +447,9 @@ app.post(
   authenticated,
   [body("course").escape()],
   (req, res, next) => {
+    if (!req.body.course) {
+      return res.status(400).end("Bad Request");
+    }
     if (req.session.classes.includes(parseInt(req.body.course))) {
       return redisClient.exists(req.body.course, (err, num) => {
         if (num > 0) {

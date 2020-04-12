@@ -1,0 +1,610 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "Code-llaborate API",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "https://code-llaborate.tools/api"
+      }
+    ],
+    "paths": {
+      "/signup": {
+        "post": {
+          "summary": "Sign into the application",
+          "tags": ["Login"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "A user object.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#components/schemas/User"
+                  }
+                }
+              }
+            },
+            "400": {
+                "description": "Bad Request if an input is missing or malformed"
+            }
+          }
+        }
+      },
+      "/login": {
+        "post": {
+          "summary": "Log into the application",
+          "tags": ["Login"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "A user object.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#components/schemas/User"
+                  }
+                }
+              }
+            },
+            "400": {
+                "description": "Bad Request if an input is missing or malformed"
+            },
+            "401": {
+                "description": "If a user cannot authenticate with the given username and password"
+            },
+            "500" : {
+                "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/signout": {
+        "get": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Sign out of the application",
+          "tags": ["Login"],
+          "responses": {
+            "200": {
+              "description": "Signed out"
+ 
+            },
+            "401": {
+                "description": "Access Denied if not logged in"
+            }
+          }
+        }
+      },
+      "/joincourse": {
+        "post": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Join a course",
+          "tags": ["Course"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "courseCode": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "A list of the user's classes",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#components/schemas/Classes"
+                  }
+                }
+              }
+            },
+            "400": {
+                "description": "Bad Request if an input is missing or malformed or course does not exist"
+            },
+            "401": {
+                "description": "If a user is not authenticated"
+            },
+            "500" : {
+                "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/createSession": {
+        "post": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Create a session",
+          "tags": ["Session"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "course": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Session Created"
+            },
+            "400": {
+                "description": "Bad Request if an input is missing or malformed or Session Exists"
+            },
+            "401": {
+                "description": "If a user is not authenticated or unauthorized to create a session"
+            },
+            "500" : {
+                "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/createCourseCode": {
+        "post": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Create a code to let others join a course",
+          "tags": ["Course"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "courseID": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "The course code to join the course",
+              "content": {
+                  "application/json": {
+                    "type": "string",
+                    "example": "randomstringhere"
+                }
+              }
+            },
+            "400": {
+                "description": "Bad Request if an input is missing or malformed or Session Exists"
+            },
+            "422": {
+                "description": "Bad input"
+            },
+            "401": {
+                "description": "If a user is not authenticated or unauthorized to create a session"
+            },
+            "500" : {
+                "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/deleteSession": {
+        "delete": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Delete a session",
+          "tags": ["Session"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "course": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Session Deleted"
+            },
+            "400": {
+                "description": "Bad Request if an input is missing or malformed or Session does not Exist"
+            },
+            "401": {
+                "description": "If a user is not authenticated or unauthorized to delete a session"
+            },
+            "500" : {
+                "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/addtocourse": {
+        "post": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Add a use to course session",
+          "tags": ["Course"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "string"
+                    },
+                    "courseID": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successfully added user to course"
+            },
+            "400": {
+                "description": "Bad Request if an input is missing or malformed"
+            },
+            "401": {
+                "description": "If a user is not authenticated"
+            },
+            "500" : {
+                "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/searchuser": {
+        "post": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Look for a user that matches partial input",
+          "tags": ["User"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "A list of users",
+              "content": {
+                  "application/json": {
+                    "schema": {
+                      "type":"array",
+                      "example": ["user", "user"]
+                    }
+                  }
+              }
+            },
+            "400": {
+              "description": "Bad Request if an input is missing or malformed"
+            },
+            "401": {
+              "description": "If a user is not authenticated"
+            },
+            "500" : {
+              "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/sendemail": {
+        "post": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Send an email with the code to join a course",
+          "tags": ["User"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recipient": {
+                      "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                      }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "A list of users",
+              "content": {
+                  "application/json": {
+                    "schema": {
+                      "type":"array",
+                      "example": ["user", "user"]
+                    }
+                  }
+              }
+            },
+            "400": {
+              "description": "Bad Request if an input is missing or malformed"
+            },
+            "401": {
+              "description": "If a user is not authenticated"
+            },
+            "500" : {
+              "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/classes": {
+        "get": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Get courses of a user, as well as whether there is a session currently going on for that course",
+          "tags": ["Course"],
+          "responses": {
+            "200": {
+              "description": "A list of courses, and whether there is a session",
+              "content": {
+                  "application/json": {
+                    "schema": {
+                      "type":"array",
+                      "example": [{"course": "1", "exists": true}]
+                    }
+                  }
+              }
+            },
+            "401": {
+              "description": "If a user is not authenticated"
+            },
+            "500" : {
+              "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/users": {
+        "get": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Get a list of all users",
+          "parameters": [{
+            "in": "query", 
+            "name": "page", 
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Page number"
+          }],
+          "tags": ["User"],
+          "responses": {
+            "200": {
+              "description": "A list of users",
+              "content": {
+                  "application/json": {
+                    "schema": {
+                      "type":"array",
+                      "example": ["user", "user"]
+                    }
+                  }
+              }
+            },
+            "401": {
+              "description": "If a user is not authenticated"
+            },
+            "500" : {
+              "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/getallcourses": {
+        "get": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Get a list of all courses",
+          "parameters": [{
+            "in": "query", 
+            "name": "page", 
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Page number"
+          }],
+          "tags": ["Course"],
+          "responses": {
+            "200": {
+              "description": "A list of courses",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type":"array",
+                    "example": [{"course": "1", "exists": true}]
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "If a user is not authenticated"
+            },
+            "500" : {
+              "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/sessions": {
+        "get": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Get a list of all available sessions a user can join",
+          "tags": ["Session"],
+          "responses": {
+            "200": {
+              "description": "A list of ongoing sessions",
+              "content": {
+                  "application/json": {
+                    "schema": {
+                      "type":"array",
+                      "example": ["1", "2"]
+                    }
+                  }
+              }
+            },
+            "401": {
+              "description": "If a user is not authenticated"
+            },
+            "500" : {
+              "description": "If there was an internal server error"
+            }
+          }
+        }
+      },
+      "/connectSession": {
+        "post": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Connect to an ongoing session",
+          "tags": ["Session"],
+          "responses": {
+            "200": {
+              "description": "OK if successful"
+            },
+            "400": {
+              "description": "Bad Request if an input is missing or malformed or session does not exist"   
+            },
+            "401": {
+              "description": "If a user is not authenticated"
+            }
+          }
+        }
+      },
+      "/python": {
+        "post": {
+          "security": [{"cookieAuth": []}],
+          "summary": "Execute python code",
+          "description": "Sends python output through websocket to all connected clients",
+          "tags": ["Python"],
+          "responses": {
+            "200": {
+              "description": "Finished once complete"
+            },
+            "400": {
+              "description": "Bad Request if an input is missing or malformed"   
+            },
+            "401": {
+              "description": "If a user is not authenticated"
+            },
+            "500" : {
+              "description": "If there was an internal server error"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "1"
+            },
+            "roleId": {
+              "type": "string",
+              "example": "1"
+            },
+            "username": {
+              "type": "string",
+              "example": "username"
+            },
+            "name": {
+              "type": "string",
+              "example": "name"
+            },
+            "role": {
+              "type": "string",
+              "example": "TEACHING ASSISTANT"
+            }
+          }
+        },
+        "Classes": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "example": "1"
+            }
+        }
+      }, 
+      "securitySchemes": {
+        "cookieAuth": {
+            "type": "apiKey",
+            "in": "cookie",
+            "name": "connect.sid"
+        }
+      }
+    }
+  }
