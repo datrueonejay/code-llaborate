@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import Chat from "../components/Chat";
+import Chat from "./Chat";
 
 import clsx from "clsx";
 import {
@@ -16,7 +16,7 @@ import {
 import { useStyles } from "../styles/StudentPageStyle.js";
 import { useTheme } from "@material-ui/core/styles";
 
-import Logout from "../components/Logout.js";
+import Logout from "./Logout.js";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";

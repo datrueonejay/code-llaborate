@@ -88,6 +88,9 @@ export default function Login(props) {
       <Link to="/signup" className={homePageStyles.signUpElement}>
         Sign Up Here
       </Link>
+      <Link to="/credits" className={homePageStyles.signUpElement}>
+        Credits
+      </Link>
       <Typography align="center" color="error">
         {notificationText}
       </Typography>

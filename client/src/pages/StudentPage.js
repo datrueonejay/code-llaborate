@@ -3,7 +3,7 @@ import websocket from "../http/socketController.js";
 
 import clsx from "clsx";
 
-import { CircularProgress, Button } from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
 
 import Drawer from "../components/Drawer.js";
 import StudentCodeEditor from "../components/StudentCodeEditor.js";
@@ -16,7 +16,6 @@ import useStyles from "../styles/TaStudentPageStyles.module.js";
 import { setSession } from "../redux/actions/userActions";
 
 import useSharedStyles from "../styles/SharedStyles.module";
-import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import PythonOutput from "../components/PythonOutput.js";
 
@@ -82,27 +81,26 @@ export default function StudentView(props) {
 
       <div className={styles.bodyContainer}>
         <div className={sharedStyles.sessionEditorDiv}>
-        <StudentCodeEditor code={code} />
+          <StudentCodeEditor code={code} />
         </div>
         <div className={sharedStyles.sessionSuggestionDiv}>
-
-        <div
-          className={clsx(
-            sharedStyles.flexGrow,
-            styles.studentSuggestionContainer
-          )}
-        >
+          <div
+            className={clsx(
+              sharedStyles.flexGrow,
+              styles.studentSuggestionContainer
+            )}
+          >
             <Suggestions suggestions={suggestions} height={300} />
             <StudentSuggestion
               onSuggest={(lineNum, code) => {
                 websocket.send_suggestion(lineNum, code);
               }}
             />
-        </div>
+          </div>
         </div>
       </div>
       <div className={styles.bodyContainer}>
-      <PythonOutput pythonOut={pythonOut} />
+        <PythonOutput pythonOut={pythonOut} />
       </div>
     </div>
   );

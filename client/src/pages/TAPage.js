@@ -5,7 +5,7 @@ import websocket from "../http/socketController.js";
 import api from "../http/apiController.js";
 
 import Suggestions from "../components/Suggestions";
-import { CircularProgress, Button } from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setSession } from "../redux/actions/userActions";
@@ -78,23 +78,22 @@ function TeachingAssistantView(props) {
       />
       <div className={styles.bodyContainer}>
         <div className={sharedStyles.sessionEditorDiv}>
-        <TaCodeEditor
-          onCodeChange={(code) => {
-            setCode(code);
-            websocket.send_code(code);
-          }}
-          onExecute={(code) => api.executePython(code).then((res) => {})}
-          code={code}
-          onReadFile={(code) => setCode(code)}
-        />
+          <TaCodeEditor
+            onCodeChange={(code) => {
+              setCode(code);
+              websocket.send_code(code);
+            }}
+            onExecute={(code) => api.executePython(code).then((res) => {})}
+            code={code}
+            onReadFile={(code) => setCode(code)}
+          />
         </div>
         <div className={sharedStyles.sessionSuggestionDiv}>
-
-        <Suggestions suggestions={suggestions} />
+          <Suggestions suggestions={suggestions} />
         </div>
       </div>
       <div className={styles.bodyContainer}>
-      <PythonOutput pythonOut={pythonOut} />
+        <PythonOutput pythonOut={pythonOut} />
       </div>
     </div>
   );
