@@ -10,9 +10,6 @@ const redisClient = redis.createClient(
 const crypto = require("crypto");
 const SESSION_EXPIRE_TIME = 7200; // in seconds
 
-// ENV init
-require("dotenv").config();
-
 // DB api init
 const db = require("./database");
 
@@ -33,8 +30,6 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(express.static("build"));
 
-// redisClient.set("courseCodes", JSON.stringify({}));
-
 app.use(function (req, res, next) {
   console.log("HTTP request", req.method, req.url, req.body, req.query);
   next();
@@ -44,7 +39,7 @@ const sessionParser = session({
   secret: process.env.SESSION_SECRET || "d3f4ults3cr3t",
   resave: false,
   saveUninitialized: true,
-  // cookie: { httpOnly: true, secure: true, sameSite: true }
+  // cookie: { httpOnly: true, secure: true, sameSite: true },
 });
 
 app.use(sessionParser);
@@ -55,8 +50,6 @@ let authenticated = (req, res, next) => {
 };
 
 let isInstructor = (req, res, next) => {
-  console.log("session", req.session);
-  console.log("role", req.session.user.role);
   if (!req.session.user.role === "INSTRUCTOR")
     return res.status(401).end("Access denied");
   next();
@@ -80,7 +73,7 @@ app.post(
     if (!username || !password || !role || !name) {
       return res.status(400).end("Bad request");
     }
-    db.addUser(role, username, password, name, (err, user) => {
+    return db.addUser(role, username, password, name, (err, user) => {
       if (err) {
         console.error(err);
         return res.status(400).end(err);
@@ -106,7 +99,7 @@ app.post(
     return db.checkUser(username, password, (err, user) => {
       if (err) {
         console.error(err);
-        return res.status(401).end("Invalid Username and Password Combination");
+        return res.status(401).end(err);
       }
       return db.findClasses(user.username, (err, classes) => {
         if (err) {
@@ -133,32 +126,31 @@ app.post(
   [body("courseCode").escape()],
   (req, res, next) => {
     let courseCode = req.body.courseCode;
+    if (!courseCode) {
+      return res.status(400).end("Bad Request");
+    }
     return getCourseIdFromCode(courseCode).then((courseID) => {
       userID = req.session.user.id;
-      console.log(courseID);
-      console.log(userID);
       return db.checkCourse(courseID, (err, results) => {
-        console.log(err);
-        if (err) return res.status(400).end("Bad request");
+        if (err) return res.status(500).end(err);
 
         // if course found
         if (results.length > 0) {
           return db.addToCourse(userID, courseID, (err, results) => {
-            console.log(err);
-
-            if (err) return res.status(400).end("Bad request");
+            if (err) {
+              return res.status(500).end(err);
+            }
 
             return db.findClasses(req.session.user.username, (err, classes) => {
               if (err) {
-                console.log(err);
-                return res.status(500).end(err.message);
+                return res.status(500).end(err);
               }
               req.session.classes = classes;
               return res.json(classes);
             });
-
-            return res.json(results);
           });
+        } else {
+          return res.status(400).end("Course Does Not Exist");
         }
       });
     });
@@ -171,8 +163,8 @@ app.post(
   authenticated,
   [body("course").escape()],
   (req, res, next) => {
-    db.isStudent(req.session.user.username, (err, isStudent) => {
-      if (err) return res.status(500).end(err.message);
+    return db.isStudent(req.session.user.username, (err, isStudent) => {
+      if (err) return res.status(500).end(err);
       // Not a student
       if (!isStudent) {
         // Valid instructor
@@ -184,43 +176,38 @@ app.post(
             } else {
               // Session does not exist
               req.session.currSession = req.body.course;
-              redisClient.set(`${req.body.course}SESSION`, "", (err, reply) => {
-                if (err) {
-                  return res.status(500).end("Internal Server Error");
-                }
-                redisClient.expire(
-                  `${req.body.course}SESSION`,
-                  SESSION_EXPIRE_TIME
-                );
-              });
-
-              redisClient.hmset(
-                req.body.course,
-                "code",
+              return redisClient.set(
+                `${req.body.course}SESSION`,
                 "",
-                "startedBy",
-                req.session.user.id,
-                "suggestions",
-                JSON.stringify([]),
-                "chat",
-                JSON.stringify([]),
                 (err, reply) => {
                   if (err) {
                     return res.status(500).end("Internal Server Error");
                   }
-                  redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
+                  redisClient.expire(
+                    `${req.body.course}SESSION`,
+                    SESSION_EXPIRE_TIME
+                  );
+
+                  return redisClient.hmset(
+                    req.body.course,
+                    "code",
+                    "",
+                    "startedBy",
+                    req.session.user.id,
+                    "suggestions",
+                    JSON.stringify([]),
+                    "chat",
+                    JSON.stringify([]),
+                    (err, reply) => {
+                      if (err) {
+                        return res.status(500).end("Internal Server Error");
+                      }
+                      redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
+                      return res.json("Session Created");
+                    }
+                  );
                 }
               );
-              // redisClient.hset(
-              //   req.body.course,
-              //   "startedBy",
-              //   req.session.user.id
-              // );
-              // redisClient.hset(req.body.course, "code", "");
-              // redisClient.expire(req.body.course, SESSION_EXPIRE_TIME);
-              // // Remove any old suggestions
-              // redisClient.del(`${req.body.course}SUGGESTIONS`);
-              return res.json("CREATED");
             }
           });
         }
@@ -236,20 +223,16 @@ app.post(
   [body("courseID").escape()],
   (req, res, next) => {
     let courseID = req.body.courseID;
-    let courseCodes;
-
+    if (!courseID) {
+      return res.status(400).end("Bad Request");
+    }
     // Check if the hash with course code key exists
 
-    // If not, create the hash with the key and value of random string
-
-    //
     return db.checkCourse(courseID, (err, result) => {
       if (err) return res.status(422).end("Bad input");
       if (result.length > 0) {
         return redisClient.hget("courseCodes", courseID, (err, reply) => {
-          console.log(err);
-          if (err) return res.status(500).end("Internal Server Error");
-          console.log(reply);
+          if (err) return res.status(500).end(err);
           if (!reply) {
             let code = crypto
               .createHash("md5")
@@ -280,9 +263,8 @@ app.delete(
   authenticated,
   [body("course").escape()],
   (req, res, next) => {
-    console.log("request is");
-    console.log(req.body);
-    redisClient.hget(req.body.course, "startedBy", (err, id) => {
+    return redisClient.hget(req.body.course, "startedBy", (err, id) => {
+      if (err) return res.status(500).end("Internal Server Error");
       if (!id) {
         return res.status(400).end("No session exists");
       }
@@ -310,10 +292,12 @@ app.post(
   (req, res, next) => {
     let userID = req.body.userID;
     let courseID = req.body.courseID;
-    db.addToCourse(userID, courseID, (err, results) => {
+    if (!userID || !courseID) {
+      return res.status(400).end("Bad Request");
+    }
+    return db.addToCourse(userID, courseID, (err, results) => {
       if (err) {
-        console.log(err.message);
-        return res.status(500).end(err.message);
+        return res.status(500).end(err);
       }
       return res.json("Successfully added user to course");
     });
@@ -328,10 +312,8 @@ app.post(
     let searchQuery = req.body.query;
     db.searchUser(searchQuery, (err, results) => {
       if (err) {
-        console.log(err);
         return res.status(500).end(err.message);
       }
-      console.log(results);
       return res.json(results);
     });
   }
@@ -342,6 +324,11 @@ app.post(
   authenticated,
   [body("recipient").escape(), body("message").escape()],
   (req, res, next) => {
+    let recipient = req.body.recipient;
+
+    if (!recipient) {
+      return res.status(400).end("Bad Request");
+    }
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -352,29 +339,26 @@ app.post(
 
     let message = {
       from: "turtlebear41@gmail.com",
-      to: req.body.recipient,
+      to: recipient,
       subject: "Join my course!",
       text: "Join my course using the code!",
       html: `<p>${req.body.message}</p>`,
     };
 
-    transporter.sendMail(message, function (err, info) {
+    return transporter.sendMail(message, function (err, info) {
       if (err) return res.status(500).end("Internal Server Error");
-      console.log(info);
       return res.json(info);
     });
   }
 );
 
 app.get("/api/classes", authenticated, (req, res, next) => {
-  console.log(req.session.classes);
   return redisClient.mget(
     req.session.classes.map((course) => {
       return `${course}SESSION`;
     }),
     (err, sessions) => {
-      console.log("ASOPDJASOIJ");
-      console.log(sessions);
+      if (err) return res.status(500).end("Internal Server Error");
       return res.json(
         req.session.classes.map((val, index) => {
           return {
@@ -389,10 +373,9 @@ app.get("/api/classes", authenticated, (req, res, next) => {
 
 app.get("/api/users", authenticated, (req, res, next) => {
   let page = req.query.page || 0;
-  db.getUsers(page, (err, results, fields) => {
+  return db.getUsers(page, (err, results, fields) => {
     if (err) {
-      console.log(err);
-      return res.status(500).end(err.message);
+      return res.status(500).end(err);
     }
     return res.json(results);
   });
@@ -401,41 +384,30 @@ app.get("/api/users", authenticated, (req, res, next) => {
 app.get("/api/getallcourses", authenticated, (req, res, next) => {
   let page = req.query.page || 0;
   db.getCourses(page, (err, results, fields) => {
-    if (err) return res.status(500).end(err.message);
+    if (err) return res.status(500).end(err);
     return res.json(results);
   });
 });
 
 app.get("/api/sessions", authenticated, (req, res, next) => {
-  console.log(req.session.classes);
   if (req.session.classes.length === 0) {
     return res.json([]);
   }
-  console.log("Looking for");
-  console.log(
-    req.session.classes.map((val) => {
-      return `${val}SESSION`;
-    })
-  );
-  redisClient.mget(
+  return redisClient.mget(
     req.session.classes.map((val) => {
       return `${val}SESSION`;
     }),
     (err, results) => {
-      console.log(err);
-      if (err) return res.status(500).end("Internal Server error");
-
-      console.log("GETTING ALL VALID SESSIONS");
-      console.log(results);
-
+      if (err) {
+        console.error(err);
+        return res.status(500).end("Internal Server error");
+      }
       let ret = [];
       req.session.classes.forEach((course, index) => {
-        // console.log(res)
         if (results[index] !== null) {
           ret.push({ course: course, exists: true });
         }
       });
-      console.log(ret);
       return res.json(ret);
     }
   );
@@ -447,7 +419,7 @@ app.post(
   [body("course").escape()],
   (req, res, next) => {
     if (req.session.classes.includes(parseInt(req.body.course))) {
-      redisClient.exists(req.body.course, (err, num) => {
+      return redisClient.exists(req.body.course, (err, num) => {
         if (num > 0) {
           req.session.currSession = req.body.course;
           return res.json("OK");
@@ -461,7 +433,6 @@ app.post(
 );
 
 // Python stuff
-
 app.post("/api/python", authenticated, (req, res, next) => {
   let code = req.body.code;
   const from = "PYTHON";
@@ -471,15 +442,12 @@ app.post("/api/python", authenticated, (req, res, next) => {
   python.executePython(
     code,
     (output) => {
-      console.log(`out ${output}`);
       sendClients(req.session.currSession, output, from);
     },
     (err) => {
-      console.log(`err ${err}`);
       sendClients(req.session.currSession, err, from);
     },
     (exitCode) => {
-      console.log(`Python exited with code ${exitCode}`);
       return res.json("OK");
     }
   );
@@ -491,7 +459,7 @@ let sendClients = (course, data, from) => {
     message: data,
   };
   wss.clients.forEach((client) => {
-    if (client.course === course) {
+    if (client.readyState === WebSocket.OPEN && client.course === course) {
       client.send(JSON.stringify(ret));
     }
   });
@@ -506,37 +474,41 @@ const server = http.createServer(app);
 
 const wss = new WebSocket.Server({ noServer: true });
 
+// When someone successfully connects to websocket
 wss.on("session", (ws, req) => {
   ws.course = req.session.currSession;
-  // Instructor logic
+
+  ws.isAlive = true;
+  ws.on("pong", heartbeat);
 
   ws.on("message", (message) => {
     let parsedMsg = JSON.parse(message);
-
     let ret;
     // TA CODE
     if (
       req.session.user.role === "TEACHING ASSISTANT" &&
       parsedMsg.type == "CODE"
     ) {
-      redisClient.hset(ws.course, "code", parsedMsg.message);
+      let code = parsedMsg.message;
+      redisClient.hset(ws.course, "code", code);
       ret = {
         type: "CODE",
         from: req.session.user.role,
-        message: parsedMsg.message,
+        message: code,
       };
     } else if (parsedMsg.type == "CHAT") {
       return redisClient.hget(ws.course, "chat", (err, chat) => {
         if (err) return;
         let messages = JSON.parse(chat);
-        messages.push(parsedMsg.message);
+        let message = parsedMsg.message;
+        messages.push(message);
         return redisClient.hset(
           ws.course,
           "chat",
           JSON.stringify(messages),
           (err, reply) => {
             if (err) return;
-            return sendClients(ws.course, parsedMsg.message, "CHAT");
+            return sendClients(ws.course, message, "CHAT");
 
             // return sendClients(ws.course, messages, req.session.user.role);
           }
@@ -546,27 +518,21 @@ wss.on("session", (ws, req) => {
       return redisClient.hget(ws.course, "suggestions", (err, suggestions) => {
         if (err) return;
         let suggestionsList = JSON.parse(suggestions);
-        console.log(suggestionsList);
-        suggestionsList.forEach((suggestion) => {
+        let suggestion = parsedMsg.message;
+        let lineNum = parsedMsg.lineNum;
+        for (let i = 0; i < suggestionsList.length; i++) {
           // Already suggested
           if (
-            suggestion.message === parsedMsg.message &&
-            suggestion.lineNum === parsedMsg.lineNum
+            suggestionsList[i].suggestion === suggestion &&
+            suggestionsList[i].lineNum === lineNum
           ) {
             return;
-            // return sendClients(
-            //   ws.course,
-            //   suggestionsList,
-            //   req.session.user.role
-            // );
           }
-        });
-
+        }
         let newSuggestion = {
-          suggestion: parsedMsg.message,
-          lineNum: parsedMsg.lineNum,
+          suggestion: suggestion,
+          lineNum: lineNum,
         };
-
         suggestionsList.push(newSuggestion);
         return redisClient.hset(
           ws.course,
@@ -586,12 +552,11 @@ wss.on("session", (ws, req) => {
     });
   });
 
+  // Send initial data about session
   redisClient.hgetall(req.session.currSession, (err, res) => {
     let code = res.code;
 
     let suggestions = JSON.parse(res.suggestions);
-    console.log("chat");
-
     let chat = JSON.parse(res.chat);
 
     ws.send(
@@ -600,16 +565,36 @@ wss.on("session", (ws, req) => {
   });
 });
 
+// Verify clients are still connected, taken from https://github.com/websockets/ws
+function noop() {}
+
+function heartbeat() {
+  this.isAlive = true;
+}
+
+const interval = setInterval(function ping() {
+  wss.clients.forEach(function each(ws) {
+    if (ws.isAlive === false) return ws.terminate();
+
+    ws.isAlive = false;
+    ws.ping(noop);
+  });
+}, 30000);
+
+wss.on("close", function close() {
+  clearInterval(interval);
+});
+
 server.on("upgrade", (req, socket, head) => {
   const pathname = url.parse(req.url).pathname;
   // Necessary because we only set express app to use parser, not the http server
   sessionParser(req, {}, () => {
-    console.log(req.session);
     if (!req.session.user) {
       return socket.destroy();
     }
     if (pathname === "/api/session") {
       return redisClient.exists(req.session.currSession, (err, num) => {
+        if (err) return socket.destroy();
         if (num > 0) {
           return wss.handleUpgrade(req, socket, head, (ws) => {
             wss.emit("session", ws, req);

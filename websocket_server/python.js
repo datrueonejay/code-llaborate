@@ -7,8 +7,6 @@ const pythonPath = process.env.PYTHON_PATH || "/usr/local/bin/python";
 //////////////// Python Compiler Imports/Constants //////////////////
 let mkdirp = require("mkdirp");
 const path = require("path");
-const multer = require("multer");
-const upload = multer({ dest: path.join(__dirname, "uploads") });
 
 /////////////////////////////////////////////////////////////////
 /**
@@ -16,7 +14,6 @@ const upload = multer({ dest: path.join(__dirname, "uploads") });
  */
 exports.executePython = (code, onOutput, onError, onExit) => {
   let filename = randomString();
-
 
   let filePath = path.join(__dirname, `/tmp/${filename}.py`);
 
@@ -38,7 +35,7 @@ exports.executePython = (code, onOutput, onError, onExit) => {
       // Execute python code
       // TODO: Replace with pypy sandbox
       //TODO: check timeout
-      
+
       let compileScript = spawn(pythonPath, [filePath]);
 
       /**  UNCOMMENT LET LINE FOR PYPY
@@ -56,7 +53,11 @@ exports.executePython = (code, onOutput, onError, onExit) => {
       });
 
       compileScript.on("exit", (code) => {
-        console.log("Exit code: " + code);
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error(err);
+          }
+        });
         onExit(code);
       });
     });
@@ -71,130 +72,3 @@ let randomString = () => {
 let byteToString = function (data) {
   return new TextDecoder("utf-8").decode(data);
 };
-
-// Previous Stuff
-
-//////////////// Python Compiler Imports/Constants //////////////////
-// let mkdirp = require("mkdirp");
-// const path = require("path");
-// const multer = require("multer");
-// const upload = multer({ dest: path.join(__dirname, "uploads") });
-
-/////////////////////////////////////////////////////////////////
-//////////////// Python Compiler //////////////////
-/**
- * credits: https://stackoverflow.com/questions/16316330/how-to-write-file-if-parent-folder-doesnt-exist
- */
-
-// upload.sing('file') file variable corresponds to req
-// app.post("/compile/file/", upload.single("file"), function (req, res, next) {
-//   let fs = require("fs");
-//   // console.log("this is file");
-
-//   let file = req.file;
-//   // console.log(file.path);
-
-//   let filePath = file.path;
-
-//   compilePython(
-//     filePath,
-//     function (output) {
-//       // console.log("this comes back");
-//       // console.log("this is output "+ output);
-//       res.json({ path: filePath, string: output });
-//     },
-//     req.session.currSession
-//   );
-// });
-
-// app.post("/compile/plaintext/", upload.single("picture"), function (
-//   req,
-//   res,
-//   next
-// ) {
-//   let fs = require("fs");
-//   // console.log("this is plain");
-//   // console.log(req.body);
-//   let string = req.body.code;
-//   // console.log("hello");
-//   // console.log(string);
-//   // console.log("bye");
-
-//   // full path to tmp file
-//   let filePath = path.join(__dirname, "/tmp/code.txt");
-//   //function to get the parent dir of tmp file
-//   let getDirName = path.dirname;
-//   // mks the parent dir if it doesn't exist
-//   mkdirp(getDirName(filePath), function (err) {
-//     if (err) throw err;
-//     fs.writeFile(filePath, string, { flag: "w" }, function (err) {
-//       if (err) throw err;
-//       console.log("Saved!");
-//       compilePython(
-//         filePath,
-//         function (output) {
-//           // console.log("this comes back");
-//           // console.log("this is output "+ output);
-//           res.json({ path: filePath, string: output });
-//         },
-//         req.session.currSession
-//       );
-//     });
-//   });
-// });
-
-// // Function to convert an Uint8Array to a string
-// var decoduint8array = function (data) {
-//   return new TextDecoder("utf-8").decode(data);
-// };
-
-// function compilePython(path, callback, course) {
-//   let output = "";
-//   let pythonPath = process.env.PYTHON_PATH || "/usr/local/bin/python";
-
-//   const spawn = require("child_process").spawn;
-
-//   const compilescript = spawn(pythonPath, [path]);
-
-//   //output
-//   compilescript.stdout.on("data", (data) => {
-//     // TODO: STREAM OUTPUT
-//     let ret = {
-//       from: "PYTHON",
-//       message: decoduint8array(data),
-//     };
-//     wss.clients.forEach((client) => {
-//       if (client.course === course) {
-//         client.send(JSON.stringify(ret));
-//       }
-//     });
-//     output = output + decoduint8array(data);
-//     // console.log(decoduint8array(data));
-//   });
-
-//   // error
-//   compilescript.stderr.on("data", (data) => {
-//     let ret = {
-//       from: "PYTHON",
-//       message: decoduint8array(data),
-//     };
-//     wss.clients.forEach((client) => {
-//       if (client.course === course) {
-//         client.send(JSON.stringify(ret));
-//       }
-//     });
-//     output = output + decoduint8array(data);
-//     // console.log(decoduint8array(data));
-//   });
-
-//   // exit
-//   compilescript.on("exit", (code) => {
-//     console.log("Exit code : " + code);
-//     console.log(output);
-//     // console.log("this is the string output;");
-//     callback(output);
-//     //return output;
-//   });
-// }
-
-// /////////////////////////////////////////////////////////////////
