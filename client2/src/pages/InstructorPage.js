@@ -34,13 +34,13 @@ function InstructorView(props) {
     getCourses(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function getUsers(page=0) {
+  function getUsers(page = 0) {
     api.getUsers(page).then((res) => {
       setStudents(res);
     });
   }
 
-  function getCourses(page=0) {
+  function getCourses(page = 0) {
     api.getCourses(page).then((res) => {
       setCourses(res);
     });
@@ -58,20 +58,13 @@ function InstructorView(props) {
         setNotification("Successfully added user to the course");
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         setNotification("User is already in the course or IDs do not exist");
       })
       .finally(() => {
         formRef.current.reset();
       });
   }
-
-  // function setValue(ref, id) {
-  //   return function(e) {
-  //     console.log(ref.current);
-  //     ref.current.focus();
-  //   }
-  // }
 
   function searchStudent() {
     if (values.searchStudent === "") {
@@ -106,36 +99,35 @@ function InstructorView(props) {
 
   useEffect(() => {
     if (values.userPage > 1 && students.length === 0) {
-      setValues({...values, userPage: values.userPage - 1});
+      setValues({ ...values, userPage: values.userPage - 1 });
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [students]);
 
   useEffect(() => {
     if (values.coursePage > 1 && courses.length === 0) {
-      setValues({...values, coursePage: values.coursePage - 1});
+      setValues({ ...values, coursePage: values.coursePage - 1 });
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courses]);
 
-
   const nextUserPage = () => {
-    setValues({...values, userPage: values.userPage + 1});
-  }
+    setValues({ ...values, userPage: values.userPage + 1 });
+  };
 
   const prevUserPage = () => {
     if (values.userPage > 0) {
-      setValues({...values, userPage: values.userPage - 1});
+      setValues({ ...values, userPage: values.userPage - 1 });
     }
-  }
+  };
 
   const nextCoursePage = () => {
-    setValues({...values, coursePage: values.coursePage + 1});
-  }
+    setValues({ ...values, coursePage: values.coursePage + 1 });
+  };
 
   const prevCoursePage = () => {
-    if (values.coursePage > 0)  {
-      setValues({...values, coursePage: values.coursePage - 1});
+    if (values.coursePage > 0) {
+      setValues({ ...values, coursePage: values.coursePage - 1 });
     }
-  }
+  };
 
   const styles = useStyles();
 
@@ -201,7 +193,7 @@ function InstructorView(props) {
           </Button>
         </div>
 
-        <div style={{display: "inline-block", width: "50vw"}}>
+        <div style={{ display: "inline-block", width: "50vw" }}>
           <Typography color="textPrimary" variant="h6">
             Users
           </Typography>
@@ -217,7 +209,10 @@ function InstructorView(props) {
           />
         </div>
 
-        <div className={styles.studentsClass} style={{display: "inline-block", width: "50vw"}}>
+        <div
+          className={styles.studentsClass}
+          style={{ display: "inline-block", width: "50vw" }}
+        >
           <Typography color="textPrimary" variant="h6">
             Courses
           </Typography>

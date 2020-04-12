@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import Editor from "../containers/Editor.js";
 import { TYPE_TA, TYPE_STUDENT } from "../Constants";
-// import http from "../http";
 import api from "../http/apiController.js";
 import Logout from "../components/Logout.js";
 
@@ -15,6 +13,8 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  Typography,
+  CircularProgress,
 } from "@material-ui/core";
 import { setSession } from "../redux/actions/userActions";
 
@@ -26,6 +26,8 @@ export default function Sessions(props) {
   const [courses, setCourses] = useState([]);
   const [courseCode, setCourseCode] = useState("");
   const [formNotification, setFormNotification] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const dispatch = useDispatch();
 
   const role = useSelector((state) => state.userReducer.userType);
@@ -37,31 +39,37 @@ export default function Sessions(props) {
       api
         .getSessions()
         .then((res) => {
-          console.log(res);
           setCourses(res);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err))
+        .finally(() => {
+          setLoading(false);
+        });
     } else if (role === TYPE_TA) {
       api
         .getUserCourses()
         .then((res) => {
-          console.log(res);
           setCourses(res);
         })
-        .catch((err) => console.log(err));
-    } // eslint-disable-next-line react-hooks/exhaustive-deps
+        .catch((err) => console.error(err))
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   }, []);
 
   function joinCourse(e) {
     e.preventDefault();
 
-    api.joinCourse(courseCode).then((res) => {
-      console.log("joined course");
-      setFormNotification("Successfully joined course!");
-    })
-    .catch((err) => {
-      setFormNotification(err);
-    });
+    api
+      .joinCourse(courseCode)
+      .then((res) => {
+        setFormNotification("Successfully joined course!");
+      })
+      .catch((err) => {
+        console.error(err);
+        setFormNotification(err);
+      });
   }
 
   function handleChange(e) {
@@ -87,60 +95,67 @@ export default function Sessions(props) {
           <Button type="submit" color="primary" variant="contained">
             Join Course
           </Button>
-          <div id="notification">{formNotification}</div>
+          <Typography align="center" id="notification" color="error">
+            {formNotification}
+          </Typography>
         </div>
       </form>
       <List>
-        <ListSubheader component="div">Courses</ListSubheader>
-        {courses.map((courseInfo, index) => {
-          let course = courseInfo.course;
-          let sessionExists = courseInfo.exists;
-          return (
-            <ListItem
-              button
-              onClick={() => {
-                if (role === TYPE_STUDENT || sessionExists) {
-                  api
-                    .joinSession(course)
-                    .then((res) => {
-                      console.log(res);
-                      dispatch(setSession(course));
-                      props.history.push(
-                        role === TYPE_STUDENT ? "/student" : "/ta"
-                      );
-                    })
-                    .catch((err) => console.log(err));
-                } else if (role === TYPE_TA) {
-                  api
-                    .startSession(course)
-                    .then((res) => {
-                      dispatch(setSession(course));
-
-                      console.log(res);
-                      props.history.push("/ta");
-                    })
-                    .catch((err) => console.log(err));
-                }
-              }}
-            >
-              <ListItemIcon>
-                {role === TYPE_STUDENT || sessionExists ? (
-                  <PlayArrowRoundedIcon />
-                ) : (
-                  <AddRoundedIcon />
-                )}
-              </ListItemIcon>
-              <ListItemText
-                className={styles.sessionText}
-                primary={
-                  role === TYPE_STUDENT || sessionExists
-                    ? `Join Session for course ${course}`
-                    : `Create Session for course ${course}`
-                }
-              />
-            </ListItem>
-          );
-        })}
+        <ListSubheader component="h3">Courses</ListSubheader>
+        {loading ? (
+          <>
+            <CircularProgress align="center" />
+            <Typography color="textPrimary">Loading Courses</Typography>
+          </>
+        ) : (
+          courses.map((courseInfo, index) => {
+            let course = courseInfo.course;
+            let sessionExists = courseInfo.exists;
+            return (
+              <ListItem
+                button
+                onClick={() => {
+                  if (role === TYPE_STUDENT || sessionExists) {
+                    api
+                      .joinSession(course)
+                      .then((res) => {
+                        dispatch(setSession(course));
+                        props.history.push(
+                          role === TYPE_STUDENT ? "/student" : "/ta"
+                        );
+                      })
+                      .catch((err) => console.log(err));
+                  } else if (role === TYPE_TA) {
+                    api
+                      .startSession(course)
+                      .then((res) => {
+                        dispatch(setSession(course));
+                        props.history.push("/ta");
+                      })
+                      .catch((err) => console.log(err));
+                  }
+                }}
+                key={index}
+              >
+                <ListItemIcon>
+                  {role === TYPE_STUDENT || sessionExists ? (
+                    <PlayArrowRoundedIcon />
+                  ) : (
+                    <AddRoundedIcon />
+                  )}
+                </ListItemIcon>
+                <ListItemText
+                  className={styles.sessionText}
+                  primary={
+                    role === TYPE_STUDENT || sessionExists
+                      ? `Join Session for course ${course}`
+                      : `Create Session for course ${course}`
+                  }
+                />
+              </ListItem>
+            );
+          })
+        )}
       </List>
     </div>
   );

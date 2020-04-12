@@ -10,7 +10,7 @@ exports.signup = (username, password, role, name) => {
     })
     .then((res) => res.data)
     .catch((err) => {
-      console.log(err.response);
+      console.error(err.response);
       throw err.response.data || err.response.responseText;
     });
 };
@@ -20,7 +20,7 @@ exports.login = (username, password) => {
     .post("/api/login", { username: username, password: password })
     .then((res) => res.data)
     .catch((err) => {
-      console.log(err.response);
+      console.error(err.response);
       throw err.response.data || err.response.responseText;
     });
 };
@@ -30,7 +30,7 @@ exports.signout = () => {
     .get("/api/signout")
     .then((res) => res.data)
     .catch((err) => {
-      console.log(err.response);
+      console.error(err.response);
       throw err.response.data || err.response.responseText;
     });
 };

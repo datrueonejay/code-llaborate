@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 
-// import { Button, Form } from "react-bootstrap";
 import { Button } from "@material-ui/core";
 
 import AceEditor from "react-ace";
@@ -16,7 +15,6 @@ import useSharedStyles from "../styles/SharedStyles.module";
 import clsx from "clsx";
 
 export default function TaCodeEditor(props) {
-
   // Snippet taken from https://stackoverflow.com/questions/40589302/how-to-enable-file-upload-on-reacts-material-ui-simple-input
 
   const editorRef = useRef(null);
@@ -25,7 +23,6 @@ export default function TaCodeEditor(props) {
 
   function onChange(newValue) {
     props.onCodeChange(newValue);
-    // setCode(newValue);
   }
 
   // https://stackoverflow.com/questions/55830414/how-to-read-text-file-in-react
@@ -37,8 +34,6 @@ export default function TaCodeEditor(props) {
         let code = ev.target.result;
         props.onReadFile(code);
         onChange(code);
-        // props.onCodeChange(code);
-        // setCode(code);
       };
       reader.readAsText(e.target.files[0]);
     }
@@ -54,7 +49,6 @@ export default function TaCodeEditor(props) {
         mode="python"
         theme="monokai"
         name="AceEditor"
-        // onLoad={this.onLoad}
         onChange={onChange}
         value={props.code}
         fontSize={14}

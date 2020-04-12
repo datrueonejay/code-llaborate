@@ -3,7 +3,6 @@
  */
 
 import React, { useState } from "react";
-// import "./Home.css";
 import { useDispatch } from "react-redux";
 import { setType, setAuth } from "../redux/actions/userActions";
 import useStyles from "../styles/HomePageStyles.module";
@@ -19,6 +18,7 @@ import {
   MenuItem,
   Grid,
   FormControl,
+  Typography,
 } from "@material-ui/core";
 
 import { TYPE_INSTRUCTOR } from "../Constants.js";
@@ -67,10 +67,7 @@ export default function SignUp(props) {
     >
       {" "}
       <div className={sharedStyles.title}>Code-llaborate</div>
-      <form
-        onSubmit={(e) => submit(e)}
-        className={homePageStyles.loginForm}
-      >
+      <form onSubmit={(e) => submit(e)} className={homePageStyles.loginForm}>
         <Grid container direction="column" spacing={2}>
           <Grid item>
             <TextField
@@ -130,7 +127,9 @@ export default function SignUp(props) {
       <Link to="/" className={homePageStyles.signUpElement}>
         Back to login
       </Link>
-      <div className={sharedStyles.errorText}>{notificationText}</div>
+      <Typography align="center" color="error">
+        {notificationText}
+      </Typography>
     </Grid>
   );
 }

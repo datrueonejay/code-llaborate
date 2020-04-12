@@ -3,19 +3,12 @@
  */
 
 import React, { useState } from "react";
-// import "./Home.css";
 import { useDispatch } from "react-redux";
 import { setType, setAuth } from "../redux/actions/userActions";
 import useStyles from "../styles/HomePageStyles.module";
 import useSharedStyles from "../styles/SharedStyles.module";
 
-// import "../scss/Home.scss";
-
-import {
-  TextField,
-  Button,
-  Grid,
-} from "@material-ui/core";
+import { TextField, Button, Grid, Typography } from "@material-ui/core";
 
 import { TYPE_INSTRUCTOR } from "../Constants.js";
 import { Link } from "react-router-dom";
@@ -95,7 +88,9 @@ export default function Login(props) {
       <Link to="/signup" className={homePageStyles.signUpElement}>
         Sign Up Here
       </Link>
-      <div className={sharedStyles.errorText}>{notificationText}</div>
+      <Typography align="center" color="error">
+        {notificationText}
+      </Typography>
     </Grid>
   );
 }

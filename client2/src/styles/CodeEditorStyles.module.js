@@ -31,7 +31,11 @@ let useStyles = makeStyles((theme) => ({
   runEditorButton: {
     marginTop: 5,
     marginBottom: 5,
-  }
+  },
+  studentSuggestionForm: {
+    display: "flex",
+    flexDirection: "column",
+  },
 }));
 
 export default useStyles;

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import TaCodeEditor from "../components/TaCodeEditor.js";
-// import http from "../http";
 import websocket from "../http/socketController.js";
 import api from "../http/apiController.js";
 
@@ -14,7 +13,6 @@ import useSharedStyles from "../styles/SharedStyles.module";
 import Drawer from "../components/Drawer.js";
 import useStyles from "../styles/TaStudentPageStyles.module.js";
 import clsx from "clsx";
-// import "brace/theme/terminal";
 import PythonOutput from "../components/PythonOutput.js";
 
 function TeachingAssistantView(props) {
@@ -32,15 +30,11 @@ function TeachingAssistantView(props) {
   useEffect(() => {
     websocket.connect(
       () => {
-        console.log("Connected successfully!");
         setConnecting(false);
       },
-      () => {
-        console.log("Could not connect");
-      }
+      () => {}
     );
     websocket.code_listener((code) => {
-      console.log("settings code");
       setCode(code);
     });
 
@@ -68,32 +62,26 @@ function TeachingAssistantView(props) {
         }}
       />
       <div className={sharedStyles.leaveSession}>
-      <Link to="/sessions">
-        <Button
-          variant="contained"
-          onClick={() => {
-            api.stopSession(session).then((res) => {
-              dispatch(setSession(null));
-              console.log(res);
-              // returnToSessions();
-            });
-          }}
-          color="primary"
-        >
-          Destroy and Leave Session
-        </Button>
-      </Link>
+        <Link to="/sessions">
+          <Button
+            variant="contained"
+            onClick={() => {
+              api.stopSession(session).then((res) => {
+                dispatch(setSession(null));
+              });
+            }}
+            color="primary"
+          >
+            Destroy and Leave Session
+          </Button>
+        </Link>
       </div>
       <div className={styles.bodyContainer}>
         <TaCodeEditor
           onCodeChange={(code) => {
             websocket.send_code(code);
           }}
-          onExecute={(code) =>
-            api.executePython(code).then((res) => {
-              console.log(res);
-            })
-          }
+          onExecute={(code) => api.executePython(code).then((res) => {})}
           code={code}
           onReadFile={(code) => setCode(code)}
         />

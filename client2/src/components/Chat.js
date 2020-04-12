@@ -1,5 +1,4 @@
 import React from "react";
-// import http from "../http";
 import { Form } from "react-bootstrap";
 import { FixedSizeList as List } from "react-window";
 
@@ -11,23 +10,36 @@ import {
   CardContent,
 } from "@material-ui/core";
 
+let getTime = (utcDateString) => {
+  let date = new Date(utcDateString);
+  let hours = date.getHours();
+  let ending = "AM";
+  if (hours === 0) {
+    hours = 12;
+  } else if (hours > 12) {
+    hours -= 12;
+    ending = "AM";
+  }
+  let minutes = date.getMinutes();
+  return `${hours}:${minutes < 10 ? "0" : ""}${minutes} ${ending}`;
+};
+
 function Chat(props) {
   let handleSubmitChat = (event) => {
     event.preventDefault();
     props.sendChat(document.querySelector("#chatText").value);
   };
 
-  // TODO: Fill in username/possibly time?
-
   let Chat = ({ index, style }) => {
+    let { message, time, user } = props.chatOut[index];
     return (
       <div style={style}>
         <Card variant="outlined">
           <CardContent>
-            <Typography color="textPrimary">Anonymous</Typography>
             <Typography color="textSecondary">
-              {props.chatOut[index]}
+              {user} at {getTime(time)}
             </Typography>
+            <Typography color="textPrimary">{message}</Typography>
           </CardContent>
         </Card>
       </div>
@@ -39,7 +51,6 @@ function Chat(props) {
       <Typography align="center" variant="h4" color="textPrimary">
         Chat
       </Typography>
-      {/* <div className={sharedStyles.subTitle}>Chat</div> */}
       <List
         height={props.height || 400}
         itemSize={150}
@@ -48,17 +59,6 @@ function Chat(props) {
       >
         {Chat}
       </List>
-      {/* <nav className="listMessage">
-        <ul>
-          {props.chatOut.map((chat, index) => {
-            return (
-              <li key={index} id={chat}>
-                {chat}
-              </li>
-            );
-          })}
-        </ul>
-      </nav> */}
       <Form onSubmit={handleSubmitChat}>
         <div>
           <TextField
@@ -66,6 +66,7 @@ function Chat(props) {
             name="chat"
             className="chatText"
             id="chatText"
+            fullWidth
           ></TextField>
           <Button type="submit" variant="contained" color="primary" fullWidth>
             Send Message

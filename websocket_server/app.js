@@ -53,6 +53,11 @@ let authenticated = (req, res, next) => {
   next();
 };
 
+let inSession = (req, res, next) => {
+  if (!req.session.currSession)
+    return res.status(403).end("Not currently in a session.");
+};
+
 let isInstructor = (req, res, next) => {
   if (!req.session.user.role === "INSTRUCTOR")
     return res.status(401).end("Access denied");
@@ -133,31 +138,38 @@ app.post(
     if (!courseCode) {
       return res.status(400).end("Bad Request");
     }
-    return getCourseIdFromCode(courseCode).then((courseID) => {
-      userID = req.session.user.id;
-      return db.checkCourse(courseID, (err, results) => {
-        if (err) return res.status(500).end(err);
+    return getCourseIdFromCode(courseCode)
+      .then((courseID) => {
+        userID = req.session.user.id;
+        return db.checkCourse(courseID, (err, results) => {
+          if (err) return res.status(500).end(err);
 
-        // if course found
-        if (results.length > 0) {
-          return db.addToCourse(userID, courseID, (err, results) => {
-            if (err) {
-              return res.status(500).end(err);
-            }
-
-            return db.findClasses(req.session.user.username, (err, classes) => {
+          // if course found
+          if (results.length > 0) {
+            return db.addToCourse(userID, courseID, (err, results) => {
               if (err) {
                 return res.status(500).end(err);
               }
-              req.session.classes = classes;
-              return res.json(classes);
+
+              return db.findClasses(
+                req.session.user.username,
+                (err, classes) => {
+                  if (err) {
+                    return res.status(500).end(err);
+                  }
+                  req.session.classes = classes;
+                  return res.json(classes);
+                }
+              );
             });
-          });
-        } else {
-          return res.status(400).end("Course Does Not Exist");
-        }
+          } else {
+            return res.status(400).end("Course Does Not Exist");
+          }
+        });
+      })
+      .catch((err) => {
+        return res.status(400).end("Course Code Does Not Exist");
       });
-    });
   }
 );
 
@@ -202,6 +214,8 @@ app.post(
                     JSON.stringify([]),
                     "chat",
                     JSON.stringify([]),
+                    "output",
+                    "",
                     (err, reply) => {
                       if (err) {
                         return res.status(500).end("Internal Server Error");
@@ -265,6 +279,7 @@ app.post(
 app.delete(
   "/api/deleteSession",
   authenticated,
+  inSession,
   [body("course").escape()],
   (req, res, next) => {
     return redisClient.hget(req.body.course, "startedBy", (err, id) => {
@@ -446,13 +461,43 @@ app.post("/api/python", authenticated, (req, res, next) => {
   python.executePython(
     code,
     (output) => {
-      sendClients(req.session.currSession, output, from);
+      return redisClient.hget(
+        req.session.currSession,
+        "output",
+        (err, oldOutput) => {
+          if (err) return res.status(500).end("internal Server Error");
+          return redisClient.hset(
+            req.session.currSession,
+            "output",
+            oldOutput + output,
+            (err, reply) => {
+              if (err) return res.status(500).end("internal Server Error");
+              return sendClients(req.session.currSession, output, from);
+            }
+          );
+        }
+      );
     },
-    (err) => {
-      sendClients(req.session.currSession, err, from);
+    (errOutput) => {
+      return redisClient.hget(
+        req.session.currSession,
+        "output",
+        (err, oldOutput) => {
+          if (err) return res.status(500).end("internal Server Error");
+          return redisClient.hset(
+            req.session.currSession,
+            "output",
+            oldOutput + errOutput,
+            (err, reply) => {
+              if (err) return res.status(500).end("internal Server Error");
+              return sendClients(req.session.currSession, errOutput, from);
+            }
+          );
+        }
+      );
     },
     (exitCode) => {
-      return res.json("OK");
+      return res.json("Finished");
     }
   );
 });
@@ -505,14 +550,19 @@ wss.on("session", (ws, req) => {
         if (err) return;
         let messages = JSON.parse(chat);
         let message = parsedMsg.message;
-        messages.push(message);
+        let data = {
+          message: message,
+          time: new Date().toUTCString(),
+          user: req.session.user.name,
+        };
+        messages.push(data);
         return redisClient.hset(
           ws.course,
           "chat",
           JSON.stringify(messages),
           (err, reply) => {
             if (err) return;
-            return sendClients(ws.course, message, "CHAT");
+            return sendClients(ws.course, data, "CHAT");
 
             // return sendClients(ws.course, messages, req.session.user.role);
           }
@@ -559,12 +609,15 @@ wss.on("session", (ws, req) => {
   // Send initial data about session
   redisClient.hgetall(req.session.currSession, (err, res) => {
     let code = res.code;
-
+    let output = res.output;
     let suggestions = JSON.parse(res.suggestions);
     let chat = JSON.parse(res.chat);
 
     ws.send(
-      JSON.stringify({ from: "INITIAL", message: { code, suggestions, chat } })
+      JSON.stringify({
+        from: "INITIAL",
+        message: { code, suggestions, chat, output },
+      })
     );
   });
 });
@@ -614,9 +667,9 @@ server.on("upgrade", (req, socket, head) => {
 
 function getCourseIdFromCode(courseCode) {
   return new Promise(function (resolve, reject) {
-    redisClient.hgetall("courseCodes", (err, courseCodes) => {
-      if (err) reject();
-      resolve(
+    return redisClient.hgetall("courseCodes", (err, courseCodes) => {
+      if (err || !courseCodes) return reject();
+      return resolve(
         Object.keys(courseCodes).find((key) => courseCodes[key] === courseCode)
       );
     });

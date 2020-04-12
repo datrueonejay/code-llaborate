@@ -14,22 +14,17 @@ let http = (function () {
     );
 
     exampleSocket.onopen = (e) => {
-      console.log("connection and opened");
-      console.log(e);
       onopen();
     };
 
     exampleSocket.onerror = function (error) {
-      console.log("WebSocket Error ");
-      console.log(error);
+      console.error(error);
       onerror();
     };
 
     exampleSocket.onmessage = function (e) {
-      console.log("Server: " + e.data);
       let res = JSON.parse(e.data);
       let from = res.from;
-      console.log(`message from ${from}`);
       if (from === "TEACHING ASSISTANT" && res.type !== "CHAT") {
         codeListeners.forEach((listener) => {
           listener(res.message);
@@ -43,19 +38,16 @@ let http = (function () {
           listener(res.message);
         });
       } else if (from === "INITIAL") {
-        // console.log(typeof res.message);
-        // initialListeners.forEach((listener) => {
-        //   listener(res.message);
-        // });
-        let { code, suggestions, chat } = res.message;
-        console.log(code);
-        console.log(typeof suggestions);
-        console.log(chat);
+        let { code, suggestions, chat, output } = res.message;
         codeListeners.forEach((listener) => {
           listener(code);
         });
+        if (output) {
+          pythonListeners.forEach((listener) => {
+            listener(output);
+          });
+        }
         suggestions.forEach((suggestion) => {
-          console.log(suggestion);
           suggestionListeners.forEach((listener) => {
             listener(suggestion);
           });
@@ -66,8 +58,7 @@ let http = (function () {
           });
         });
       } else {
-        console.log("DEFAULT SUGGESTIONS");
-        console.log(res.message);
+        // Suggestions
         suggestionListeners.forEach((listener) => {
           listener(res.message);
         });

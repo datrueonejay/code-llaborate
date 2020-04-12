@@ -26,42 +26,45 @@ exports.executePython = (code, onOutput, onError, onExit) => {
   */
 
   let getDirName = path.dirname;
-
   // mks the parent dir if it doesn't exist
-  mkdirp(getDirName(filePath), function (err) {
-    if (err) throw err;
-    fs.writeFile(filePath, code, { flag: "w" }, function (err) {
-      if (err) throw err;
-      // Execute python code
-      // TODO: Replace with pypy sandbox
-      //TODO: check timeout
+  mkdirp(getDirName(filePath))
+    .then((made) => {
+      fs.writeFile(filePath, code, { flag: "w" }, function (err) {
+        if (err) throw err;
+        // Execute python code
+        // TODO: Replace with pypy sandbox
+        //TODO: check timeout
 
-      let compileScript = spawn(pythonPath, [filePath]);
+        let compileScript = spawn(pythonPath, [filePath]);
 
-      /**  UNCOMMENT LET LINE FOR PYPY
+        /**  UNCOMMENT LET LINE FOR PYPY
       let compileScript = spawn(pythonPath, [ pypyInteractPath, `--tmp=${getDirName(filePath)}`, "--timeout=3", pypySandbox, "-S",  codePath]);
       */
 
-      compileScript.stdout.on("data", (data) => {
-        let string = byteToString(data);
-        onOutput(string);
-      });
-
-      compileScript.stderr.on("data", (data) => {
-        let string = byteToString(data);
-        onError(string);
-      });
-
-      compileScript.on("exit", (code) => {
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.error(err);
-          }
+        compileScript.stdout.on("data", (data) => {
+          let string = byteToString(data);
+          onOutput(string);
         });
-        onExit(code);
+
+        compileScript.stderr.on("data", (data) => {
+          let string = byteToString(data);
+          onError(string);
+        });
+
+        compileScript.on("exit", (code) => {
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error(err);
+            }
+          });
+          onExit(code);
+        });
       });
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
     });
-  });
 };
 
 //https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript

@@ -49,21 +49,24 @@ export default function StudentSuggestion(props) {
         height="250px"
         width="100%"
       />
-      <TextField
-        id="lineNum"
-        label="Line Number for Suggestion"
-        type="number"
-        onChange={(e) => setLineNum(e.target.value)}
-      />
-      <Button
-        onClick={() => {
+      <form
+        className={styles.studentSuggestionForm}
+        onSubmit={(e) => {
+          e.preventDefault();
           props.onSuggest(lineNum, code);
         }}
-        color="primary"
-        variant="contained"
       >
-        Suggest Code
-      </Button>
+        <TextField
+          id="lineNum"
+          label="Line Number for Suggestion"
+          type="number"
+          required
+          onChange={(e) => setLineNum(e.target.value)}
+        />
+        <Button type="submit" color="primary" variant="contained">
+          Suggest Code
+        </Button>
+      </form>
     </div>
   );
 }

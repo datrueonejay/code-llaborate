@@ -21,7 +21,6 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 
-
 export default function StudentView(props) {
   const [open, setOpen] = useState(false);
 
@@ -81,7 +80,6 @@ export default function StudentView(props) {
           <Chat
             chatOut={props.chatOut}
             sendChat={(message) => {
-              console.log(message);
               websocket.send_chat(message);
             }}
           ></Chat>

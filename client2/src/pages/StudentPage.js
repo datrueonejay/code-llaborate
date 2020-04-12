@@ -3,7 +3,7 @@ import websocket from "../http/socketController.js";
 
 import clsx from "clsx";
 
-import {CircularProgress, Button } from "@material-ui/core";
+import { CircularProgress, Button } from "@material-ui/core";
 
 import Drawer from "../components/Drawer.js";
 import StudentCodeEditor from "../components/StudentCodeEditor.js";
@@ -35,12 +35,13 @@ export default function StudentView(props) {
 
   useEffect(() => {
     websocket.connect(
+      // On connect
       () => {
-        console.log("Connected successfully!");
         setConnecting(false);
       },
+      // On Error
       () => {
-        console.log("Could not connect");
+        console.error("Could not connect");
       }
     );
     websocket.code_listener((message) => {
@@ -66,22 +67,21 @@ export default function StudentView(props) {
       <Drawer
         chatOut={chatOut}
         sendChat={(message) => {
-          console.log(message);
           websocket.send_chat(message);
         }}
       />
       <div className={sharedStyles.leaveSession}>
-      <Link to="/sessions">
-        <Button
-          variant="contained"
-          onClick={() => {
-            dispatch(setSession(null));
-          }}
-          color="primary"
-        >
-          Leave Session
-        </Button>
-      </Link>
+        <Link to="/sessions">
+          <Button
+            variant="contained"
+            onClick={() => {
+              dispatch(setSession(null));
+            }}
+            color="primary"
+          >
+            Leave Session
+          </Button>
+        </Link>
       </div>
       <div className={styles.bodyContainer}>
         <StudentCodeEditor code={code} />
@@ -91,15 +91,14 @@ export default function StudentView(props) {
             styles.studentSuggestionContainer
           )}
         >
-          <div className={sharedStyles.sessionSuggestion} >
-          <Suggestions suggestions={suggestions} height={300} />
-          
+          <div className={sharedStyles.sessionSuggestion}>
+            <Suggestions suggestions={suggestions} height={300} />
 
-          <StudentSuggestion
-            onSuggest={(lineNum, code) => {
-              websocket.send_suggestion(lineNum, code);
-            }}
-          />
+            <StudentSuggestion
+              onSuggest={(lineNum, code) => {
+                websocket.send_suggestion(lineNum, code);
+              }}
+            />
           </div>
         </div>
       </div>

@@ -22,11 +22,9 @@ const darkTheme = createMuiTheme({
 });
 
 function App() {
-  const authenticate = useSelector((state) => state.userReducer.auth);
   const type = useSelector((state) => state.userReducer.userType);
 
   let isStudent = type === "STUDENT";
-  console.log(authenticate);
 
   // Private route notes: the redirect currently goes to login, wen eed to make an unauthorized page or a 404 page ?? TODO
   return (
