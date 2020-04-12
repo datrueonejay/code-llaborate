@@ -79,10 +79,8 @@ export default function Sessions(props) {
 
   return (
     <div className={sharedStyles.background}>
-      <div className={sharedStyles.title}>Code-llaborate</div>
-
       <Logout />
-
+      <div className={sharedStyles.title}>Code-llaborate</div>
       <form onSubmit={joinCourse}>
         <div className={styles.joinCourseContainer}>
           <TextField
