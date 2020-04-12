@@ -125,14 +125,14 @@ exports.searchUser = (query, cb) => {
 
 exports.getUsers = (page = 0, cb) => {
   let sql =
-    "SELECT Name, Users.ID, Role FROM Users inner join Roles on Users.ID = Roles.ID ORDER BY ID LIMIT ?, 50";
-  connection.query(sql, [page * 50], cb);
+    "SELECT Name, Users.ID, Role FROM Users inner join Roles on Users.RoleID = Roles.ID ORDER BY ID LIMIT ?, 25";
+  connection.query(sql, [page * 25], cb);
 };
 
 //TODO: perhaps change it so only the isntructors who are a part of the course can see the course???????
-exports.getCourses = (cb) => {
-  let sql = "SELECT * from Courses";
-  connection.query(sql, cb);
+exports.getCourses = (page, cb) => {
+  let sql = "SELECT * from Courses ORDER BY ID LIMIT ?, 25";
+  connection.query(sql, [page * 25], cb);
 };
 
 exports.addToCourse = (userID, courseID, cb) => {

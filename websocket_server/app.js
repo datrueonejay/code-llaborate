@@ -10,6 +10,9 @@ const redisClient = redis.createClient(
 const crypto = require("crypto");
 const SESSION_EXPIRE_TIME = 7200; // in seconds
 
+// ENV init
+require('dotenv').config();
+
 // DB api init
 const db = require("./database");
 
@@ -242,28 +245,32 @@ app.post(
     //
     return db.checkCourse(courseID, (err, result) => {
       if (err) return res.status(422).end("Bad input");
-      return redisClient.hget("courseCodes", courseID, (err, reply) => {
-        console.log(err);
-        if (err) return res.status(500).end("Internal Server Error");
-        console.log(reply);
-        if (!reply) {
-          let code = crypto
-            .createHash("md5")
-            .update(req.body.courseID + Date.now().toString())
-            .digest("hex");
-          return redisClient.hset(
-            "courseCodes",
-            courseID,
-            code,
-            (err, reply2) => {
-              redisClient.expire(`courseCodes`, SESSION_EXPIRE_TIME);
-              return res.json(code);
-            }
-          );
-        } else {
-          return res.json(reply);
-        }
-      });
+      if (result.length > 0) {
+        return redisClient.hget("courseCodes", courseID, (err, reply) => {
+          console.log(err);
+          if (err) return res.status(500).end("Internal Server Error");
+          console.log(reply);
+          if (!reply) {
+            let code = crypto
+              .createHash("md5")
+              .update(req.body.courseID + Date.now().toString())
+              .digest("hex");
+            return redisClient.hset(
+              "courseCodes",
+              courseID,
+              code,
+              (err, reply2) => {
+                redisClient.expire(`courseCodes`, SESSION_EXPIRE_TIME);
+                return res.json(code);
+              }
+            );
+          } else {
+            return res.json(reply);
+          }
+        });
+      } else {
+        return res.status(422).end("Bad input");
+      }
     });
 
     // return redisClient.exists("courseCodes", (err, num) => {
@@ -402,22 +409,23 @@ app.post(
 app.post(
   "/api/sendemail",
   authenticated,
-  [body("recipient").escape()],
+  [body("recipient").escape(), body("message").escape()],
   (req, res, next) => {
+
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "ENTERHERE", // generated ethereal user
-        pass: "ENTERHERE", // generated ethereal password
+        user: process.env.NODEMAILER_EMAIL, // generated ethereal user
+        pass: process.env.NODEMAILER_PASSWORD, // generated ethereal password
       },
     });
 
     let message = {
       from: "turtlebear41@gmail.com",
-      to: "tapexov866@2go-mail.com",
+      to: req.body.recipient,
       subject: "Join my course!",
-      text: "Plaintext version of the message",
-      html: "<p>OMEGALUL</p>",
+      text: "Join my course using the code!",
+      html: `<p>${req.body.message}</p>`,
     };
 
     transporter.sendMail(message, function (err, info) {
@@ -461,7 +469,8 @@ app.get("/api/users", authenticated, (req, res, next) => {
 });
 
 app.get("/api/getallcourses", authenticated, (req, res, next) => {
-  db.getCourses((err, results, fields) => {
+  let page = req.query.page || 0;
+  db.getCourses(page, (err, results, fields) => {
     if (err) return res.status(500).end(err.message);
     return res.json(results);
   });
