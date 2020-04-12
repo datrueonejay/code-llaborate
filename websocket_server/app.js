@@ -56,6 +56,7 @@ let authenticated = (req, res, next) => {
 let inSession = (req, res, next) => {
   if (!req.session.currSession)
     return res.status(403).end("Not currently in a session.");
+  next();
 };
 
 let isInstructor = (req, res, next) => {

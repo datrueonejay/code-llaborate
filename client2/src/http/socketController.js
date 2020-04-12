@@ -1,102 +1,102 @@
-let http = (function () {
-  const codeListeners = [];
-  const suggestionListeners = [];
-  const pythonListeners = [];
-  const chatListeners = [];
+class SocketConnection {
+  onmessage = (e) => {
+    let res = JSON.parse(e.data);
+    let from = res.from;
+    if (from === "TEACHING ASSISTANT" && res.type !== "CHAT") {
+      this.codeListeners.forEach((listener) => {
+        listener(res.message);
+      });
+    } else if (from === "PYTHON") {
+      this.pythonListeners.forEach((listener) => {
+        listener(res.message);
+      });
+    } else if (from === "CHAT") {
+      this.chatListeners.forEach((listener) => {
+        listener(res.message);
+      });
+    } else if (from === "INITIAL") {
+      let { code, suggestions, chat, output } = res.message;
+      this.codeListeners.forEach((listener) => {
+        listener(code);
+      });
+      if (output) {
+        this.pythonListeners.forEach((listener) => {
+          listener(output);
+        });
+      }
+      suggestions.forEach((suggestion) => {
+        this.suggestionListeners.forEach((listener) => {
+          listener(suggestion);
+        });
+      });
+      chat.forEach((message) => {
+        this.chatListeners.forEach((listener) => {
+          listener(message);
+        });
+      });
+    } else {
+      // Suggestions
+      this.suggestionListeners.forEach((listener) => {
+        listener(res.message);
+      });
+    }
+  };
 
-  let module = {};
-
-  let exampleSocket;
-  module.connect = (onopen, onerror) => {
-    exampleSocket = new WebSocket(
+  constructor(onopen, onerror) {
+    this.codeListeners = [];
+    this.suggestionListeners = [];
+    this.pythonListeners = [];
+    this.chatListeners = [];
+    this.socket = new WebSocket(
       process.env.REACT_APP_SOCKET_URL ||
         `wss://${window.location.host}/api/session`
     );
 
-    exampleSocket.onopen = (e) => {
+    this.socket.onopen = (e) => {
       onopen();
     };
 
-    exampleSocket.onerror = function (error) {
+    this.socket.onerror = function (error) {
       console.error(error);
       onerror();
     };
 
-    exampleSocket.onmessage = function (e) {
-      let res = JSON.parse(e.data);
-      let from = res.from;
-      if (from === "TEACHING ASSISTANT" && res.type !== "CHAT") {
-        codeListeners.forEach((listener) => {
-          listener(res.message);
-        });
-      } else if (from === "PYTHON") {
-        pythonListeners.forEach((listener) => {
-          listener(res.message);
-        });
-      } else if (from === "CHAT") {
-        chatListeners.forEach((listener) => {
-          listener(res.message);
-        });
-      } else if (from === "INITIAL") {
-        let { code, suggestions, chat, output } = res.message;
-        codeListeners.forEach((listener) => {
-          listener(code);
-        });
-        if (output) {
-          pythonListeners.forEach((listener) => {
-            listener(output);
-          });
-        }
-        suggestions.forEach((suggestion) => {
-          suggestionListeners.forEach((listener) => {
-            listener(suggestion);
-          });
-        });
-        chat.forEach((message) => {
-          chatListeners.forEach((listener) => {
-            listener(message);
-          });
-        });
-      } else {
-        // Suggestions
-        suggestionListeners.forEach((listener) => {
-          listener(res.message);
-        });
-      }
-    };
+    this.socket.onmessage = this.onmessage;
+  }
+
+  code_listener = (listener) => {
+    this.codeListeners.push(listener);
   };
 
-  module.code_listener = (listener) => {
-    codeListeners.push(listener);
+  suggestion_listener = (listener) => {
+    this.suggestionListeners.push(listener);
   };
 
-  module.suggestion_listener = (listener) => {
-    suggestionListeners.push(listener);
+  python_listener = (listener) => {
+    this.pythonListeners.push(listener);
   };
 
-  module.python_listener = (listener) => {
-    pythonListeners.push(listener);
+  chat_listener = (listener) => {
+    console.log(this.chatListeners);
+    this.chatListeners.push(listener);
   };
 
-  module.chat_listener = (listener) => {
-    chatListeners.push(listener);
+  send_code = (message) => {
+    this.socket.send(JSON.stringify({ message: message, type: "CODE" }));
   };
 
-  module.send_code = (message) => {
-    exampleSocket.send(JSON.stringify({ message: message, type: "CODE" }));
+  send_chat = (chat) => {
+    this.socket.send(JSON.stringify({ message: chat, type: "CHAT" }));
   };
 
-  module.send_chat = (chat) => {
-    exampleSocket.send(JSON.stringify({ message: chat, type: "CHAT" }));
-  };
-
-  module.send_suggestion = (lineNum, message) => {
-    exampleSocket.send(
-      JSON.stringify({ message: message, type: "SUGGESTION", lineNum: lineNum })
+  send_suggestion = (lineNum, message) => {
+    this.socket.send(
+      JSON.stringify({
+        message: message,
+        type: "SUGGESTION",
+        lineNum: lineNum,
+      })
     );
   };
-
-  return module;
-})();
-
-export default http;
+}
+export default SocketConnection;

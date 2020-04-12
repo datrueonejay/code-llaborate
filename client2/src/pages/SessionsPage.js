@@ -124,7 +124,7 @@ export default function Sessions(props) {
                           role === TYPE_STUDENT ? "/student" : "/ta"
                         );
                       })
-                      .catch((err) => console.log(err));
+                      .catch((err) => console.error(err));
                   } else if (role === TYPE_TA) {
                     api
                       .startSession(course)
@@ -132,7 +132,7 @@ export default function Sessions(props) {
                         dispatch(setSession(course));
                         props.history.push("/ta");
                       })
-                      .catch((err) => console.log(err));
+                      .catch((err) => console.error(err));
                   }
                 }}
                 key={index}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 import Chat from "../components/Chat";
-import websocket from "../http/socketController.js";
 
 import clsx from "clsx";
 import {
@@ -80,7 +79,7 @@ export default function StudentView(props) {
           <Chat
             chatOut={props.chatOut}
             sendChat={(message) => {
-              websocket.send_chat(message);
+              props.sendChat(message);
             }}
           ></Chat>
 

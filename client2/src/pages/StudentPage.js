@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import websocket from "../http/socketController.js";
+import SocketConnection from "../http/socketController.js";
 
 import clsx from "clsx";
 
@@ -11,7 +11,6 @@ import StudentSuggestion from "../components/StudentSuggestion.js";
 
 import Suggestions from "../components/Suggestions";
 
-// import { useStyles } from "../styles/StudentPageStyle.js";
 import useStyles from "../styles/TaStudentPageStyles.module.js";
 
 import { setSession } from "../redux/actions/userActions";
@@ -33,17 +32,14 @@ export default function StudentView(props) {
   const sharedStyles = useSharedStyles();
   const dispatch = useDispatch();
 
+  const websocket = new SocketConnection(
+    () => {
+      setConnecting(false);
+    },
+    () => {}
+  );
+
   useEffect(() => {
-    websocket.connect(
-      // On connect
-      () => {
-        setConnecting(false);
-      },
-      // On Error
-      () => {
-        console.error("Could not connect");
-      }
-    );
     websocket.code_listener((message) => {
       setCode(message);
     });

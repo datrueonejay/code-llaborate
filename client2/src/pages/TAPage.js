@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TaCodeEditor from "../components/TaCodeEditor.js";
-import websocket from "../http/socketController.js";
+import SocketConnection from "../http/socketController.js";
+
 import api from "../http/apiController.js";
 
 import Suggestions from "../components/Suggestions";
@@ -27,20 +28,23 @@ function TeachingAssistantView(props) {
   const dispatch = useDispatch();
   const sharedStyles = useSharedStyles();
   const styles = useStyles();
+  const websocket = new SocketConnection(
+    () => {
+      setConnecting(false);
+    },
+    () => {}
+  );
+
+  const suggestionListener = (suggestion) => {
+    setSuggestions((old) => old.concat(suggestion));
+  };
+
   useEffect(() => {
-    websocket.connect(
-      () => {
-        setConnecting(false);
-      },
-      () => {}
-    );
     websocket.code_listener((code) => {
       setCode(code);
     });
 
-    websocket.suggestion_listener((suggestion) => {
-      setSuggestions((old) => old.concat(suggestion));
-    });
+    websocket.suggestion_listener(suggestionListener);
     websocket.python_listener((output) => {
       setPythonOut((old) => old.concat(output));
     });

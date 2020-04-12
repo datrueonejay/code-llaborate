@@ -25,9 +25,12 @@ let getTime = (utcDateString) => {
 };
 
 function Chat(props) {
+  const listRef = React.createRef();
+
   let handleSubmitChat = (event) => {
     event.preventDefault();
     props.sendChat(document.querySelector("#chatText").value);
+    listRef.current.scrollToItem(props.chatOut.length + 1);
   };
 
   let Chat = ({ index, style }) => {
@@ -52,6 +55,7 @@ function Chat(props) {
         Chat
       </Typography>
       <List
+        ref={listRef}
         height={props.height || 400}
         itemSize={150}
         itemCount={props.chatOut.length}

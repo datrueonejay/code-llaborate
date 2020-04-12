@@ -125,7 +125,6 @@ exports.startSession = (courseId) => {
 };
 
 exports.stopSession = (courseId) => {
-  console.log(courseId);
   return axios
     .delete(`/api/deleteSession`, {
       data: { course: courseId },
