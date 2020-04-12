@@ -7,6 +7,8 @@ import clsx from "clsx";
 
 import AceEditor from "react-ace";
 
+/**Credits: AceEditor http://securingsincity.github.io/react-ace/ */
+
 export default function StudentCodeEditor(props) {
   const editorRef = useRef(null);
   const styles = useStyles();

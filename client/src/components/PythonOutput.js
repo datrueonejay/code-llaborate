@@ -2,6 +2,7 @@ import React from "react";
 import useSharedStyles from "../styles/SharedStyles.module";
 import AceEditor from "react-ace";
 
+/**Credits: AceEditor http://securingsincity.github.io/react-ace/ */
 
 function PythonOutput(props) {
   const sharedStyles = useSharedStyles();

@@ -7,6 +7,8 @@ import AceEditor from "react-ace";
 
 import useStyles from "../styles/CodeEditorStyles.module";
 
+/**Credits: AceEditor http://securingsincity.github.io/react-ace/ */
+
 export default function StudentSuggestion(props) {
   const [code, setCode] = useState("");
   const [lineNum, setLineNum] = useState(0);
@@ -35,9 +37,6 @@ export default function StudentSuggestion(props) {
         highlightActiveLine={true}
         value={code}
         setOptions={{
-          // enableBasicAutocompletion: false,
-          // enableLiveAutocompletion: false,
-          // enableSnippets: false,
           showLineNumbers: true,
           tabSize: 2,
         }}
