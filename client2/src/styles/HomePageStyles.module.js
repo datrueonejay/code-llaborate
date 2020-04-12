@@ -5,11 +5,14 @@ import Background from '../pictures/background_image.jpg';
 let useStyles = makeStyles((theme) => ({
   loginPage: {
     textAlign: "center",
-    // backgroundColor: "#121212",
+    backgroundColor: "#121212",
     // width: "100%",
     height: "100%",
     justifyContent: "center",
-    backgroundImage: `url(${Background})`,
+    background: `url(${Background}) no-repeat center center fixed`,
+    WebkitBackgroundSize: "cover",
+    MozBackgroundSize: "cover",
+    OBackgroundSize: "cover",
     backgroundSize: "cover",
   },
   loginForm: {

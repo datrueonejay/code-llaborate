@@ -12,6 +12,7 @@ let useSharedStyles = makeStyles((theme) => ({
   subTitle: {
     color: "#FFFFFF",
     fontSize: "20px",
+    padding: 10,
   },
   fullwidth: {
     width: "100%",
@@ -20,11 +21,11 @@ let useSharedStyles = makeStyles((theme) => ({
     color: "#CF6679",
   },
   background: {
-    background: `linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${Background})`,
-    // backgroundImage: `url(${Background})`,
+    background: `linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${Background}) no-repeat center center fixed`,
+    WebkitBackgroundSize: "cover",
+    MozBackgroundSize: "cover",
+    OBackgroundSize: "cover",
     backgroundSize: "cover",
-    backgroundColor: "#121212",
-    height: "100%",
   },
   flexGrow: {
     flexGrow: 2,
@@ -32,6 +33,12 @@ let useSharedStyles = makeStyles((theme) => ({
   hideOverflowY: {
     overflowY: "hidden",
   },
+  sessionSuggestion: {
+    paddingLeft: 15,
+  },
+  leaveSession: {
+    margin: 10
+  }
 }));
 
 export default useSharedStyles;
