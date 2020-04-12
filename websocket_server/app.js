@@ -361,16 +361,16 @@ app.post(
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.NODEMAILER_EMAIL, // generated ethereal user
-        pass: process.env.NODEMAILER_PASSWORD, // generated ethereal password
+        user: process.env.NODEMAILER_EMAIL, 
+        pass: process.env.NODEMAILER_PASSWORD, 
       },
     });
 
     let message = {
-      from: "turtlebear41@gmail.com",
+      from: process.env.NODEMAILER_EMAIL,
       to: recipient,
       subject: "Join my course!",
-      text: "Join my course using the code!",
+      text: "Join my course using my code!",
       html: `<p>${req.body.message}</p>`,
     };
 

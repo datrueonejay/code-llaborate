@@ -5,11 +5,6 @@ import { TextField } from "@material-ui/core";
 import { Button } from "@material-ui/core";
 import AceEditor from "react-ace";
 
-// Import a Mode (language)
-import "brace/mode/python";
-
-// Import a Theme
-import "brace/theme/monokai";
 import useStyles from "../styles/CodeEditorStyles.module";
 
 export default function StudentSuggestion(props) {
@@ -40,9 +35,9 @@ export default function StudentSuggestion(props) {
         highlightActiveLine={true}
         value={code}
         setOptions={{
-          enableBasicAutocompletion: false,
-          enableLiveAutocompletion: false,
-          enableSnippets: false,
+          // enableBasicAutocompletion: false,
+          // enableLiveAutocompletion: false,
+          // enableSnippets: false,
           showLineNumbers: true,
           tabSize: 2,
         }}

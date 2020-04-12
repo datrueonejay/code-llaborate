@@ -7,15 +7,6 @@ import clsx from "clsx";
 
 import AceEditor from "react-ace";
 
-// Import a Mode (language)
-import "brace/mode/python";
-
-// Import a Theme
-import "brace/theme/monokai";
-
-// Import Extra tools
-import "brace/ext/language_tools";
-
 export default function StudentCodeEditor(props) {
   const editorRef = useRef(null);
   const styles = useStyles();

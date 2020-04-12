@@ -15,6 +15,10 @@ import Sessions from "./pages/SessionsPage";
 import InstructorView from "./pages/InstructorPage.js";
 import SignUp from "./pages/SignUpPage";
 
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/mode-python";
+import 'ace-builds/webpack-resolver';
+
 const darkTheme = createMuiTheme({
   palette: {
     type: "dark",
