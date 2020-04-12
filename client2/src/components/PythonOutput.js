@@ -1,7 +1,10 @@
 import React from "react";
 import useSharedStyles from "../styles/SharedStyles.module";
 import AceEditor from "react-ace";
-import "brace/theme/terminal";
+
+import "ace-builds/src-noconflict/theme-terminal";
+import "ace-builds/src-noconflict/mode-text";
+
 
 function PythonOutput(props) {
   const sharedStyles = useSharedStyles();
@@ -12,6 +15,7 @@ function PythonOutput(props) {
       <AceEditor
         id="AceEditor2"
         theme="terminal"
+        mode="text"
         name="AceEditor2"
         value={props.pythonOut}
         fontSize={14}

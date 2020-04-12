@@ -3,12 +3,6 @@ import React, { useRef } from "react";
 import { Button } from "@material-ui/core";
 
 import AceEditor from "react-ace";
-
-// Import a Mode (language)
-import "brace/mode/python";
-
-// Import a Theme
-import "brace/theme/monokai";
 import useStyles from "../styles/CodeEditorStyles.module";
 import useSharedStyles from "../styles/SharedStyles.module";
 
@@ -56,9 +50,9 @@ export default function TaCodeEditor(props) {
         showGutter={true}
         highlightActiveLine={true}
         setOptions={{
-          enableBasicAutocompletion: false,
-          enableLiveAutocompletion: false,
-          enableSnippets: false,
+          // enableBasicAutocompletion: false,
+          // enableLiveAutocompletion: false,
+          // enableSnippets: false,
           showLineNumbers: true,
           tabSize: 2,
         }}
