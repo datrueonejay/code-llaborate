@@ -19,14 +19,14 @@ function PrivateRoute(props) {
     if (type === props.for) {
       return <props.component />;
     } else {
-      return <Redirect to="/" />;
+      return <Redirect to="/404NotFound" />;
     }
   }
 
   if (authenticated) {
     return <props.component />;
   } else {
-    return <Redirect to="/" />;
+    return <Redirect to="/401NotAuthenticated" />;
   }
 }
 

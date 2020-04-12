@@ -515,6 +515,10 @@ app.post("/api/python", authenticated, (req, res, next) => {
   );
 });
 
+app.get('*', (req, res) => {                       
+  res.send(app.static("./build"));                               
+});
+
 let sendClients = (course, data, from) => {
   let ret = {
     from: from,
