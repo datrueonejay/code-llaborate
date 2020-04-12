@@ -3,15 +3,14 @@ import websocket from "../http/socketController.js";
 
 import clsx from "clsx";
 
-import { CssBaseline, CircularProgress, Button } from "@material-ui/core";
+import {CircularProgress, Button } from "@material-ui/core";
 
-import Logout from "../components/Logout.js";
 import Drawer from "../components/Drawer.js";
 import StudentCodeEditor from "../components/StudentCodeEditor.js";
 import StudentSuggestion from "../components/StudentSuggestion.js";
 
 import Suggestions from "../components/Suggestions";
-import Chat from "../components/Chat";
+
 // import { useStyles } from "../styles/StudentPageStyle.js";
 import useStyles from "../styles/TaStudentPageStyles.module.js";
 
@@ -23,7 +22,6 @@ import { useDispatch } from "react-redux";
 import PythonOutput from "../components/PythonOutput.js";
 
 export default function StudentView(props) {
-  const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [pythonOut, setPythonOut] = useState("");

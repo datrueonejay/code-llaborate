@@ -1,23 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-import { Form } from "react-bootstrap";
 import Chat from "../components/Chat";
 import websocket from "../http/socketController.js";
 
 import clsx from "clsx";
 import {
-  Button,
   Drawer,
   AppBar,
-  CssBaseline,
-  TextField,
   Toolbar,
   Typography,
   IconButton,
   Divider,
-  List,
-  ListItem,
-  CircularProgress,
 } from "@material-ui/core";
 
 import { useStyles } from "../styles/StudentPageStyle.js";
@@ -28,15 +21,9 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 
-let handleSubmitChat = (event) => {
-  event.preventDefault();
-  let chat = document.querySelector("#chatText").value;
-  // http.send_message(chat, "CHAT");
-};
 
 export default function StudentView(props) {
   const [open, setOpen] = useState(false);
-  const [chatOut, setChatOut] = useState([]);
 
   const classes = useStyles();
   const theme = useTheme();

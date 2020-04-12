@@ -14,11 +14,7 @@ import useSharedStyles from "../styles/SharedStyles.module";
 import {
   TextField,
   Button,
-  Select,
-  InputLabel,
-  MenuItem,
   Grid,
-  Box,
 } from "@material-ui/core";
 
 import { TYPE_INSTRUCTOR } from "../Constants.js";

@@ -68,7 +68,6 @@ export default function SignUp(props) {
       {" "}
       <div className={sharedStyles.title}>Code-llaborate</div>
       <form
-        className="form"
         onSubmit={(e) => submit(e)}
         className={homePageStyles.loginForm}
       >

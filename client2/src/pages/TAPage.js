@@ -4,11 +4,8 @@ import TaCodeEditor from "../components/TaCodeEditor.js";
 import websocket from "../http/socketController.js";
 import api from "../http/apiController.js";
 
-import Logout from "../components/Logout.js";
-
 import Suggestions from "../components/Suggestions";
-import Chat from "../components/Chat";
-import { CircularProgress, Button, CssBaseline, Grid } from "@material-ui/core";
+import { CircularProgress, Button } from "@material-ui/core";
 
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
@@ -17,8 +14,7 @@ import useSharedStyles from "../styles/SharedStyles.module";
 import Drawer from "../components/Drawer.js";
 import useStyles from "../styles/TaStudentPageStyles.module.js";
 import clsx from "clsx";
-import AceEditor from "react-ace";
-import "brace/theme/terminal";
+// import "brace/theme/terminal";
 import PythonOutput from "../components/PythonOutput.js";
 
 function TeachingAssistantView(props) {

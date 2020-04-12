@@ -1,5 +1,3 @@
-import axios from "axios";
-
 let http = (function () {
   const codeListeners = [];
   const suggestionListeners = [];
@@ -32,7 +30,7 @@ let http = (function () {
       let res = JSON.parse(e.data);
       let from = res.from;
       console.log(`message from ${from}`);
-      if (from === "TEACHING ASSISTANT" && res.type != "CHAT") {
+      if (from === "TEACHING ASSISTANT" && res.type !== "CHAT") {
         codeListeners.forEach((listener) => {
           listener(res.message);
         });
@@ -40,7 +38,7 @@ let http = (function () {
         pythonListeners.forEach((listener) => {
           listener(res.message);
         });
-      } else if (from == "CHAT") {
+      } else if (from === "CHAT") {
         chatListeners.forEach((listener) => {
           listener(res.message);
         });

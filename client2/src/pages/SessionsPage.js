@@ -7,18 +7,9 @@ import Logout from "../components/Logout.js";
 
 import { useSelector, useDispatch } from "react-redux";
 
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import clsx from "clsx";
 import {
   Button,
-  Drawer,
-  AppBar,
-  CssBaseline,
   TextField,
-  Toolbar,
-  Typography,
-  IconButton,
-  Divider,
   List,
   ListItem,
   ListItemIcon,
@@ -58,7 +49,7 @@ export default function Sessions(props) {
           setCourses(res);
         })
         .catch((err) => console.log(err));
-    }
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function joinCourse(e) {

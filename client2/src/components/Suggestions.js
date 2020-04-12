@@ -1,12 +1,9 @@
 import React from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-// import { List } from "@material-ui/core";
 import { FixedSizeList as List } from "react-window";
-import AceEditor from "react-ace";
-import "brace/theme/monokai";
 
 // Import Extra tools
-import "brace/ext/language_tools";
+// import "brace/ext/language_tools";
 import { ListItemIcon, ListItem, ListItemText } from "@material-ui/core";
 
 import FileCopyRoundedIcon from "@material-ui/icons/FileCopyRounded";

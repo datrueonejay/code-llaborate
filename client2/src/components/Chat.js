@@ -5,21 +5,11 @@ import { FixedSizeList as List } from "react-window";
 
 import {
   Button,
-  Drawer,
-  AppBar,
-  CssBaseline,
   TextField,
-  Toolbar,
   Typography,
-  IconButton,
-  Divider,
-  ListItem,
-  CircularProgress,
   Card,
   CardContent,
 } from "@material-ui/core";
-import useSharedStyles from "../styles/SharedStyles.module";
-import useStyles from "../styles/ChatStyles.module";
 
 function Chat(props) {
   let handleSubmitChat = (event) => {
@@ -44,8 +34,6 @@ function Chat(props) {
     );
   };
 
-  const sharedStyles = useSharedStyles();
-  const styles = useStyles();
   return (
     <div>
       <Typography align="center" variant="h4" color="textPrimary">
