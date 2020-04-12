@@ -14,6 +14,7 @@ import Sessions from "./pages/SessionsPage";
 
 import InstructorView from "./pages/InstructorPage.js";
 import SignUp from "./pages/SignUpPage";
+import NotFound from "./pages/NotFoundPage";
 
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/mode-python";
@@ -65,6 +66,7 @@ function App() {
             for="INSTRUCTOR"
             component={(props) => <InstructorView {...props} />}
           />
+          <Route component={NotFound} />
         </Switch>
       </Router>
     </ThemeProvider>
