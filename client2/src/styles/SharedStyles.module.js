@@ -5,6 +5,7 @@ let useSharedStyles = makeStyles((theme) => ({
     color: "#FFFFFF",
     fontSize: "45px",
     textAlign: "center",
+    marginBottom: "20px",
   },
   subTitle: {
     color: "#FFFFFF",

@@ -6,6 +6,7 @@ let useStyles = makeStyles((theme) => ({
     backgroundColor: "#121212",
     // width: "100%",
     height: "100%",
+    justifyContent: "center",
   },
   loginForm: {
     alignContent: "center",

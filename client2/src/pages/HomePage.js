@@ -76,7 +76,6 @@ export default function Login(props) {
               required
               fullWidth
               onChange={(e) => setUsername(e.target.value)}
-              color="white"
             />
           </Grid>
           <Grid item>
