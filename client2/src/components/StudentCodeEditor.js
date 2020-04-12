@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import useStyles from "../styles/CodeEditorStyles.module";
 import { Button } from "@material-ui/core";
 import useSharedStyles from "../styles/SharedStyles.module";

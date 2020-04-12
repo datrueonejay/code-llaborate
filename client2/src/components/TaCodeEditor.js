@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 
 // import { Button, Form } from "react-bootstrap";
-import { Button, Input } from "@material-ui/core";
-import Suggestions from "./Suggestions";
+import { Button } from "@material-ui/core";
 
 import AceEditor from "react-ace";
 
@@ -17,7 +16,6 @@ import useSharedStyles from "../styles/SharedStyles.module";
 import clsx from "clsx";
 
 export default function TaCodeEditor(props) {
-  // const [code, setCode] = useState(props.code);
 
   // Snippet taken from https://stackoverflow.com/questions/40589302/how-to-enable-file-upload-on-reacts-material-ui-simple-input
 

@@ -31,7 +31,7 @@ function InstructorView(props) {
 
   useEffect(() => {
     getUsers();
-    getCourses();
+    getCourses(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function getUsers(page=0) {
@@ -97,23 +97,23 @@ function InstructorView(props) {
   };
 
   useEffect(() => {
-    getUsers(values.userPage);
+    getUsers(values.userPage); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.userPage]);
 
   useEffect(() => {
-    getCourses(values.coursePage);
+    getCourses(values.coursePage); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.coursePage]);
 
   useEffect(() => {
     if (values.userPage > 1 && students.length === 0) {
       setValues({...values, userPage: values.userPage - 1});
-    }
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [students]);
 
   useEffect(() => {
     if (values.coursePage > 1 && courses.length === 0) {
-      setValues({... values, coursePage: values.coursePage - 1});
-    }
+      setValues({...values, coursePage: values.coursePage - 1});
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courses]);
 
 

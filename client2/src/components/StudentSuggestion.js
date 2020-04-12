@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 
 import { TextField } from "@material-ui/core";
-
-import Suggestions from "./Suggestions";
 
 import { Button } from "@material-ui/core";
 import AceEditor from "react-ace";
