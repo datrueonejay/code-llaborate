@@ -35,6 +35,7 @@ function InstructorView(props) {
     getCourses(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // initalize 
   function getUsers(page = 0) {
     api.getUsers(page).then((res) => {
       setStudents(res);
@@ -112,6 +113,8 @@ function InstructorView(props) {
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courses]);
 
+
+  // double effect because setting values are async
   const nextUserPage = () => {
     setValues({ ...values, userPage: values.userPage + 1 });
   };

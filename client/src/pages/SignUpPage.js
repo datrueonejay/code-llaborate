@@ -113,7 +113,6 @@ export default function SignUp(props) {
               >
                 <MenuItem value="STUDENT">Student</MenuItem>
                 <MenuItem value="TEACHING ASSISTANT">TA</MenuItem>
-                <MenuItem value="INSTRUCTOR">Instructor</MenuItem>
               </Select>
             </FormControl>
           </Grid>

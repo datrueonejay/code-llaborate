@@ -24,6 +24,7 @@ const helmet = require("helmet");
 const { body } = require("express-validator");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
+const path = require('path');
 
 // Redis Connect
 const RedisStore = require("connect-redis")(session);
@@ -86,7 +87,8 @@ app.post(
     let password = req.body.password;
     let role = req.body.role;
     let name = req.body.name;
-    if (!username || !password || !role || !name) {
+
+    if (!username || !password || !role || !name || role === "INSTRUCTOR") {
       return res.status(400).end("Bad request");
     }
     return db.addUser(role, username, password, name, (err, user) => {
@@ -253,6 +255,7 @@ app.post(
     }
     // Check if the hash with course code key exists
 
+    // logic to get random hash from https://stackoverflow.com/questions/8855687/secure-random-token-in-node-js
     return db.checkCourse(courseID, (err, result) => {
       if (err) return res.status(422).end("Bad input");
       if (result.length > 0) {
@@ -515,10 +518,6 @@ app.post("/api/python", authenticated, (req, res, next) => {
   );
 });
 
-app.get("*", (req, res) => {
-  res.send(app.static("./build"));
-});
-
 // Send to all clients including yourself
 let sendClients = (course, data, from) => {
   let ret = {
@@ -691,5 +690,16 @@ function getCourseIdFromCode(courseCode) {
     });
   });
 }
+
+
+// keep at bottom so other routes still work - Ricky
+// snippet from https://tylermcginnis.com/react-router-cannot-get-url-refresh/
+app.get('/*', function(req, res) {
+  res.sendFile(path.join(__dirname, './build/index.html'), function(err) {
+    if (err) {
+      res.status(500).end("Internal Server Error");
+    }
+  })
+})
 
 server.listen(8080);
