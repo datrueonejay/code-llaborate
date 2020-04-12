@@ -49,7 +49,7 @@ const sessionParser = session({
   resave: false,
   saveUninitialized: true,
   store: new RedisStore({ client: redisClient }),
-  // cookie: { httpOnly: true, secure: true, sameSite: true },
+  cookie: { httpOnly: true, secure: true, sameSite: true },
 });
 
 app.use(sessionParser);

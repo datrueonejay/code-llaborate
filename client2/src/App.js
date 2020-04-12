@@ -22,6 +22,9 @@ import 'ace-builds/webpack-resolver';
 const darkTheme = createMuiTheme({
   palette: {
     type: "dark",
+    primary: {
+      main: "#778899"
+    }
   },
 });
 
