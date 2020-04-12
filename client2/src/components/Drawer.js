@@ -10,6 +10,7 @@ import {
   Typography,
   IconButton,
   Divider,
+  Button,
 } from "@material-ui/core";
 
 import { useStyles } from "../styles/StudentPageStyle.js";
@@ -20,11 +21,14 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 
+import useSharedStyles from "../styles/SharedStyles.module";
+
 export default function StudentView(props) {
   const [open, setOpen] = useState(false);
 
   const classes = useStyles();
   const theme = useTheme();
+  const sharedStyles = useSharedStyles();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -44,6 +48,11 @@ export default function StudentView(props) {
           <Typography variant="h6" noWrap className={classes.title}>
             Code-llaborate
           </Typography>
+          <div className={sharedStyles.leaveSession}>
+            <Button variant="contained" onClick={props.onLeave} color="primary">
+              {props.leaveText}
+            </Button>
+          </div>
           <Logout />
           <IconButton
             color="inherit"

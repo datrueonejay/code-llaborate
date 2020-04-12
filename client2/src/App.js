@@ -18,21 +18,19 @@ import NotFound from "./pages/NotFoundPage";
 
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/mode-python";
-import 'ace-builds/webpack-resolver';
+import "ace-builds/webpack-resolver";
 
 const darkTheme = createMuiTheme({
   palette: {
     type: "dark",
     primary: {
-      main: "#778899"
-    }
+      main: "#778899",
+    },
   },
 });
 
 function App() {
   const type = useSelector((state) => state.userReducer.userType);
-
-  let isStudent = type === "STUDENT";
 
   // Private route notes: the redirect currently goes to login, wen eed to make an unauthorized page or a 404 page ?? TODO
   return (
@@ -42,29 +40,16 @@ function App() {
           <Route exact path="/" component={Home} />
           <Route path="/sessions" component={Sessions} />
           <Route path="/signup" component={SignUp} />
-          <PrivateRoute
-            path="/student"
-            for="STUDENT"
-            component={(props) => (
-              <StudentView {...props} isStudent={isStudent} />
-            )}
-          />
+          <PrivateRoute path="/student" for="STUDENT" component={StudentView} />
           <PrivateRoute
             path="/ta"
             for="TEACHING ASSISTANT"
-            component={(props) => (
-              <TeachingAssistantView {...props} isStudent={isStudent} />
-            )}
+            component={TeachingAssistantView}
           />
           <PrivateRoute
             path="/instructor"
             for="INSTRUCTOR"
-            component={(props) => <InstructorView {...props} />}
-          />
-          <PrivateRoute
-            path="/private"
-            for="INSTRUCTOR"
-            component={(props) => <InstructorView {...props} />}
+            component={InstructorView}
           />
           <Route component={NotFound} />
         </Switch>

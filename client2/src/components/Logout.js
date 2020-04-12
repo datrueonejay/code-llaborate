@@ -2,13 +2,12 @@ import React from "react";
 import { setAuth } from "../redux/actions/userActions";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { useStyles } from "../styles/LogoutStyles.module";
+import { Button } from "@material-ui/core";
 
 const authentication = require("../http/autheticationController.js");
 
 function Logout() {
   const dispatch = useDispatch();
-  const styles = useStyles();
 
   function onClick() {
     authentication.signout().then((res) => {
@@ -17,16 +16,11 @@ function Logout() {
   }
 
   return (
-    <div className={styles.logoutClass}>
-      <Link
-        className={styles.logoutLinkClass}
-        to="/"
-        onClick={(e) => onClick()}
-      >
-        {" "}
-        Logout!{" "}
-      </Link>
-    </div>
+    <Link to="/" onClick={(e) => onClick()} style={{ textDecoration: "none" }}>
+      <Button variant="contained" color="primary" onClick={onClick}>
+        Logout!
+      </Button>
+    </Link>
   );
 }
 

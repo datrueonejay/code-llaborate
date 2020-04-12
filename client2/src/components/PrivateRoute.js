@@ -2,14 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 import { Redirect } from "react-router-dom";
-
-// const PrivateRoute = ({ component: Component, auth: auth, ...rest }) => (
-//   <Route {...rest} render={props =>
-//     auth === true
-//     ? (<Component {...props} />)
-//     : (<Redirect to="/login" />)
-//   } />
-// );
+import { Route } from "react-router-dom";
 
 function PrivateRoute(props) {
   const authenticated = useSelector((state) => state.userReducer.auth);
@@ -17,14 +10,14 @@ function PrivateRoute(props) {
 
   if (props.for) {
     if (type === props.for) {
-      return <props.component />;
+      return <Route component={props.component} {...props} />;
     } else {
       return <Redirect to="/404NotFound" />;
     }
   }
 
   if (authenticated) {
-    return <props.component />;
+    return <Route component={props.component} {...props} />;
   } else {
     return <Redirect to="/401NotAuthenticated" />;
   }

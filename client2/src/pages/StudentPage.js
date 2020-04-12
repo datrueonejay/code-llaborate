@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import SocketConnection from "../http/socketController.js";
+import websocket from "../http/socketController.js";
 
 import clsx from "clsx";
 
@@ -32,17 +32,17 @@ export default function StudentView(props) {
   const sharedStyles = useSharedStyles();
   const dispatch = useDispatch();
 
-  const websocket = new SocketConnection(
-    () => {
-      setConnecting(false);
-    },
-    () => {}
-  );
-
   useEffect(() => {
-    websocket.code_listener((message) => {
-      setCode(message);
+    websocket.connect(
+      () => {
+        setConnecting(false);
+      },
+      () => {}
+    );
+    websocket.code_listener((code) => {
+      setCode(code);
     });
+
     websocket.suggestion_listener((suggestion) => {
       setSuggestions((old) => old.concat(suggestion));
     });
@@ -52,6 +52,10 @@ export default function StudentView(props) {
     websocket.chat_listener((message) => {
       setChatOut((old) => old.concat(message));
     });
+
+    return () => {
+      websocket.close();
+    };
   }, []);
 
   if (connecting) {
@@ -65,20 +69,13 @@ export default function StudentView(props) {
         sendChat={(message) => {
           websocket.send_chat(message);
         }}
+        onLeave={() => {
+          dispatch(setSession(null));
+          props.history.push("/sessions");
+        }}
+        leaveText={"Leave Session"}
       />
-      <div className={sharedStyles.leaveSession}>
-        <Link to="/sessions">
-          <Button
-            variant="contained"
-            onClick={() => {
-              dispatch(setSession(null));
-            }}
-            color="primary"
-          >
-            Leave Session
-          </Button>
-        </Link>
-      </div>
+
       <div className={styles.bodyContainer}>
         <StudentCodeEditor code={code} />
         <div

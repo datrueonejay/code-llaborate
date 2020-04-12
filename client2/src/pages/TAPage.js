@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TaCodeEditor from "../components/TaCodeEditor.js";
-import SocketConnection from "../http/socketController.js";
+import websocket from "../http/socketController.js";
 
 import api from "../http/apiController.js";
 
@@ -8,7 +8,6 @@ import Suggestions from "../components/Suggestions";
 import { CircularProgress, Button } from "@material-ui/core";
 
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import { setSession } from "../redux/actions/userActions";
 import useSharedStyles from "../styles/SharedStyles.module";
 import Drawer from "../components/Drawer.js";
@@ -21,36 +20,37 @@ function TeachingAssistantView(props) {
   const [pythonOut, setPythonOut] = useState("");
   const [chatOut, setChatOut] = useState([]);
   const [code, setCode] = useState("");
-  const session = useSelector((state) => state.userReducer.session);
-
   const [connecting, setConnecting] = useState(true);
 
+  const session = useSelector((state) => state.userReducer.session);
   const dispatch = useDispatch();
   const sharedStyles = useSharedStyles();
   const styles = useStyles();
-  const websocket = new SocketConnection(
-    () => {
-      setConnecting(false);
-    },
-    () => {}
-  );
-
-  const suggestionListener = (suggestion) => {
-    setSuggestions((old) => old.concat(suggestion));
-  };
 
   useEffect(() => {
+    websocket.connect(
+      () => {
+        setConnecting(false);
+      },
+      () => {}
+    );
     websocket.code_listener((code) => {
       setCode(code);
     });
 
-    websocket.suggestion_listener(suggestionListener);
+    websocket.suggestion_listener((suggestion) => {
+      setSuggestions((old) => old.concat(suggestion));
+    });
     websocket.python_listener((output) => {
       setPythonOut((old) => old.concat(output));
     });
     websocket.chat_listener((message) => {
       setChatOut((old) => old.concat(message));
     });
+
+    return () => {
+      websocket.close();
+    };
   }, []);
 
   if (connecting) {
@@ -64,22 +64,14 @@ function TeachingAssistantView(props) {
         sendChat={(message) => {
           websocket.send_chat(message);
         }}
+        onLeave={() => {
+          api.stopSession(session).then((res) => {
+            dispatch(setSession(null));
+            props.history.push("/sessions");
+          });
+        }}
+        leaveText={"End and Leave Session"}
       />
-      <div className={sharedStyles.leaveSession}>
-        <Link to="/sessions">
-          <Button
-            variant="contained"
-            onClick={() => {
-              api.stopSession(session).then((res) => {
-                dispatch(setSession(null));
-              });
-            }}
-            color="primary"
-          >
-            Destroy and Leave Session
-          </Button>
-        </Link>
-      </div>
       <div className={styles.bodyContainer}>
         <TaCodeEditor
           onCodeChange={(code) => {
