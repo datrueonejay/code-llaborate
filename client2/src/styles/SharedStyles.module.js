@@ -1,5 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
 
+import Background from '../pictures/background_image.jpg';
+
 let useSharedStyles = makeStyles((theme) => ({
   title: {
     color: "#FFFFFF",
@@ -18,6 +20,9 @@ let useSharedStyles = makeStyles((theme) => ({
     color: "#CF6679",
   },
   background: {
+    background: `linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${Background})`,
+    // backgroundImage: `url(${Background})`,
+    backgroundSize: "cover",
     backgroundColor: "#121212",
     height: "100%",
   },
