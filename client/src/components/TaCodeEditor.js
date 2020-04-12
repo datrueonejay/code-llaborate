@@ -8,8 +8,11 @@ import useSharedStyles from "../styles/SharedStyles.module";
 
 import clsx from "clsx";
 
+/**Credits: AceEditor http://securingsincity.github.io/react-ace/ */
+
+
 export default function TaCodeEditor(props) {
-  // Snippet taken from https://stackoverflow.com/questions/40589302/how-to-enable-file-upload-on-reacts-material-ui-simple-input
+  // Credits: Snippet taken from https://stackoverflow.com/questions/40589302/how-to-enable-file-upload-on-reacts-material-ui-simple-input
 
   const editorRef = useRef(null);
   const styles = useStyles();
@@ -19,7 +22,7 @@ export default function TaCodeEditor(props) {
     props.onCodeChange(newValue);
   }
 
-  // https://stackoverflow.com/questions/55830414/how-to-read-text-file-in-react
+  // Credits: Snippet inspired by: https://stackoverflow.com/questions/55830414/how-to-read-text-file-in-react
   let loadFile = (e) => {
     e.preventDefault();
     if (e.target.files[0]) {
@@ -50,9 +53,6 @@ export default function TaCodeEditor(props) {
         showGutter={true}
         highlightActiveLine={true}
         setOptions={{
-          // enableBasicAutocompletion: false,
-          // enableLiveAutocompletion: false,
-          // enableSnippets: false,
           showLineNumbers: true,
           tabSize: 2,
         }}

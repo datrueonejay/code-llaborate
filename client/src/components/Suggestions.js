@@ -2,15 +2,13 @@ import React from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { FixedSizeList as List } from "react-window";
 
-// Import Extra tools
-// import "brace/ext/language_tools";
 import { ListItemIcon, ListItem, ListItemText } from "@material-ui/core";
 
 import FileCopyRoundedIcon from "@material-ui/icons/FileCopyRounded";
 import useSharedStyles from "../styles/SharedStyles.module";
 import useStyles from "../styles/SuggestionsStyles.module";
 
-//https://addyosmani.com/blog/react-window/
+//Credits: Rendering Lists https://addyosmani.com/blog/react-window/
 
 function Suggestions(props) {
   const sharedStyles = useSharedStyles();

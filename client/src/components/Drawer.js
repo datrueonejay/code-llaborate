@@ -23,6 +23,8 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 
 import useSharedStyles from "../styles/SharedStyles.module";
 
+/** Credits for the drawer component: https://material-ui.com/components/drawers/ */
+
 export default function StudentView(props) {
   const [open, setOpen] = useState(false);
 
