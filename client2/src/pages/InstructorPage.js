@@ -98,13 +98,13 @@ function InstructorView(props) {
   }, [values.coursePage]);
 
   useEffect(() => {
-    if (values.userPage > 1 && students.length === 0) {
+    if (values.userPage > 0 && students.length === 0) {
       setValues({ ...values, userPage: values.userPage - 1 });
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [students]);
 
   useEffect(() => {
-    if (values.coursePage > 1 && courses.length === 0) {
+    if (values.coursePage > 0 && courses.length === 0) {
       setValues({ ...values, coursePage: values.coursePage - 1 });
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courses]);
@@ -193,7 +193,7 @@ function InstructorView(props) {
           </Button>
         </div>
 
-        <div style={{ display: "inline-block", width: "50vw" }}>
+        <div style={{ display: "inline-block", width: "40vw" }}>
           <Typography color="textPrimary" variant="h6">
             Users
           </Typography>
@@ -211,7 +211,7 @@ function InstructorView(props) {
 
         <div
           className={styles.studentsClass}
-          style={{ display: "inline-block", width: "50vw" }}
+          style={{ display: "inline-block", width: "40vw" }}
         >
           <Typography color="textPrimary" variant="h6">
             Courses
@@ -223,7 +223,7 @@ function InstructorView(props) {
             setValue={setValue}
             value="courseId"
             list={courses}
-            helperText="Filter by Course code"
+            helperText="Filter by name"
           />
         </div>
       </div>

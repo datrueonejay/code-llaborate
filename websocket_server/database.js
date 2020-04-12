@@ -162,7 +162,7 @@ exports.getUsers = (page = 0, cb) => {
   });
 };
 
-exports.getCourses = (page, cb) => {
+exports.getCourses = (page = 0, cb) => {
   let sql = "SELECT * from Courses ORDER BY ID LIMIT ?, 25";
   return connection.query(sql, [page * 25], (err, results) => {
     if (err) {
