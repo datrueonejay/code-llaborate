@@ -14,6 +14,7 @@ function InstructorView(props) {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [notification, setNotification] = useState("");
+  const [isError, setIsError] = useState(false);
   const [values, setValues] = useState({
     studentId: "",
     courseId: "",
@@ -56,10 +57,12 @@ function InstructorView(props) {
       .addToCourse(userID, courseID)
       .then((res) => {
         setNotification("Successfully added user to the course");
+        setIsError(false);
       })
       .catch((err) => {
         console.error(err);
-        setNotification("User is already in the course or IDs do not exist");
+        setNotification("User is already in the course or invalid IDs");
+        setIsError(true);
       })
       .finally(() => {
         formRef.current.reset();
@@ -135,7 +138,11 @@ function InstructorView(props) {
     <div className={clsx(sharedStyles.background, sharedStyles.hideOverflowY)}>
       <Logout />
       <CourseModal open={values.modal} />
-      <div className={styles.notificationClass}>{notification}</div>
+      <div className={styles.centerClass}>
+        <Typography color={isError === true ? "error" : "textPrimary"} variant="h6">
+            {notification}
+        </Typography>
+      </div>
 
       <form className={styles.formClass} ref={formRef} onSubmit={handleSubmit}>
         <Typography color="textPrimary" variant="h6">

@@ -7,6 +7,7 @@ function CourseModal(props) {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const [formNotification, setFormNotification] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const styles = useStyles();
 
@@ -30,6 +31,7 @@ function CourseModal(props) {
       })
       .catch((err) => {
         setFormNotification("Bad input");
+        setIsError(true);
       });
 
     e.target.reset();
@@ -45,10 +47,12 @@ function CourseModal(props) {
       .sendEmail(to, message)
       .then((res) => {
         setFormNotification("successfully sent email!");
+        setIsError(false);
       })
       .catch((err) => {
         console.error(err);
         setFormNotification("An error occured while sending the email");
+        setIsError(true);
       });
 
     e.target.reset();
@@ -56,13 +60,15 @@ function CourseModal(props) {
 
   return (
     <div>
-      <Button color="primary" onClick={openModal} onClose={closeModal}>
+      <Button style={{marginLeft: "10px"}} variant="contained" color="primary" onClick={openModal} onClose={closeModal}>
         Create Course Code
       </Button>
       <Modal open={open} onClose={closeModal}>
         <div className={`${styles.modalClass} ${styles.root}`}>
           <div className={styles.centerClass}>
-            <div>{formNotification}</div>
+            <Typography color={isError === true ? "error" : "textPrimary"}>
+              {formNotification}
+            </Typography>
             <Typography color="textPrimary" variant="h6">
               Create course code
             </Typography>
@@ -82,7 +88,9 @@ function CourseModal(props) {
                 </Button>
               </div>
             </form>
-            {code === "" ? null : `\n Your Course Code: ${code} \n`}
+            <Typography color="textPrimary" variant="h6">
+              {code === "" ? null : `\n Your Course Code: ${code} \n`}
+            </Typography>
             <Typography color="textPrimary" variant="h6">
               Send email
             </Typography>

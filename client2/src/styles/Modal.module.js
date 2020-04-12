@@ -5,7 +5,7 @@ export const useStyles = makeStyles((theme) => ({
 
         //.modal
         modalClass: {
-                margin: "30% auto",
+                margin: "15% auto",
                 padding: "10px",
                 width: "50vw",
                 maxHeight: "50vh",
