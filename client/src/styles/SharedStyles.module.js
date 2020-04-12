@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-import Background from '../pictures/background_image.jpg';
+import Background from "../pictures/background_image.jpg";
 
 let useSharedStyles = makeStyles((theme) => ({
   title: {
@@ -26,6 +26,7 @@ let useSharedStyles = makeStyles((theme) => ({
     MozBackgroundSize: "cover",
     OBackgroundSize: "cover",
     backgroundSize: "cover",
+    height: "100%",
   },
   flexGrow: {
     flexGrow: 2,
@@ -37,8 +38,8 @@ let useSharedStyles = makeStyles((theme) => ({
     paddingLeft: 15,
   },
   leaveSession: {
-    margin: 10
-  }
+    margin: 10,
+  },
 }));
 
 export default useSharedStyles;

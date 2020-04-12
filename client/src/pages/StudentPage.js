@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from "react";
-import TaCodeEditor from "../components/TaCodeEditor.js";
 import websocket from "../http/socketController.js";
 
-import api from "../http/apiController.js";
+import clsx from "clsx";
 
-import Suggestions from "../components/Suggestions";
 import { CircularProgress, Button } from "@material-ui/core";
 
-import { useSelector, useDispatch } from "react-redux";
-import { setSession } from "../redux/actions/userActions";
-import useSharedStyles from "../styles/SharedStyles.module";
 import Drawer from "../components/Drawer.js";
+import StudentCodeEditor from "../components/StudentCodeEditor.js";
+import StudentSuggestion from "../components/StudentSuggestion.js";
+
+import Suggestions from "../components/Suggestions";
+
 import useStyles from "../styles/TaStudentPageStyles.module.js";
-import clsx from "clsx";
+
+import { setSession } from "../redux/actions/userActions";
+
+import useSharedStyles from "../styles/SharedStyles.module";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import PythonOutput from "../components/PythonOutput.js";
 
-function TeachingAssistantView(props) {
+export default function StudentView(props) {
+  const [code, setCode] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [pythonOut, setPythonOut] = useState("");
   const [chatOut, setChatOut] = useState([]);
-  const [code, setCode] = useState("");
-  const [connecting, setConnecting] = useState(true);
 
-  const session = useSelector((state) => state.userReducer.session);
-  const dispatch = useDispatch();
-  const sharedStyles = useSharedStyles();
+  const [connecting, setConnecting] = useState(false);
+
   const styles = useStyles();
+  const sharedStyles = useSharedStyles();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     websocket.connect(
@@ -54,7 +59,11 @@ function TeachingAssistantView(props) {
   }, []);
 
   if (connecting) {
-    return <CircularProgress />;
+    return (
+      <div className={clsx(sharedStyles.background, styles.container)}>
+        <CircularProgress />
+      </div>
+    );
   }
 
   return (
@@ -65,27 +74,32 @@ function TeachingAssistantView(props) {
           websocket.send_chat(message);
         }}
         onLeave={() => {
-          api.stopSession(session).then((res) => {
-            dispatch(setSession(null));
-            props.history.push("/sessions");
-          });
+          dispatch(setSession(null));
+          props.history.push("/sessions");
         }}
-        leaveText={"End and Leave Session"}
+        leaveText={"Leave Session"}
       />
+
       <div className={styles.bodyContainer}>
-        <TaCodeEditor
-          onCodeChange={(code) => {
-            websocket.send_code(code);
-          }}
-          onExecute={(code) => api.executePython(code).then((res) => {})}
-          code={code}
-          onReadFile={(code) => setCode(code)}
-        />
-        <Suggestions suggestions={suggestions} />
+        <StudentCodeEditor code={code} />
+        <div
+          className={clsx(
+            sharedStyles.flexGrow,
+            styles.studentSuggestionContainer
+          )}
+        >
+          <div className={sharedStyles.sessionSuggestion}>
+            <Suggestions suggestions={suggestions} height={300} />
+
+            <StudentSuggestion
+              onSuggest={(lineNum, code) => {
+                websocket.send_suggestion(lineNum, code);
+              }}
+            />
+          </div>
+        </div>
       </div>
       <PythonOutput pythonOut={pythonOut} />
     </div>
   );
 }
-
-export default TeachingAssistantView;

@@ -49,7 +49,7 @@ const sessionParser = session({
   resave: false,
   saveUninitialized: true,
   store: new RedisStore({ client: redisClient }),
-  cookie: { httpOnly: true, secure: true, sameSite: true },
+  // cookie: { httpOnly: true, secure: true, sameSite: true },
 });
 
 app.use(sessionParser);
@@ -361,8 +361,8 @@ app.post(
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.NODEMAILER_EMAIL, 
-        pass: process.env.NODEMAILER_PASSWORD, 
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
@@ -515,10 +515,11 @@ app.post("/api/python", authenticated, (req, res, next) => {
   );
 });
 
-app.get('*', (req, res) => {                       
-  res.send(app.static("./build"));                               
+app.get("*", (req, res) => {
+  res.send(app.static("./build"));
 });
 
+// Send to all clients including yourself
 let sendClients = (course, data, from) => {
   let ret = {
     from: from,
@@ -562,6 +563,11 @@ wss.on("session", (ws, req) => {
         from: req.session.user.role,
         message: code,
       };
+      return wss.clients.forEach((client) => {
+        if (client.course === ws.course && ws !== client) {
+          client.send(JSON.stringify(ret));
+        }
+      });
     } else if (parsedMsg.type == "CHAT") {
       return redisClient.hget(ws.course, "chat", (err, chat) => {
         if (err) return;
@@ -580,8 +586,6 @@ wss.on("session", (ws, req) => {
           (err, reply) => {
             if (err) return;
             return sendClients(ws.course, data, "CHAT");
-
-            // return sendClients(ws.course, messages, req.session.user.role);
           }
         );
       });
@@ -616,11 +620,6 @@ wss.on("session", (ws, req) => {
         );
       });
     }
-    wss.clients.forEach((client) => {
-      if (client.course === ws.course) {
-        client.send(JSON.stringify(ret));
-      }
-    });
   });
 
   // Send initial data about session
