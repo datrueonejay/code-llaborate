@@ -25,6 +25,9 @@ const { body } = require("express-validator");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 
+// Redis Connect
+const RedisStore = require("connect-redis")(session);
+
 const app = express();
 app.use(helmet());
 app.use(bodyParser.json());
@@ -39,6 +42,7 @@ const sessionParser = session({
   secret: process.env.SESSION_SECRET || "d3f4ults3cr3t",
   resave: false,
   saveUninitialized: true,
+  store: new RedisStore({ client: redisClient }),
   // cookie: { httpOnly: true, secure: true, sameSite: true },
 });
 
