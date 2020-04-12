@@ -24,6 +24,9 @@ let useSharedStyles = makeStyles((theme) => ({
   flexGrow: {
     flexGrow: 2,
   },
+  hideOverflowY: {
+    overflowY: "hidden",
+  },
 }));
 
 export default useSharedStyles;

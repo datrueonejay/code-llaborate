@@ -23,6 +23,8 @@ export const useStyles = makeStyles((theme) => ({
   //.list-wrapper
   listWrapperClass: {
     textAlign: "center",
+    overflowY: "scroll",
+    maxHeight: "50vh"
   },
   //.list
   listClass: {},
@@ -32,9 +34,26 @@ export const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     alignItems: "center",
   },
-  //.students
-  studentsClass: {
-    border: "black solid 3px",
-    background: "#121212",
+
+  colorWhiteClass: {
+    color: "white"
   },
+
+  inlineBlock: {
+    display: "inline-block"
+  },
+
+  hide: {
+    position: "absolute !important",
+    top: "-6980px !important",
+    left: "-6980px !important",
+  },
+
+  arrow: {
+    fontSize: "50px",
+    userSelect: "none",
+    cursor: "pointer"
+  }
 }));
+
+export default useStyles;

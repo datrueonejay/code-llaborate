@@ -2,18 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Modal,
   TextField,
-  Button
+  Button,
+  Typography
 } from '@material-ui/core';
 //import styles from "../scss/Modal.module.scss";
 import {useStyles} from "../styles/Modal.module.js";
 const api = require("../http/apiController.js");
-const nodemailer = require('nodemailer');
 
 function CourseModal(props) {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
+  const [formNotification, setFormNotification] = useState("");
 
-  const formRef = useRef(null);
   const styles = useStyles();
 
 
@@ -30,20 +30,34 @@ function CourseModal(props) {
     let formData = new FormData(e.target);
     let courseID = formData.get("courseID");
 
-    api.createCourseCode(courseID).then((res) => {
+    api.createCourseCode(courseID)
+    .then((res) => {
       setCode(res);
     })
+    .catch((err) => {
+      setFormNotification("Bad input");
+    })
 
-    formRef.current.reset();
+    e.target.reset();
   }
 
   async function sendEmail(e) {
     e.preventDefault();
     let formData = new FormData(e.target);
     let to = formData.get("to");
-    console.log(to);
+    let message = formData.get("message");
 
-    api.sendEmail();
+    api.sendEmail(to, message)
+      .then((res) => {
+        console.log(res);
+        setFormNotification("successfully sent email!");
+      })
+      .catch((err) => {
+        console.log(err);
+        setFormNotification("An error occured while sending the email")
+      })
+    
+    e.target.reset();
   }
 
   return(
@@ -53,14 +67,18 @@ function CourseModal(props) {
         open={open}
         onClose={closeModal}
       >
-        <div className={`${styles.modalClass}`}>
+        <div className={`${styles.modalClass} ${styles.root}`}>
           <div className={styles.centerClass}>
-            <p>Create Course Code</p>
-            <form ref={formRef} onSubmit={createCourseCode}>
+            <div>{formNotification}</div>
+            <Typography color="textPrimary" variant="h6">
+              Create course code
+            </Typography>
+            <form onSubmit={createCourseCode}>
               <div>
                 <TextField
                   id="courseID"
                   fullWidth={true}
+                  InputProps={{className: styles.input}}
                   label="Course Id"
                   name="courseID"
                   helperText="The course id, for example, 2"
@@ -69,8 +87,10 @@ function CourseModal(props) {
                 <Button type='submit' color="primary">Get Code</Button>
               </div>
             </form>
-            {code === "" ? null : `\nYour Course Code: ${code}`}
-            <p>Send email</p>
+            {code === "" ? null : `\n Your Course Code: ${code} \n`}
+            <Typography color="textPrimary" variant="h6">
+              Send email
+            </Typography>            
             <form onSubmit={sendEmail}>
               <div>
                 <TextField
@@ -81,7 +101,15 @@ function CourseModal(props) {
                   helperText="Email address"
                   required
                 />
-                <Button type='submit' color="primary">Send Email</Button>
+                <TextField
+                  id="message"
+                  fullWidth={true}
+                  label="Body message of email"
+                  name="message"
+                  helperText="e.g Hey, Join my course using my code J8HV3"
+                  required
+                />
+                <Button type='submit' color="primary">Send Email (Wait at least 5 seconds)</Button>
               </div>
             </form>
           </div>

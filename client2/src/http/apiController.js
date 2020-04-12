@@ -9,8 +9,8 @@ exports.searchUser = (query) => {
   return axios.post("/api/searchuser", { query }).then((res) => res.data);
 };
 
-exports.getCourses = () => {
-  return axios.get("/api/getallcourses").then((res) => res.data);
+exports.getCourses = (page = 0) => {
+  return axios.get(`/api/getallcourses?page=${page}`).then((res) => res.data);
 };
 
 exports.getUserCourses = () => {
@@ -29,9 +29,9 @@ exports.createCourseCode = (courseID) => {
     .then((res) => res.data);
 }
 
-exports.sendEmail = () => {
+exports.sendEmail = (recipient, message) => {
   return axios
-    .post("/api/sendemail", {})
+    .post("/api/sendemail", { recipient, message })
     .then((res) => res.data);
 }
 // python endpoints

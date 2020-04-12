@@ -21,6 +21,8 @@ function InstructorView(props) {
     courseIdFilter: "",
     searchStudent: "",
     modal: false,
+    coursePage: 0,
+    userPage: 0,
   });
 
   const sharedStyles = useSharedStyles();
@@ -32,14 +34,14 @@ function InstructorView(props) {
     getCourses();
   }, []);
 
-  function getUsers() {
-    api.getUsers(0).then((res) => {
+  function getUsers(page=0) {
+    api.getUsers(page).then((res) => {
       setStudents(res);
     });
   }
 
-  function getCourses() {
-    api.getCourses().then((res) => {
+  function getCourses(page=0) {
+    api.getCourses(page).then((res) => {
       setCourses(res);
     });
   }
@@ -94,16 +96,57 @@ function InstructorView(props) {
     setValues({ ...values, [value]: event.target.value });
   };
 
+  useEffect(() => {
+    getUsers(values.userPage);
+  }, [values.userPage]);
+
+  useEffect(() => {
+    getCourses(values.coursePage);
+  }, [values.coursePage]);
+
+  useEffect(() => {
+    if (values.userPage > 1 && students.length === 0) {
+      setValues({...values, userPage: values.userPage - 1});
+    }
+  }, [students]);
+
+  useEffect(() => {
+    if (values.coursePage > 1 && courses.length === 0) {
+      setValues({... values, coursePage: values.coursePage - 1});
+    }
+  }, [courses]);
+
+
+  const nextUserPage = () => {
+    setValues({...values, userPage: values.userPage + 1});
+  }
+
+  const prevUserPage = () => {
+    if (values.userPage > 0) {
+      setValues({...values, userPage: values.userPage - 1});
+    }
+  }
+
+  const nextCoursePage = () => {
+    setValues({...values, coursePage: values.coursePage + 1});
+  }
+
+  const prevCoursePage = () => {
+    if (values.coursePage > 0)  {
+      setValues({...values, coursePage: values.coursePage - 1});
+    }
+  }
+
   const styles = useStyles();
 
   return (
-    <div className={clsx(sharedStyles.background)}>
+    <div className={clsx(sharedStyles.background, sharedStyles.hideOverflowY)}>
       <Logout />
       <CourseModal open={values.modal} />
       <div className={styles.notificationClass}>{notification}</div>
 
       <form className={styles.formClass} ref={formRef} onSubmit={handleSubmit}>
-        <Typography color="textPrimary" variant="h3">
+        <Typography color="textPrimary" variant="h6">
           Add student or TA to course
         </Typography>
         {/* <h1 className="text-center">Add student or TA to course</h1> */}
@@ -140,38 +183,47 @@ function InstructorView(props) {
       </form>
 
       <div className={styles.centerClass} id="id-selector">
-        <div className={styles.studentsClass}>
-          <h1>Users:</h1>
-          <div id="search-user">
-            <TextField
-              className={styles.inputClass}
-              type="text"
-              onChange={handleChange("searchStudent")}
-              value={values.searchStudent}
-              helperText="Search for a User, e.g JayQuelen"
-            />
-            <Button
-              onClick={searchStudent}
-              type="submit"
-              color="primary"
-              variant="contained"
-            >
-              Search
-            </Button>
-          </div>
+        <div id="search-user">
+          <TextField
+            className={styles.inputClass}
+            type="text"
+            onChange={handleChange("searchStudent")}
+            value={values.searchStudent}
+            helperText="Search for a User, e.g JayQuelen"
+          />
+          <Button
+            onClick={searchStudent}
+            type="submit"
+            color="primary"
+            variant="contained"
+          >
+            Search
+          </Button>
+        </div>
+
+        <div style={{display: "inline-block", width: "50vw"}}>
+          <Typography color="textPrimary" variant="h6">
+            Users
+          </Typography>
 
           <ContentList
+            nextPage={nextUserPage}
+            prevPage={prevUserPage}
             type="users"
             setValue={setValue}
             value="studentId"
             list={students}
-            helperText="Filter by title"
+            helperText="Filter by name"
           />
         </div>
 
-        <div className={styles.studentsClass}>
-          <h1>Courses:</h1>
+        <div className={styles.studentsClass} style={{display: "inline-block", width: "50vw"}}>
+          <Typography color="textPrimary" variant="h6">
+            Courses
+          </Typography>
           <ContentList
+            nextPage={nextCoursePage}
+            prevPage={prevCoursePage}
             type="courses"
             setValue={setValue}
             value="courseId"
