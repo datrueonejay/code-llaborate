@@ -189,6 +189,8 @@ exports.addToCourse = (userID, courseID, cb) => {
   });
 };
 
+exports.findRole = findRole;
+
 exports.checkCourse = (courseID, cb) => {
   return findCourse(courseID, (err, result) => {
     if (err) return cb(err, null);
