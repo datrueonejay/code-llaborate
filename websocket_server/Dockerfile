@@ -23,9 +23,11 @@ FROM node:latest
 WORKDIR /usr/src/app
 RUN apt-get update && apt-get install -y python
 
+COPY --from=pythonBuild /usr/src/app/pypy/ pypy/
+
+
 COPY . ./
 
-COPY --from=pythonBuild /usr/src/app/pypy/ pypy/
 
 RUN npm install
 

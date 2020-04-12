@@ -11,7 +11,7 @@ const crypto = require("crypto");
 const SESSION_EXPIRE_TIME = 7200; // in seconds
 
 // ENV init
-require('dotenv').config();
+require("dotenv").config();
 
 // DB api init
 const db = require("./database");
@@ -272,46 +272,6 @@ app.post(
         return res.status(422).end("Bad input");
       }
     });
-
-    // return redisClient.exists("courseCodes", (err, num) => {
-    //   if (num > 0) {
-    //     return redisClient.get("courseCodes", (err, reply) => {
-
-    //       if (err) return res.status(500).end("Redis client broke");
-
-    //       courseCodes = JSON.parse(reply);
-    //       console.log("courseCodes", courseCodes);
-
-    //       // check if code already exists
-    //       if ((code = courseCodes[courseID])) {
-    //         console.log("COde already exists", courseID, code);
-    //         return res.json(code);
-    //       }
-
-    //       // Not in redis, need to create a new course code
-    //       db.checkCourse(courseID, (err, result) => {
-    //         if (err) return res.status(422).end("Bad input");
-    //         let code = crypto
-    //           .createHash("md5")
-    //           .update(req.body.courseID + Date.now().toString())
-    //           .digest("hex");
-    //         console.log(
-    //           "Code didnt exist, setting new code for",
-    //           courseID,
-    //           code,
-    //           "\n----------------------------------------------------------------"
-    //         );
-    //         redisClient.set(
-    //           "courseCodes",
-    //           JSON.stringify({ ...courseCodes, [courseID]: code })
-    //         );
-    //         return res.json(code);
-    //       });
-    //     });
-    //   } else {
-
-    //   }
-    // })
   }
 );
 
@@ -340,35 +300,6 @@ app.delete(
           .end(`Not leading session for ${req.body.course}`);
       }
     });
-
-    // db.isStudent(req.session.user.username, (err, isStudent) => {
-    //   if (err) return res.status(500).end(err.message);
-    //   // Verify they are the person who started the session
-    //   redisClient.hget(req.body.course, "startedBy", (err, id) => {
-    //     if (id == req.session.user.id) {
-    //       redisClient.del(req.body.course, number => {
-    //         return res.json(`${number} session(s) deleted`);
-    //       });
-    //     } else {
-    //       return res
-    //         .status(401)
-    //         .end(`Not leading session for ${req.body.course}`);
-    //     }
-    //   });
-
-    //   if (!isStudent) {
-    //     // Valid instructor
-    //     if (req.session.currSession === req.body.course) {
-    //       req.session.currSession = req.body.course;
-    //       redisClient.del(req.body.course, number => {
-    //         return res.json(`${number} session(s) deleted`);
-    //       });
-    //     } else {
-    //       res.status(401).end(`Not leading session for ${req.body.course}`);
-    //     }
-    //   }
-    //   return res.status(401).end("Access denied");
-    // });
   }
 );
 
@@ -411,7 +342,6 @@ app.post(
   authenticated,
   [body("recipient").escape(), body("message").escape()],
   (req, res, next) => {
-
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -577,7 +507,6 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 
 wss.on("session", (ws, req) => {
-  console.log("ASOIDJASOIDJAOSIJ");
   ws.course = req.session.currSession;
   // Instructor logic
 
@@ -590,8 +519,6 @@ wss.on("session", (ws, req) => {
       req.session.user.role === "TEACHING ASSISTANT" &&
       parsedMsg.type == "CODE"
     ) {
-      console.log("TA MESSAGE");
-
       redisClient.hset(ws.course, "code", parsedMsg.message);
       ret = {
         type: "CODE",
@@ -599,7 +526,6 @@ wss.on("session", (ws, req) => {
         message: parsedMsg.message,
       };
     } else if (parsedMsg.type == "CHAT") {
-      // redisClient.rpush(`${req.session.currSession}CHAT`, parsedMsg.message);
       return redisClient.hget(ws.course, "chat", (err, chat) => {
         if (err) return;
         let messages = JSON.parse(chat);
@@ -661,44 +587,21 @@ wss.on("session", (ws, req) => {
   });
 
   redisClient.hgetall(req.session.currSession, (err, res) => {
-    console.log(res);
-    console.log("HEHEH");
-    console.log(typeof res);
-    console.log("code");
-
     let code = res.code;
-    console.log("suggestions");
 
     let suggestions = JSON.parse(res.suggestions);
     console.log("chat");
 
     let chat = JSON.parse(res.chat);
 
-    // let { code, suggestions, chat } = res;
-    console.log("SENDING");
-    sendClients(ws.course, { code, suggestions, chat }, "INITIAL");
+    ws.send(
+      JSON.stringify({ from: "INITIAL", message: { code, suggestions, chat } })
+    );
   });
-
-  // redisClient.hget(req.session.currSession, "code", (err, res) => {
-  //   if (err) {
-  //     console.log(err);
-  //     return ws.send("Error retrieving initial message");
-  //   }
-  //   console.log(res);
-  //   let ret = {
-  //     from: "TEACHING ASSISTANT",
-  //     message: res,
-  //   };
-  //   return ws.send(JSON.stringify(ret));
-  // });
 });
 
 server.on("upgrade", (req, socket, head) => {
-  console.log("ASOIDHJAOSIJ");
-
   const pathname = url.parse(req.url).pathname;
-  const protocol = req.headers["sec-websocket-protocol"];
-  console.log("ASOIDHJAOSIJ");
   // Necessary because we only set express app to use parser, not the http server
   sessionParser(req, {}, () => {
     console.log(req.session);
@@ -706,12 +609,9 @@ server.on("upgrade", (req, socket, head) => {
       return socket.destroy();
     }
     if (pathname === "/api/session") {
-      console.log("YEEE");
-      console.log(req.session.currSession);
-      redisClient.exists(req.session.currSession, (err, num) => {
+      return redisClient.exists(req.session.currSession, (err, num) => {
         if (num > 0) {
           return wss.handleUpgrade(req, socket, head, (ws) => {
-            console.log("Emitting request");
             wss.emit("session", ws, req);
           });
         }
@@ -727,8 +627,6 @@ function getCourseIdFromCode(courseCode) {
   return new Promise(function (resolve, reject) {
     redisClient.hgetall("courseCodes", (err, courseCodes) => {
       if (err) reject();
-      // let courseCodes = JSON.parse(reply);
-      console.log("courseCodes", courseCodes);
       resolve(
         Object.keys(courseCodes).find((key) => courseCodes[key] === courseCode)
       );
