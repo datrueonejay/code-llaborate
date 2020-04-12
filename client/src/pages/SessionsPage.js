@@ -26,6 +26,7 @@ export default function Sessions(props) {
   const [courses, setCourses] = useState([]);
   const [courseCode, setCourseCode] = useState("");
   const [formNotification, setFormNotification] = useState("");
+  const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const dispatch = useDispatch();
@@ -64,11 +65,12 @@ export default function Sessions(props) {
     api
       .joinCourse(courseCode)
       .then((res) => {
+        setIsError(false);
         setFormNotification("Successfully joined course!");
       })
       .catch((err) => {
-        console.error(err);
-        setFormNotification(err);
+        setIsError(true);
+        setFormNotification("Could not join course");
       });
   }
 
@@ -95,7 +97,11 @@ export default function Sessions(props) {
           <Button type="submit" color="primary" variant="contained">
             Join Course
           </Button>
-          <Typography align="center" id="notification" color="error">
+          <Typography
+            align="center"
+            id="notification"
+            color={isError ? "error" : "textPrimary"}
+          >
             {formNotification}
           </Typography>
         </div>
