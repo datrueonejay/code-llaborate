@@ -18,7 +18,7 @@ let getTime = (utcDateString) => {
     hours = 12;
   } else if (hours > 12) {
     hours -= 12;
-    ending = "AM";
+    ending = "PM";
   }
   let minutes = date.getMinutes();
   return `${hours}:${minutes < 10 ? "0" : ""}${minutes} ${ending}`;
