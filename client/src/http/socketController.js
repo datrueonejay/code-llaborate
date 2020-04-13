@@ -8,10 +8,9 @@ let http = (function () {
 
   let exampleSocket;
   module.connect = (onopen, onerror) => {
-    exampleSocket = new WebSocket(
-      process.env.REACT_APP_SOCKET_URL ||
-        `wss://${window.location.host}/api/session`
-    );
+    // Uncomment line 12 and comment line 13 to run on local development
+    // exampleSocket = new WebSocket(`ws://${window.location.host}/api/session`);
+    exampleSocket = new WebSocket(`wss://${window.location.host}/api/session`);
 
     exampleSocket.onopen = (e) => {
       onopen();

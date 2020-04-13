@@ -50,7 +50,7 @@ const sessionParser = session({
   resave: false,
   saveUninitialized: true,
   store: new RedisStore({ client: redisClient }),
-  cookie: { httpOnly: true, secure: true, sameSite: true },
+  cookie: { httpOnly: true, sameSite: true },
 });
 
 app.use(sessionParser);
@@ -378,7 +378,10 @@ app.post(
     };
 
     return transporter.sendMail(message, function (err, info) {
-      if (err) return res.status(500).end("Internal Server Error");
+      if (err) {
+        console.error(err);
+        return res.status(500).end("Internal Server Error");
+      }
       return res.json(info);
     });
   }
