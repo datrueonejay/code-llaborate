@@ -24,7 +24,7 @@ const helmet = require("helmet");
 const { body } = require("express-validator");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
-const path = require('path');
+const path = require("path");
 
 // Redis Connect
 const RedisStore = require("connect-redis")(session);
@@ -50,7 +50,7 @@ const sessionParser = session({
   resave: false,
   saveUninitialized: true,
   store: new RedisStore({ client: redisClient }),
-  // cookie: { httpOnly: true, secure: true, sameSite: true },
+  cookie: { httpOnly: true, secure: true, sameSite: true },
 });
 
 app.use(sessionParser);
@@ -691,15 +691,14 @@ function getCourseIdFromCode(courseCode) {
   });
 }
 
-
 // keep at bottom so other routes still work - Ricky
 // snippet from https://tylermcginnis.com/react-router-cannot-get-url-refresh/
-app.get('/*', function(req, res) {
-  res.sendFile(path.join(__dirname, './build/index.html'), function(err) {
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "./build/index.html"), function (err) {
     if (err) {
       res.status(500).end("Internal Server Error");
     }
-  })
-})
+  });
+});
 
 server.listen(8080);

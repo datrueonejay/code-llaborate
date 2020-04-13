@@ -16,7 +16,7 @@ function Logout() {
   }
 
   return (
-    <Link to="/" onClick={(e) => onClick()} style={{ textDecoration: "none" }}>
+    <Link to="/" style={{ textDecoration: "none" }}>
       <Button variant="contained" color="primary" onClick={onClick}>
         Logout!
       </Button>

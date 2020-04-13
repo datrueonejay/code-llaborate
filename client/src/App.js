@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
 import "./App.css";
@@ -16,7 +15,6 @@ import InstructorView from "./pages/InstructorPage.js";
 import SignUp from "./pages/SignUpPage";
 import NotFound from "./pages/NotFoundPage";
 
-
 // Import a Mode (language)
 import "brace/mode/python";
 import "brace/mode/text";
@@ -27,7 +25,7 @@ import "brace/theme/terminal";
 
 // Import Extra tools
 import "brace/ext/language_tools";
-
+import Credits from "./pages/CreditsPage";
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -39,8 +37,6 @@ const darkTheme = createMuiTheme({
 });
 
 function App() {
-  const type = useSelector((state) => state.userReducer.userType);
-
   // Private route notes: the redirect currently goes to login, wen eed to make an unauthorized page or a 404 page ?? TODO
   return (
     <ThemeProvider theme={darkTheme}>
@@ -49,6 +45,7 @@ function App() {
           <Route exact path="/" component={Home} />
           <Route path="/sessions" component={Sessions} />
           <Route path="/signup" component={SignUp} />
+          <Route path="/credits" component={Credits} />
           <PrivateRoute path="/student" for="STUDENT" component={StudentView} />
           <PrivateRoute
             path="/ta"
