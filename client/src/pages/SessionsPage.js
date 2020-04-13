@@ -35,7 +35,7 @@ export default function Sessions(props) {
   const sharedStyles = useSharedStyles();
   const styles = useStyles();
 
-  useEffect(() => {
+  let setPage = () => {
     if (role === TYPE_STUDENT) {
       api
         .getSessions()
@@ -57,6 +57,10 @@ export default function Sessions(props) {
           setLoading(false);
         });
     }
+  };
+
+  useEffect(() => {
+    setPage();
   }, []);
 
   function joinCourse(e) {
@@ -67,6 +71,7 @@ export default function Sessions(props) {
       .then((res) => {
         setIsError(false);
         setFormNotification("Successfully joined course!");
+        setPage();
       })
       .catch((err) => {
         setIsError(true);
