@@ -17,8 +17,7 @@ services:
     container_name: ws_container
     build: ./websocket_server
     image: c09app:latest
-    # expose:
-    #   - 3001
+
     ports:
       - 8080:8080
     depends_on:
@@ -29,15 +28,4 @@ services:
       - DB_PASSWORD=password
       - REDIS_HOST=redis
       - PYTHON_PATH=/usr/bin/python
-  # client:
-  #   container_name: client_container
-  #   environment:
-  #     - REACT_APP_SOCKET_URL=ws://server:3001
-  #   build: ./client2
-  #   # expose:
-  #   #   - 3000
-  #   ports: 
-  #     - 3000:3000
-  #   depends_on:
-  #     - server
-# TODO: Fix client, for some reason it does not connect to the server???
+
