@@ -6,7 +6,7 @@
     - https://code-llaborate.tools/
 - Our documentation
     - https://code-llaborate.tools/api/docs/
-- Our Video
+- Our Demo Video
     - https://youtu.be/clVe42xD5Hc
 
 
@@ -62,3 +62,15 @@ Instructors have the ability to add users to other courses. Upon signing in as a
 - Learning how to deploy an application on AWS
 - Learning how to use React was an initial hurdle as most of us are not very familiar with web frameworks at all.
 - Learning how to set up our images + environments (deploy/prod) using Docker
+
+## To Run App Locally
+- Please note that docker-compose up will take a while because of our PyPy Sandbox
+
+- npm install in directory client
+- in client/src/http/socketController.js
+    - uncomment line 12
+    - comment line 13
+- run ./build.sh in root directory
+- run docker-compose up --build in root directory
+- visit localhost:8080
+
