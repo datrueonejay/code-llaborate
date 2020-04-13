@@ -138,7 +138,7 @@ function InstructorView(props) {
   const styles = useStyles();
 
   return (
-    <div className={clsx(sharedStyles.backgroundAdmin, sharedStyles.hideOverflowY)}>
+    <div className={clsx(sharedStyles.background, sharedStyles.hideOverflowY)}>
       <Logout />
       <CourseModal open={values.modal} />
       <div className={styles.centerClass}>

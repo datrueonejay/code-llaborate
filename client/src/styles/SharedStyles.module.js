@@ -27,14 +27,6 @@ let useSharedStyles = makeStyles((theme) => ({
     OBackgroundSize: "cover",
     backgroundSize: "cover",
   },
-  backgroundAdmin: {
-    background: `linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${Background}) no-repeat center center fixed`,
-    WebkitBackgroundSize: "cover",
-    MozBackgroundSize: "cover",
-    OBackgroundSize: "cover",
-    backgroundSize: "cover",
-    height: "100%",
-  },
   flexGrow: {
     flexGrow: 2,
   },
