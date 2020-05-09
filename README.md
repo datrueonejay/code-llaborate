@@ -13,16 +13,8 @@
 ## Team Members
 
 - Jacqueline Chan 
-    - 1003150190 
-    - chanja51
-
 - Jayden Arquelada 
-    - 1003195106 
-    - arquela1
-
 - Ricky Chen 
-    - 1003193876 
-    - chenric6
 
 ## A description of the web application
 
