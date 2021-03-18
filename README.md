@@ -1,11 +1,6 @@
 # Project Title : Code-llaborate
 
 ## Links
-
-- Our App
-    - https://code-llaborate.tools/
-- Our API Documentation
-    - https://code-llaborate.tools/api/docs/
 - Our Demo Video
     - https://youtu.be/clVe42xD5Hc
 
